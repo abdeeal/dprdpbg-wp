@@ -58,9 +58,13 @@ function dprd_enqueue_assets() {
 }
 add_action('wp_enqueue_scripts', 'dprd_enqueue_assets');
 
-// --- Placeholder: CPT & ACF Field Groups akan didaftarkan di sini (Fase 2) ---
-// require get_template_directory() . '/inc/post-types.php';
-// require get_template_directory() . '/inc/acf-fields.php';
-
+// --- Load CPT, Taxonomies, and Custom Systems ---
+require get_template_directory() . '/inc/post-types.php';
+require get_template_directory() . '/inc/taxonomies.php';
 require get_template_directory() . '/inc/class-repeater-field.php';
 require get_template_directory() . '/inc/options-pages.php';
+
+// Autoload all Meta Box controllers
+foreach (glob(get_template_directory() . '/inc/meta-boxes/*.php') as $file) {
+    require $file;
+}
