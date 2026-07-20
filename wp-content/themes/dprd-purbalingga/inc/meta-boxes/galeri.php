@@ -18,10 +18,35 @@ add_action('add_meta_boxes', function () {
 
 function dprd_render_galeri_meta_box($post) {
     wp_nonce_field('dprd_save_galeri_meta', 'dprd_galeri_meta_nonce');
-    $caption = get_post_meta($post->ID, 'caption', true);
-    $tanggal = get_post_meta($post->ID, 'tanggal', true);
     $image_id = get_post_meta($post->ID, 'image_id', true);
     $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'medium') : '';
+
+    // Ambil term kategori yang saat ini terpilih
+    $terms = wp_get_object_terms($post->ID, 'kategori-galeri');
+    $current_term_id = !empty($terms) && !is_wp_error($terms) ? $terms[0]->term_id : 0;
+
+    // Daftar Kategori Galeri yang ada di website live
+    $categories = [
+        'Rapat Paripurna',
+        'Rapat Komisi',
+        'Kunjungan Kerja',
+        'Reses',
+        'Audiensi & Kunjungan Tamu'
+    ];
+
+    // Pastikan kategori-kategori ini terdaftar di database
+    $options = [];
+    foreach ($categories as $cat_name) {
+        $term = get_term_by('name', $cat_name, 'kategori-galeri');
+        if (!$term) {
+            $inserted = wp_insert_term($cat_name, 'kategori-galeri');
+            if (!is_wp_error($inserted)) {
+                $options[$inserted['term_id']] = $cat_name;
+            }
+        } else {
+            $options[$term->term_id] = $cat_name;
+        }
+    }
 
     // Enqueue media uploader bawaan WordPress
     wp_enqueue_media();
@@ -77,16 +102,15 @@ function dprd_render_galeri_meta_box($post) {
             </td>
         </tr>
         <tr>
-            <th><label for="dprd_caption">Keterangan Foto (Caption)</label></th>
+            <th><label for="dprd_kategori">Kategori Kegiatan</label></th>
             <td>
-                <textarea name="caption" id="dprd_caption" rows="3" class="large-text" placeholder="Tulis penjelasan singkat mengenai foto kegiatan ini..."><?php echo esc_textarea($caption); ?></textarea>
-            </td>
-        </tr>
-        <tr>
-            <th><label for="dprd_tanggal">Tanggal Kegiatan</label></th>
-            <td>
-                <input type="date" name="tanggal" id="dprd_tanggal" value="<?php echo esc_attr($tanggal); ?>" class="regular-text">
-                <p class="description">Pilih tanggal saat kegiatan ini berlangsung.</p>
+                <select name="kategori_galeri" id="dprd_kategori" class="postform">
+                    <option value="">-- Pilih Kategori --</option>
+                    <?php foreach ($options as $id => $name): ?>
+                        <option value="<?php echo esc_attr($id); ?>" <?php selected($current_term_id, $id); ?>><?php echo esc_html($name); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <p class="description">Pilih kategori untuk memfilter foto ini di halaman website Galeri.</p>
             </td>
         </tr>
     </table>
@@ -107,10 +131,13 @@ add_action('save_post', function ($post_id) {
     if (isset($_POST['image_id'])) {
         update_post_meta($post_id, 'image_id', absint($_POST['image_id']));
     }
-    if (isset($_POST['caption'])) {
-        update_post_meta($post_id, 'caption', sanitize_textarea_field($_POST['caption']));
-    }
-    if (isset($_POST['tanggal'])) {
-        update_post_meta($post_id, 'tanggal', sanitize_text_field($_POST['tanggal']));
+    
+    if (isset($_POST['kategori_galeri'])) {
+        $term_id = absint($_POST['kategori_galeri']);
+        if ($term_id > 0) {
+            wp_set_object_terms($post_id, $term_id, 'kategori-galeri');
+        } else {
+            wp_set_object_terms($post_id, [], 'kategori-galeri');
+        }
     }
 });
