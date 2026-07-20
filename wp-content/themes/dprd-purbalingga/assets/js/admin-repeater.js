@@ -64,12 +64,21 @@
           });
           frame.on('select', function () {
             var attachment = frame.state().get('selection').first().toJSON();
-            field.querySelector('.dprd-image-id').value = attachment.id;
-            field.querySelector('.dprd-image-preview').innerHTML =
-              '<img src="' + (attachment.sizes && attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url) + '" style="max-width:60px;max-height:60px;display:block;">';
-            btn.textContent = 'Ganti Gambar';
-            field.querySelector('.dprd-remove-image').style.display = '';
-            sync();
+            var cropRatio = btn.dataset.crop;
+            console.log('Image selected!', { attachmentId: attachment.id, cropRatio: cropRatio, typeofCropper: typeof Cropper });
+            
+            if (cropRatio && typeof Cropper !== 'undefined') {
+                console.log('Opening cropper modal...');
+                openCropperModal(attachment, cropRatio, field, btn, sync);
+            } else {
+                console.log('Cropper not triggered. cropRatio:', cropRatio, 'Cropper:', typeof Cropper);
+                field.querySelector('.dprd-image-id').value = attachment.id;
+                field.querySelector('.dprd-image-preview').innerHTML =
+                  '<img src="' + (attachment.sizes && attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url) + '" style="max-width:60px;max-height:60px;display:block;">';
+                btn.textContent = 'Ganti Gambar';
+                field.querySelector('.dprd-remove-image').style.display = '';
+                sync();
+            }
           });
           frame.open();
         });
@@ -180,5 +189,104 @@
 
     // Initial sync so hidden input matches rendered state exactly
     sync();
+  }
+
+  function openCropperModal(attachment, cropRatio, field, btn, syncCallback) {
+      var ratioParts = cropRatio.split('/');
+      var ratio = ratioParts.length === 2 ? parseInt(ratioParts[0]) / parseInt(ratioParts[1]) : NaN;
+
+      var modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:999999; display:flex; flex-direction:column; align-items:center; justify-content:center;';
+      
+      var container = document.createElement('div');
+      container.style.cssText = 'width:90%; height:90%; max-width:1000px; background:#fff; padding:20px; box-sizing:border-box; border-radius:8px; display:flex; flex-direction:column;';
+      
+      var title = document.createElement('h2');
+      title.textContent = 'Sesuaikan Crop (' + cropRatio + ')';
+      title.style.cssText = 'margin-top:0;';
+      
+      var imgContainer = document.createElement('div');
+      imgContainer.style.cssText = 'flex:1; overflow:hidden; background:#333; margin-bottom:20px; display:flex; align-items:center; justify-content:center;';
+      
+      var img = document.createElement('img');
+      img.src = attachment.url;
+      img.style.maxWidth = '100%';
+      img.style.maxHeight = '100%';
+      imgContainer.appendChild(img);
+      
+      var actions = document.createElement('div');
+      actions.style.cssText = 'text-align:right; flex-shrink:0;';
+      
+      var cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'button';
+      cancelBtn.textContent = 'Batal';
+      cancelBtn.style.marginRight = '10px';
+      
+      var cropBtn = document.createElement('button');
+      cropBtn.type = 'button';
+      cropBtn.className = 'button button-primary';
+      cropBtn.textContent = 'Crop & Gunakan';
+      
+      actions.appendChild(cancelBtn);
+      actions.appendChild(cropBtn);
+      
+      container.appendChild(title);
+      container.appendChild(imgContainer);
+      container.appendChild(actions);
+      modal.appendChild(container);
+      document.body.appendChild(modal);
+
+      var cropper = new Cropper(img, {
+          aspectRatio: ratio || NaN,
+          viewMode: 2,
+      });
+
+      cancelBtn.addEventListener('click', function() {
+          cropper.destroy();
+          modal.remove();
+      });
+
+      cropBtn.addEventListener('click', function() {
+          cropBtn.textContent = 'Memproses...';
+          cropBtn.disabled = true;
+          
+          cropper.getCroppedCanvas({
+              maxWidth: 1920,
+              maxHeight: 1080
+          }).toBlob(function(blob) {
+              var formData = new FormData();
+              formData.append('action', 'dprd_upload_cropped_image');
+              formData.append('image', blob, 'cropped-' + attachment.id + '.jpg');
+              formData.append('_ajax_nonce', dprd_repeater_vars.nonce);
+
+              fetch(dprd_repeater_vars.ajax_url, {
+                  method: 'POST',
+                  body: formData
+              })
+              .then(function(res) { return res.json(); })
+              .then(function(res) {
+                  if (res.success) {
+                      field.querySelector('.dprd-image-id').value = res.data.id;
+                      field.querySelector('.dprd-image-preview').innerHTML =
+                        '<img src="' + res.data.url + '" style="max-width:60px;max-height:60px;display:block;">';
+                      btn.textContent = 'Ganti Gambar';
+                      field.querySelector('.dprd-remove-image').style.display = '';
+                      syncCallback();
+                      cropper.destroy();
+                      modal.remove();
+                  } else {
+                      alert('Gagal crop gambar: ' + (res.data || 'Error'));
+                      cropBtn.textContent = 'Crop & Gunakan';
+                      cropBtn.disabled = false;
+                  }
+              })
+              .catch(function(err) {
+                  alert('Terjadi kesalahan jaringan.');
+                  cropBtn.textContent = 'Crop & Gunakan';
+                  cropBtn.disabled = false;
+              });
+          }, 'image/jpeg', 0.9);
+      });
   }
 })();

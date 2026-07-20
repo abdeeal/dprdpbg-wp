@@ -83,19 +83,38 @@ class DPRD_Repeater_Field {
         wp_enqueue_media(); // WP media uploader untuk field image
 
         wp_enqueue_style(
+            'cropper-css',
+            'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css',
+            [],
+            '1.6.1'
+        );
+        wp_enqueue_script(
+            'cropper-js',
+            'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js',
+            [],
+            '1.6.1',
+            true
+        );
+
+        wp_enqueue_style(
             'dprd-admin-repeater',
             get_template_directory_uri() . '/assets/css/admin-repeater.css',
             [],
-            '1.0.0'
+            time()
         );
 
         wp_enqueue_script(
             'dprd-admin-repeater',
             get_template_directory_uri() . '/assets/js/admin-repeater.js',
-            [],
-            '1.0.0',
+            ['jquery', 'cropper-js'],
+            time(),
             true
         );
+
+        wp_localize_script('dprd-admin-repeater', 'dprd_repeater_vars', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce'    => wp_create_nonce('dprd_cropper_nonce')
+        ]);
     }
 
     public function register() {
@@ -202,17 +221,19 @@ class DPRD_Repeater_Field {
                 );
 
             case 'image':
+                $crop = $def['crop'] ?? '';
                 $image_url = $value ? wp_get_attachment_image_url((int) $value, 'thumbnail') : '';
                 return sprintf(
                     '<div class="dprd-image-field">
                         <input type="hidden" class="dprd-image-id" data-key="%s" value="%s">
                         <div class="dprd-image-preview">%s</div>
-                        <button type="button" class="button button-small dprd-select-image">%s</button>
+                        <button type="button" class="button button-small dprd-select-image" data-crop="%s">%s</button>
                         <button type="button" class="button-link dprd-remove-image" style="%s">Hapus gambar</button>
                     </div>',
                     esc_attr($key),
                     esc_attr($value),
                     $image_url ? '<img src="' . esc_url($image_url) . '" style="max-width:60px;max-height:60px;display:block;">' : '',
+                    esc_attr($crop),
                     $value ? 'Ganti Gambar' : 'Pilih Gambar',
                     $value ? '' : 'display:none;'
                 );
@@ -334,3 +355,35 @@ function dprd_get_option_repeater($option_name) {
     $decoded = json_decode($raw, true);
     return is_array($decoded) ? $decoded : [];
 }
+
+/**
+ * Handle AJAX upload dari Cropper.js
+ */
+add_action('wp_ajax_dprd_upload_cropped_image', function() {
+    check_ajax_referer('dprd_cropper_nonce');
+
+    if (!current_user_can('upload_files')) {
+        wp_send_json_error('Akses ditolak.');
+    }
+
+    if (empty($_FILES['image'])) {
+        wp_send_json_error('Tidak ada gambar yang diunggah.');
+    }
+
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+    require_once ABSPATH . 'wp-admin/includes/media.php';
+
+    $attachment_id = media_handle_upload('image', 0);
+    
+    if (is_wp_error($attachment_id)) {
+        wp_send_json_error($attachment_id->get_error_message());
+    }
+
+    $url = wp_get_attachment_image_url($attachment_id, 'thumbnail');
+    
+    wp_send_json_success([
+        'id'  => $attachment_id,
+        'url' => $url
+    ]);
+});

@@ -42,7 +42,7 @@ function dprd_get_banner_repeater() {
             'Banner Beranda',
             null,
             [
-                'image' => ['label' => 'Gambar', 'type' => 'image'],
+                'image' => ['label' => 'Gambar', 'type' => 'image', 'crop' => '16/9'],
                 'title' => ['label' => 'Judul', 'type' => 'text'],
                 'link'  => ['label' => 'Link', 'type' => 'url'],
             ],
@@ -79,7 +79,8 @@ function dprd_render_site_settings_page() {
         update_option('dprd_hero_stats_anggota', sanitize_text_field($_POST['dprd_hero_stats_anggota'] ?? ''));
         update_option('dprd_hero_stats_fraksi', sanitize_text_field($_POST['dprd_hero_stats_fraksi'] ?? ''));
         update_option('dprd_hero_stats_komisi', sanitize_text_field($_POST['dprd_hero_stats_komisi'] ?? ''));
-        update_option('dprd_hero_stats_periode', sanitize_text_field($_POST['dprd_hero_stats_periode'] ?? ''));
+        update_option('dprd_hero_stats_periode_mulai', sanitize_text_field($_POST['dprd_hero_stats_periode_mulai'] ?? ''));
+        update_option('dprd_hero_stats_periode_akhir', sanitize_text_field($_POST['dprd_hero_stats_periode_akhir'] ?? ''));
 
         echo '<div class="notice notice-success is-dismissible"><p>Pengaturan disimpan.</p></div>';
     }
@@ -90,7 +91,8 @@ function dprd_render_site_settings_page() {
     $stats_anggota = get_option('dprd_hero_stats_anggota', '');
     $stats_fraksi  = get_option('dprd_hero_stats_fraksi', '');
     $stats_komisi  = get_option('dprd_hero_stats_komisi', '');
-    $stats_periode = get_option('dprd_hero_stats_periode', '');
+    $stats_periode_mulai = get_option('dprd_hero_stats_periode_mulai', '');
+    $stats_periode_akhir = get_option('dprd_hero_stats_periode_akhir', '');
     ?>
     <div class="wrap">
         <h1>Pengaturan Situs DPRD Purbalingga</h1>
@@ -113,7 +115,7 @@ function dprd_render_site_settings_page() {
             <h2>Statistik Hero Beranda</h2>
             <table class="form-table">
                 <tr>
-                    <th><label for="dprd_hero_stats_anggota">Jumlah Anggota</label></th>
+                    <th><label for="dprd_hero_stats_anggota">Jumlah Anggota Dewan</label></th>
                     <td><input type="text" id="dprd_hero_stats_anggota" name="dprd_hero_stats_anggota" class="regular-text" value="<?php echo esc_attr($stats_anggota); ?>"></td>
                 </tr>
                 <tr>
@@ -125,8 +127,12 @@ function dprd_render_site_settings_page() {
                     <td><input type="text" id="dprd_hero_stats_komisi" name="dprd_hero_stats_komisi" class="regular-text" value="<?php echo esc_attr($stats_komisi); ?>"></td>
                 </tr>
                 <tr>
-                    <th><label for="dprd_hero_stats_periode">Periode</label></th>
-                    <td><input type="text" id="dprd_hero_stats_periode" name="dprd_hero_stats_periode" class="regular-text" value="<?php echo esc_attr($stats_periode); ?>" placeholder="mis. 2024-2029"></td>
+                    <th><label for="dprd_hero_stats_periode_mulai">Periode Mulai Jabatan</label></th>
+                    <td><input type="text" id="dprd_hero_stats_periode_mulai" name="dprd_hero_stats_periode_mulai" class="regular-text" value="<?php echo esc_attr($stats_periode_mulai); ?>" placeholder="mis. 2024"></td>
+                </tr>
+                <tr>
+                    <th><label for="dprd_hero_stats_periode_akhir">Periode Berakhir Jabatan</label></th>
+                    <td><input type="text" id="dprd_hero_stats_periode_akhir" name="dprd_hero_stats_periode_akhir" class="regular-text" value="<?php echo esc_attr($stats_periode_akhir); ?>" placeholder="mis. 2029"></td>
                 </tr>
             </table>
 
