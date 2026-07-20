@@ -25,27 +25,30 @@ function dprd_render_agenda_meta_box($post) {
     ?>
     <table class="form-table">
         <tr>
-            <th><label for="dprd_tanggal">Tanggal Kegiatan</label></th>
+            <th><label for="dprd_tanggal">Tanggal Agenda</label></th>
             <td>
                 <input type="date" name="tanggal" id="dprd_tanggal" value="<?php echo esc_attr($tanggal); ?>" class="regular-text">
+                <p class="description">Pilih tanggal dilaksanakannya agenda ini.</p>
             </td>
         </tr>
         <tr>
-            <th><label for="dprd_waktu">Waktu</label></th>
+            <th><label for="dprd_waktu">Waktu / Jam</label></th>
             <td>
-                <input type="text" name="waktu" id="dprd_waktu" value="<?php echo esc_attr($waktu); ?>" placeholder="Contoh: 09:00 WIB - Selesai" class="regular-text">
+                <input type="text" name="waktu" id="dprd_waktu" value="<?php echo esc_attr($waktu); ?>" placeholder="Contoh: 09.00 WIB - Selesai" class="regular-text">
+                <p class="description">Tulis jam pelaksanaan (misalnya: 09.00 WIB - Selesai, atau 10.00 - 12.00 WIB).</p>
             </td>
         </tr>
         <tr>
-            <th><label for="dprd_lokasi">Lokasi</label></th>
+            <th><label for="dprd_lokasi">Lokasi (Opsional)</label></th>
             <td>
-                <input type="text" name="lokasi" id="dprd_lokasi" value="<?php echo esc_attr($lokasi); ?>" placeholder="Contoh: Ruang Rapat Paripurna DPRD" class="large-text">
+                <input type="text" name="lokasi" id="dprd_lokasi" value="<?php echo esc_attr($lokasi); ?>" placeholder="Contoh: Ruang Rapat Paripurna" class="large-text">
+                <p class="description">Tempat pelaksanaan acara.</p>
             </td>
         </tr>
         <tr>
-            <th><label for="dprd_deskripsi">Deskripsi</label></th>
+            <th><label for="dprd_deskripsi">Keterangan Tambahan (Opsional)</label></th>
             <td>
-                <textarea name="deskripsi" id="dprd_deskripsi" rows="4" class="large-text"><?php echo esc_textarea($deskripsi); ?></textarea>
+                <textarea name="deskripsi" id="dprd_deskripsi" rows="3" class="large-text" placeholder="Tulis detail atau keterangan tambahan mengenai agenda jika ada..."><?php echo esc_textarea($deskripsi); ?></textarea>
             </td>
         </tr>
     </table>
