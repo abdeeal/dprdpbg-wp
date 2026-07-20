@@ -43,8 +43,6 @@ function dprd_get_banner_repeater() {
             null,
             [
                 'image' => ['label' => 'Gambar', 'type' => 'image', 'crop' => '16/9'],
-                'title' => ['label' => 'Judul', 'type' => 'text'],
-                'link'  => ['label' => 'Link', 'type' => 'url'],
             ],
             false
         );
@@ -76,11 +74,12 @@ function dprd_render_site_settings_page() {
         }
 
         // Hero stats (field sederhana)
-        update_option('dprd_hero_stats_anggota', sanitize_text_field($_POST['dprd_hero_stats_anggota'] ?? ''));
-        update_option('dprd_hero_stats_fraksi', sanitize_text_field($_POST['dprd_hero_stats_fraksi'] ?? ''));
-        update_option('dprd_hero_stats_komisi', sanitize_text_field($_POST['dprd_hero_stats_komisi'] ?? ''));
-        update_option('dprd_hero_stats_periode_mulai', sanitize_text_field($_POST['dprd_hero_stats_periode_mulai'] ?? ''));
-        update_option('dprd_hero_stats_periode_akhir', sanitize_text_field($_POST['dprd_hero_stats_periode_akhir'] ?? ''));
+        update_option('dprd_hero_stats_anggota', absint($_POST['dprd_hero_stats_anggota'] ?? 0));
+        update_option('dprd_hero_stats_fraksi', absint($_POST['dprd_hero_stats_fraksi'] ?? 0));
+        update_option('dprd_hero_stats_komisi', absint($_POST['dprd_hero_stats_komisi'] ?? 0));
+        update_option('dprd_hero_stats_periode_mulai', absint($_POST['dprd_hero_stats_periode_mulai'] ?? 0));
+        update_option('dprd_hero_stats_periode_akhir', absint($_POST['dprd_hero_stats_periode_akhir'] ?? 0));
+        update_option('dprd_pengumuman_strip', sanitize_text_field($_POST['dprd_pengumuman_strip'] ?? ''));
 
         echo '<div class="notice notice-success is-dismissible"><p>Pengaturan disimpan.</p></div>';
     }
@@ -93,6 +92,7 @@ function dprd_render_site_settings_page() {
     $stats_komisi  = get_option('dprd_hero_stats_komisi', '');
     $stats_periode_mulai = get_option('dprd_hero_stats_periode_mulai', '');
     $stats_periode_akhir = get_option('dprd_hero_stats_periode_akhir', '');
+    $pengumuman_strip    = get_option('dprd_pengumuman_strip', '');
     ?>
     <div class="wrap">
         <h1>Pengaturan Situs DPRD Purbalingga</h1>
@@ -105,6 +105,17 @@ function dprd_render_site_settings_page() {
                 Silakan atur menu (mendukung multi-level tanpa batas) melalui <strong><a href="<?php echo admin_url('nav-menus.php'); ?>">Appearance &gt; Menus</a></strong>.
             </p>
 
+            <h2>Strip Pengumuman (Teks Berjalan)</h2>
+            <table class="form-table">
+                <tr>
+                    <th><label for="dprd_pengumuman_strip">Teks Pengumuman</label></th>
+                    <td>
+                        <textarea id="dprd_pengumuman_strip" name="dprd_pengumuman_strip" class="large-text" rows="3" placeholder="mis. Sidang Paripurna berlangsung hari ini, pukul 09.00 WIB di Ruang Rapat Paripurna DPRD."><?php echo esc_textarea($pengumuman_strip); ?></textarea>
+                        <p class="description">Teks ini akan muncul sebagai pengumuman berjalan (marquee) di bagian atas website. Kosongkan jika tidak ada pengumuman.</p>
+                    </td>
+                </tr>
+            </table>
+
             <hr>
 
             <h2>Banner Beranda</h2>
@@ -116,23 +127,23 @@ function dprd_render_site_settings_page() {
             <table class="form-table">
                 <tr>
                     <th><label for="dprd_hero_stats_anggota">Jumlah Anggota Dewan</label></th>
-                    <td><input type="text" id="dprd_hero_stats_anggota" name="dprd_hero_stats_anggota" class="regular-text" value="<?php echo esc_attr($stats_anggota); ?>"></td>
+                    <td><input type="number" min="0" id="dprd_hero_stats_anggota" name="dprd_hero_stats_anggota" class="regular-text" value="<?php echo esc_attr($stats_anggota); ?>"></td>
                 </tr>
                 <tr>
                     <th><label for="dprd_hero_stats_fraksi">Jumlah Fraksi</label></th>
-                    <td><input type="text" id="dprd_hero_stats_fraksi" name="dprd_hero_stats_fraksi" class="regular-text" value="<?php echo esc_attr($stats_fraksi); ?>"></td>
+                    <td><input type="number" min="0" id="dprd_hero_stats_fraksi" name="dprd_hero_stats_fraksi" class="regular-text" value="<?php echo esc_attr($stats_fraksi); ?>"></td>
                 </tr>
                 <tr>
                     <th><label for="dprd_hero_stats_komisi">Jumlah Komisi</label></th>
-                    <td><input type="text" id="dprd_hero_stats_komisi" name="dprd_hero_stats_komisi" class="regular-text" value="<?php echo esc_attr($stats_komisi); ?>"></td>
+                    <td><input type="number" min="0" id="dprd_hero_stats_komisi" name="dprd_hero_stats_komisi" class="regular-text" value="<?php echo esc_attr($stats_komisi); ?>"></td>
                 </tr>
                 <tr>
                     <th><label for="dprd_hero_stats_periode_mulai">Periode Mulai Jabatan</label></th>
-                    <td><input type="text" id="dprd_hero_stats_periode_mulai" name="dprd_hero_stats_periode_mulai" class="regular-text" value="<?php echo esc_attr($stats_periode_mulai); ?>" placeholder="mis. 2024"></td>
+                    <td><input type="number" min="1900" id="dprd_hero_stats_periode_mulai" name="dprd_hero_stats_periode_mulai" class="regular-text" value="<?php echo esc_attr($stats_periode_mulai ?: ''); ?>" placeholder="mis. 2024"></td>
                 </tr>
                 <tr>
                     <th><label for="dprd_hero_stats_periode_akhir">Periode Berakhir Jabatan</label></th>
-                    <td><input type="text" id="dprd_hero_stats_periode_akhir" name="dprd_hero_stats_periode_akhir" class="regular-text" value="<?php echo esc_attr($stats_periode_akhir); ?>" placeholder="mis. 2029"></td>
+                    <td><input type="number" min="1900" id="dprd_hero_stats_periode_akhir" name="dprd_hero_stats_periode_akhir" class="regular-text" value="<?php echo esc_attr($stats_periode_akhir ?: ''); ?>" placeholder="mis. 2029"></td>
                 </tr>
             </table>
 

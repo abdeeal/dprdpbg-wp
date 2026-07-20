@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .bg-primary {
+    background-color: #A32B2E;
+  }
+  .bg-primary-light {
+    background-color: #FBEAEA;
+  }
+  .bg-secondary {
+    background-color: #33502F;
+  }
+  .bg-main {
+    background-color: #FAFAF7;
+  }
+  .bg-surface {
+    background-color: #F0EEE7;
+  }
+  .text-primary {
+    color: #A32B2E;
+  }
+  .text-accent {
+    color: #B3872E;
+  }
+  .text-ink {
+    color: #1E211D;
+  }
+  .text-secondary {
+    color: #33502F;
+  }
+  .border-line {
+    border-color: #DEDAD0;
+  }
+  .border-accent {
+    border-color: #B3872E;
+  }
+  .font-display {
+    font-family: var(--font-fraunces), serif;
+  }
+  .font-sans {
+    font-family: var(--font-jakarta), sans-serif;
+  }
+  .font-mono {
+    font-family: var(--font-jetbrains), monospace;
+  }
+  .font-montserrat {
+    font-family: var(--font-montserrat), sans-serif;
+  }
+  .rounded-card {
+    border-radius: 12px;
+  }
+  .rounded-button {
+    border-radius: 8px;
+  }
+  .rounded-badge {
+    border-radius: 4px;
+  }
+}

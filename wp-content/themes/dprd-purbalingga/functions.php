@@ -20,6 +20,17 @@ add_action('after_setup_theme', 'dprd_theme_setup');
 
 // --- Enqueue CSS & JS hasil build Vite ---
 function dprd_enqueue_assets() {
+    // Fonts
+    wp_enqueue_style(
+        'dprd-fonts',
+        'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap',
+        [],
+        null
+    );
+
+    // Default style
+    wp_enqueue_style('dprd-style', get_stylesheet_uri());
+
     $dist_path = get_template_directory() . '/assets/dist';
     $dist_uri  = get_template_directory_uri() . '/assets/dist';
 
@@ -30,8 +41,8 @@ function dprd_enqueue_assets() {
         wp_enqueue_style(
             'dprd-main-style',
             $dist_uri . '/main.css',
-            [],
-            filemtime($css_file) // cache-busting otomatis tiap build ulang
+            ['dprd-fonts'],
+            filemtime($css_file)
         );
     }
 
