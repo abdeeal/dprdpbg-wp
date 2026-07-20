@@ -58,3 +58,11 @@ add_action('save_post', function ($post_id) {
         update_post_meta($post_id, 'waktu', sanitize_text_field($_POST['waktu']));
     }
 });
+
+// Ubah placeholder "Tambahkan judul" (Add Title) khusus untuk CPT Agenda
+add_filter('enter_title_here', function ($title, $post) {
+    if ($post->post_type === 'agenda') {
+        return 'Tambahkan judul agenda';
+    }
+    return $title;
+}, 10, 2);
