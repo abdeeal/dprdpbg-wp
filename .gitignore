@@ -1,0 +1,49 @@
+# WordPress core
+/wp-admin/
+/wp-includes/
+/wp-*.php
+!wp-config-sample.php
+xmlrpc.php
+
+# Konfigurasi sensitif — WAJIB diabaikan
+wp-config.php
+wp-content/aiven-ca.pem
+*.pem
+
+# Uploads & media (biasanya tidak perlu di-version-control)
+wp-content/uploads/
+
+# Cache & backup plugin
+wp-content/cache/
+wp-content/backup*/
+wp-content/backups/
+wp-content/upgrade/
+wp-content/upgrade-temp-backup/
+
+# Plugin & theme pihak ketiga (kalau di-install manual via wp-admin, tidak perlu commit)
+wp-content/plugins/*
+!wp-content/plugins/.gitkeep
+
+# Kecuali custom theme kamu sendiri — biarkan ter-track
+!wp-content/themes/
+wp-content/themes/*
+!wp-content/themes/dprd-purbalingga/
+
+# Tool database (Adminer, dsb.) — jangan sampai ke-expose ke repo public
+adminer.php
+test-db.php
+
+# Environment & dependency
+node_modules/
+.env
+.env.local
+
+# OS & editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Log
+*.log
+error_log
