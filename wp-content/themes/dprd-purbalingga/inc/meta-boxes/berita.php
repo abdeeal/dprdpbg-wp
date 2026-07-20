@@ -19,7 +19,7 @@ add_action('add_meta_boxes', function () {
     // Meta box di bagian utama untuk metadata tambahan
     add_meta_box(
         'dprd_berita_additional_meta',
-        'Metadata Berita Tambahan',
+        'Informasi Tambahan Berita',
         'dprd_render_berita_additional_meta_box',
         'berita',
         'normal',
@@ -34,7 +34,7 @@ function dprd_render_berita_meta_box($post) {
     <p>
         <label>
             <input type="checkbox" name="isFeatured" value="1" <?php checked($is_featured, '1'); ?>>
-            Jadikan Berita Utama (Featured)
+            Tampilkan di Slide Utama (Featured)
         </label>
     </p>
     <?php
@@ -49,30 +49,30 @@ function dprd_render_berita_additional_meta_box($post) {
     ?>
     <table class="form-table">
         <tr>
-            <th><label for="dprd_day">Hari & Tanggal Override</label></th>
+            <th><label for="dprd_day">Hari & Tanggal Rilis</label></th>
             <td>
                 <input type="text" name="day" id="dprd_day" value="<?php echo esc_attr($day); ?>" placeholder="Contoh: Senin, 14 Okt 2024" class="regular-text">
-                <p class="description">Kosongkan jika ingin menggunakan format tanggal publikasi bawaan WordPress.</p>
+                <p class="description">Bisa dikosongkan. Isi jika ingin menentukan tanggal rilis sendiri.</p>
             </td>
         </tr>
         <tr>
-            <th><label for="dprd_time">Waktu Override</label></th>
+            <th><label for="dprd_time">Jam / Waktu Rilis</label></th>
             <td>
                 <input type="text" name="time" id="dprd_time" value="<?php echo esc_attr($time); ?>" placeholder="Contoh: 18.43 WIB" class="regular-text">
-                <p class="description">Kosongkan jika ingin menggunakan waktu publikasi bawaan WordPress.</p>
+                <p class="description">Bisa dikosongkan. Isi jika ingin menentukan jam rilis sendiri.</p>
             </td>
         </tr>
         <tr>
-            <th><label for="dprd_author">Penulis Override</label></th>
+            <th><label for="dprd_author">Nama Penulis / Sumber</label></th>
             <td>
                 <input type="text" name="author" id="dprd_author" value="<?php echo esc_attr($author); ?>" placeholder="Contoh: Sekretariat DPRD" class="regular-text">
-                <p class="description">Kosongkan jika ingin menggunakan nama penulis asli akun WordPress.</p>
+                <p class="description">Bisa dikosongkan. Isi jika ditulis oleh pihak lain selain akun Anda.</p>
             </td>
         </tr>
         <tr>
-            <th><label for="dprd_image_caption">Caption Gambar Utama (Featured Image)</label></th>
+            <th><label for="dprd_image_caption">Keterangan Foto Utama</label></th>
             <td>
-                <textarea name="imageCaption" id="dprd_image_caption" rows="2" class="large-text" placeholder="Masukkan caption untuk gambar utama..."><?php echo esc_textarea($image_caption); ?></textarea>
+                <textarea name="imageCaption" id="dprd_image_caption" rows="2" class="large-text" placeholder="Tulis keterangan foto atau sumber gambar utama di sini..."><?php echo esc_textarea($image_caption); ?></textarea>
             </td>
         </tr>
     </table>
