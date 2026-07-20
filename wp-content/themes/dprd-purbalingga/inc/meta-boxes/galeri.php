@@ -23,15 +23,16 @@ function dprd_render_galeri_meta_box($post) {
     ?>
     <table class="form-table">
         <tr>
-            <th><label for="dprd_caption">Caption / Deskripsi</label></th>
+            <th><label for="dprd_caption">Keterangan Foto (Caption)</label></th>
             <td>
-                <textarea name="caption" id="dprd_caption" rows="3" class="large-text"><?php echo esc_textarea($caption); ?></textarea>
+                <textarea name="caption" id="dprd_caption" rows="3" class="large-text" placeholder="Tulis penjelasan singkat mengenai foto kegiatan ini..."><?php echo esc_textarea($caption); ?></textarea>
             </td>
         </tr>
         <tr>
             <th><label for="dprd_tanggal">Tanggal Kegiatan</label></th>
             <td>
                 <input type="date" name="tanggal" id="dprd_tanggal" value="<?php echo esc_attr($tanggal); ?>" class="regular-text">
+                <p class="description">Pilih tanggal saat kegiatan ini berlangsung.</p>
             </td>
         </tr>
     </table>
