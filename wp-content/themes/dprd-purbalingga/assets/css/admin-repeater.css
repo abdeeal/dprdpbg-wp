@@ -1,0 +1,87 @@
+/**
+ * DPRD Admin Repeater — styling
+ * Pengganti tampilan ACF Repeater, dipakai di meta box post & options page.
+ */
+
+.dprd-repeater {
+  margin: 12px 0 20px;
+}
+
+.dprd-repeater-table {
+  border-collapse: collapse;
+  margin-bottom: 8px;
+}
+
+.dprd-repeater-table th {
+  text-align: left;
+  padding: 8px 10px;
+  font-weight: 600;
+}
+
+.dprd-repeater-table td {
+  padding: 8px 10px;
+  vertical-align: top;
+}
+
+.dprd-repeater-row td input[type="text"],
+.dprd-repeater-row td input[type="url"],
+.dprd-repeater-row td textarea {
+  width: 100%;
+}
+
+.dprd-row-actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.dprd-drag-handle {
+  cursor: grab;
+  opacity: 0.5;
+}
+
+.dprd-add-row {
+  margin-top: 4px;
+}
+
+/* Nested children (sub-menu navigasi) */
+.dprd-repeater-children-row > td {
+  background: #f6f7f7;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 6px 6px 10px 34px; /* indent ke kanan biar keliatan sub-item */
+}
+
+.dprd-repeater-children-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.dprd-repeater-children-table td {
+  padding: 4px 8px;
+}
+
+.dprd-repeater-child-row td input {
+  width: 100%;
+}
+
+/* Image field */
+.dprd-image-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dprd-image-preview img {
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  display: block;
+}
+
+.dprd-remove-image {
+  color: #b32d2e;
+}
+
+/* Hide raw <template> tags from layout (browsers already do this, just being explicit) */
+.dprd-repeater template {
+  display: none;
+}
