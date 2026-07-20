@@ -37,9 +37,6 @@ define( 'DB_CHARSET', 'utf8mb4' );
 /** The database collate type. Don't change this if in doubt. */
 define( 'DB_COLLATE', '' );
 
-define('MYSQL_CLIENT_FLAGS', MYSQLI_CLIENT_SSL);
-define('MYSQL_SSL_CA', ABSPATH . 'wp-content/aiven-ca.pem');
-
 /**#@+
  * Authentication unique keys and salts.
  *
@@ -51,14 +48,14 @@ define('MYSQL_SSL_CA', ABSPATH . 'wp-content/aiven-ca.pem');
  *
  * @since 2.6.0
  */
-define('AUTH_KEY',         'GE!%Hb7Xp!5b}v1XBKe%aw++d4N}]rDxyrIwvZF]PLv>&yw~0?(AkYFDPDoRiim&');
-define('SECURE_AUTH_KEY',  'r|>a$9i7W_l+/ZAqN5-1|5w6I}/Y8m:~-< =3rR#4~.}`A iwbeivP%l/2LJ46:H');
-define('LOGGED_IN_KEY',    ':{/E5vb-8)9&.:x|;XIx{(:K[V$lB4FE+kJ+(8A{Pi.t{-:q[`M%#<p&Mz--Wq/z');
-define('NONCE_KEY',        'IeR|^M;X+]{:&gNNv; g78+ +&bME)*gQWWlf;%j-6+CgS&y=<)#oo-sqJACgt)n');
-define('AUTH_SALT',        ':da9-j++,$E(t<EB|*}8(*l0`eL;y=&oJ9O,_paDMawLyk$tYzNT;c8I(.Lx pAU');
-define('SECURE_AUTH_SALT', 'pZ7|Btb}v-)FG(0k8MEK[X8zEOaQEn%oY#5n8}|@|x7tf3IN.lZ-%]*K)/kutQGI');
-define('LOGGED_IN_SALT',   '/XwtiRZ3aB}m8PZ8U!Pw$>xN5%)|(${RwPcCBGla?S(_5X|~j,+8drLIgt66;(,;');
-define('NONCE_SALT',       '@A3ai6XiAHGU@TU!<NyXJH #Cd#oz}sZc%cv]{X4q1emU5:A>V9-qLP{b)Z*d%I1');
+define( 'AUTH_KEY',         'put your unique phrase here' );
+define( 'SECURE_AUTH_KEY',  'put your unique phrase here' );
+define( 'LOGGED_IN_KEY',    'put your unique phrase here' );
+define( 'NONCE_KEY',        'put your unique phrase here' );
+define( 'AUTH_SALT',        'put your unique phrase here' );
+define( 'SECURE_AUTH_SALT', 'put your unique phrase here' );
+define( 'LOGGED_IN_SALT',   'put your unique phrase here' );
+define( 'NONCE_SALT',       'put your unique phrase here' );
 
 /**#@-*/
 

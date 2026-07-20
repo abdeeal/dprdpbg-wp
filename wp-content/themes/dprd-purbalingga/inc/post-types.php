@@ -52,13 +52,13 @@ function dprd_register_post_types() {
         'propemperda' => [
             'singular' => 'Propemperda',
             'plural'   => 'Propemperda',
-            'supports' => ['title', 'editor'],
+            'supports' => ['title'],
             'icon'     => 'dashicons-welcome-write-blog',
         ],
         'sakip' => [
             'singular' => 'SAKIP',
             'plural'   => 'SAKIP',
-            'supports' => ['title', 'editor'],
+            'supports' => ['title'],
             'icon'     => 'dashicons-analytics',
         ],
         'tokoh-sejarah' => [
@@ -98,3 +98,19 @@ function dprd_register_post_types() {
     }
 }
 add_action('init', 'dprd_register_post_types');
+
+/**
+ * Ubah teks placeholder "Tambahkan judul" agar sesuai dengan konteks masing-masing tipe konten.
+ */
+function dprd_change_title_placeholder($title, $post) {
+    switch ($post->post_type) {
+        case 'tokoh-sejarah':
+            return 'Masukkan Nama Tokoh Sejarah';
+        case 'propemperda':
+            return 'Masukkan Tahun (Contoh: Tahun 2026)';
+        case 'sakip':
+            return 'Masukkan Nama Dokumen Laporan (Contoh: Renja Sekretariat DPRD 2024)';
+    }
+    return $title;
+}
+add_filter('enter_title_here', 'dprd_change_title_placeholder', 10, 2);

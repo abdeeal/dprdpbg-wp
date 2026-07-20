@@ -70,5 +70,26 @@ function dprd_register_taxonomies() {
         'show_in_rest'      => true,
         'rewrite'           => ['slug' => 'kategori-galeri'],
     ]);
+
+    // Taksonomi Kategori untuk CPT SAKIP (Renja, Renstra, Anggaran, dsb.)
+    register_taxonomy('kategori-sakip', ['sakip'], [
+        'hierarchical'      => true,
+        'labels'            => [
+            'name'              => 'Kategori SAKIP',
+            'singular_name'     => 'Kategori SAKIP',
+            'search_items'      => 'Cari Kategori SAKIP',
+            'all_items'         => 'Semua Kategori SAKIP',
+            'edit_item'         => 'Edit Kategori SAKIP',
+            'update_item'         => 'Perbarui Kategori SAKIP',
+            'add_new_item'      => 'Tambah Kategori SAKIP Baru',
+            'new_item_name'     => 'Nama Kategori Baru',
+            'menu_name'         => 'Kategori SAKIP',
+        ],
+        'show_ui'           => true,
+        'show_admin_column' => true,
+        'query_var'         => true,
+        'show_in_rest'      => true,
+        'rewrite'           => ['slug' => 'kategori-sakip'],
+    ]);
 }
 add_action('init', 'dprd_register_taxonomies');
