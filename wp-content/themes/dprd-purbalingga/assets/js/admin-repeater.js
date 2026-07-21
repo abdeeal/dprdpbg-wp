@@ -289,4 +289,61 @@
           }, 'image/jpeg', 0.9);
       });
   }
+
+  // Points Field Event Delegation
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('dprd-add-point')) {
+      var field = e.target.closest('.dprd-points-field');
+      var list = field.querySelector('.dprd-points-list');
+      
+      var item = document.createElement('div');
+      item.className = 'dprd-point-item';
+      item.style.cssText = 'display:flex; align-items:center; gap:5px;';
+      item.innerHTML = '<span class="dashicons dashicons-editor-justify" style="color:#888;"></span>' +
+                       '<input type="text" class="widefat dprd-point-input" value="" style="flex:1;">' +
+                       '<button type="button" class="button button-link dprd-remove-single-point" style="color:#a00; padding:0 5px;" title="Hapus poin ini">×</button>';
+      list.appendChild(item);
+      item.querySelector('input').focus();
+      syncPoints(field);
+    }
+    
+    if (e.target.classList.contains('dprd-remove-last-point')) {
+      var field = e.target.closest('.dprd-points-field');
+      var list = field.querySelector('.dprd-points-list');
+      var items = list.querySelectorAll('.dprd-point-item');
+      if (items.length > 0) {
+        items[items.length - 1].remove();
+        syncPoints(field);
+      }
+    }
+    
+    if (e.target.classList.contains('dprd-remove-single-point')) {
+      var item = e.target.closest('.dprd-point-item');
+      var field = e.target.closest('.dprd-points-field');
+      item.remove();
+      syncPoints(field);
+    }
+  });
+
+  document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('dprd-point-input')) {
+      var field = e.target.closest('.dprd-points-field');
+      syncPoints(field);
+    }
+  });
+
+  function syncPoints(field) {
+    var hidden = field.querySelector('.dprd-points-hidden');
+    var points = [];
+    field.querySelectorAll('.dprd-point-input').forEach(function(input) {
+      if (input.value.trim() !== '') {
+        points.push(input.value);
+      }
+    });
+    hidden.value = JSON.stringify(points);
+    
+    // Trigger input event to bubble and trigger the main repeater sync!
+    var event = new Event('input', { bubbles: true });
+    hidden.dispatchEvent(event);
+  }
 })();

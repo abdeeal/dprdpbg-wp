@@ -28,7 +28,7 @@ function dprd_register_post_types() {
         'anggota' => [
             'singular' => 'Anggota',
             'plural'   => 'Anggota',
-            'supports' => ['title'],
+            'supports' => ['title', 'editor'],
             'icon'     => 'dashicons-groups',
         ],
         'alat-kelengkapan' => [
