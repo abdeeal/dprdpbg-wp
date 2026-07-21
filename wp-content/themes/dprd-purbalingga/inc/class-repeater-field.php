@@ -245,6 +245,35 @@ class DPRD_Repeater_Field {
                     esc_attr($value)
                 );
 
+            case 'points':
+                $points = is_array($value) ? $value : (json_decode($value, true) ?: []);
+                $points_json = esc_attr(wp_json_encode($points));
+                $html = sprintf(
+                    '<div class="dprd-points-field">
+                        <input type="hidden" class="dprd-points-hidden" data-key="%s" value="%s">
+                        <div class="dprd-points-list" style="margin-bottom:8px; display:flex; flex-direction:column; gap:5px;">',
+                    esc_attr($key),
+                    $points_json
+                );
+                if (!is_array($points)) $points = [];
+                foreach ($points as $point) {
+                    $html .= sprintf(
+                        '<div class="dprd-point-item" style="display:flex; align-items:center; gap:5px;">
+                            <span class="dashicons dashicons-editor-justify" style="color:#888;"></span>
+                            <input type="text" class="widefat dprd-point-input" value="%s" style="flex:1;">
+                            <button type="button" class="button button-link dprd-remove-single-point" style="color:#a00; padding:0 5px;" title="Hapus poin ini">×</button>
+                        </div>',
+                        esc_attr($point)
+                    );
+                }
+                $html .= '</div>';
+                $html .= '<div style="display:flex; gap:10px;">';
+                $html .= '<button type="button" class="button button-small dprd-add-point">+ Tambah Poin</button>';
+                $html .= '<button type="button" class="button button-small dprd-remove-last-point">Hapus Poin Terakhir</button>';
+                $html .= '</div>';
+                $html .= '</div>';
+                return $html;
+
             case 'text':
             default:
                 return sprintf(
@@ -296,6 +325,14 @@ class DPRD_Repeater_Field {
                     $clean_row[$key] = esc_url_raw($val);
                 } elseif ($type === 'textarea') {
                     $clean_row[$key] = sanitize_textarea_field($val);
+                } elseif ($type === 'points') {
+                    $points = is_string($val) ? json_decode($val, true) : $val;
+                    if (!is_array($points)) $points = [];
+                    $clean_points = [];
+                    foreach ($points as $p) {
+                        $clean_points[] = sanitize_text_field($p);
+                    }
+                    $clean_row[$key] = $clean_points;
                 } else {
                     $clean_row[$key] = sanitize_text_field($val);
                 }
