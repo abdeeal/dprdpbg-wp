@@ -33,17 +33,18 @@ add_action('admin_init', function() {
 });
 
 /**
- * Register meta box khusus untuk halaman dengan template page-pimpinan-dprd.php
+ * Register meta box khusus untuk pos CPT alat-kelengkapan dengan slug pimpinan-dprd
  */
-add_action('add_meta_boxes_page', function ($post) {
-    $template = get_post_meta($post->ID, '_wp_page_template', true);
-    
-    if ($template === 'page-pimpinan-dprd.php') {
+add_action('add_meta_boxes', function () {
+    global $post;
+    if (!$post || $post->post_type !== 'alat-kelengkapan') return;
+
+    if ($post->post_name === 'pimpinan-dprd') {
         add_meta_box(
             'dprd_pimpinan_page_details',
             'Dasar Penetapan Pimpinan',
             'dprd_render_pimpinan_page_details',
-            'page',
+            'alat-kelengkapan',
             'normal',
             'high'
         );
@@ -52,7 +53,7 @@ add_action('add_meta_boxes_page', function ($post) {
             'dprd_pimpinan_tugas_meta',
             'Tugas Pimpinan DPRD',
             'dprd_render_pimpinan_tugas_meta_box',
-            'page',
+            'alat-kelengkapan',
             'normal',
             'default'
         );
