@@ -9,6 +9,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Global Reset: cegah gambar meluap dari container ── */
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Reset: pastikan header img dikontrol dengan inline style ── */
+#dprd-header img {
+  max-width: none; /* biarkan inline style yang mengontrol */
+}
+
+
 :root {
   --font-fraunces: 'Fraunces', serif;
   --font-jakarta: 'Plus Jakarta Sans', sans-serif;

@@ -35,7 +35,7 @@ if ($menu_items) {
 $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga.png';
 ?>
 
-<header id="dprd-header" class="bg-white border-b border-line/50 sticky top-0 z-50">
+<header id="dprd-header" class="bg-white border-b border-line/50 sticky top-0 z-50 relative">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 h-20 flex items-center justify-between">
 
         <!-- Kiri: Tombol Menu / Tutup -->
@@ -60,8 +60,8 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
 
         <!-- Tengah: Logo + Nama -->
         <a class="flex items-center gap-3 justify-center flex-1 transition-all duration-300" href="<?php echo esc_url(home_url('/')); ?>" aria-label="Kembali ke Beranda DPRD Purbalingga">
-            <div class="relative w-9 h-11 shrink-0">
-                <img src="<?php echo esc_url($logo_url); ?>" alt="Logo DPRD Purbalingga" class="w-full h-full object-contain">
+            <div class="relative w-9 h-11 shrink-0 overflow-hidden" style="width:36px;height:44px;flex-shrink:0">
+                <img src="<?php echo esc_url($logo_url); ?>" alt="Logo DPRD Purbalingga" style="width:36px;height:44px;object-fit:contain;display:block">
             </div>
             <span class="font-sans text-[17px] font-medium text-body tracking-wide pt-0.5 whitespace-nowrap">DPRD Purbalingga</span>
         </a>
@@ -78,15 +78,14 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
             </a>
         </div>
     </div>
-</header>
 
-<!-- ── Overlay gelap saat menu terbuka ────────────────────────────────────── -->
-<div id="dprd-overlay" class="fixed inset-0 bg-ink/20 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"></div>
+    <!-- ── Overlay gelap saat menu terbuka (absolute, mulai tepat di bawah header) ── -->
+    <div id="dprd-overlay" class="absolute top-full left-0 w-screen h-screen bg-ink/20 backdrop-blur-sm z-30 hidden opacity-0 transition-opacity duration-500 ease-out"></div>
 
-<!-- ── Mega Menu Panel ─────────────────────────────────────────────────────── -->
-<div id="dprd-megamenu"
-     class="fixed top-20 left-0 w-full bg-white border-b border-line/50 shadow-xl z-50 hidden opacity-0 translate-y-[-8px] transition-all duration-300 ease-out"
-     aria-hidden="true">
+    <!-- ── Mega Menu Panel (absolute top-full = tepat di bawah header bar) ────── -->
+    <div id="dprd-megamenu"
+         class="absolute top-full left-0 w-screen bg-white border-t border-b border-line/50 shadow-xl z-40 invisible opacity-0 transition-all duration-300 ease-out"
+         aria-hidden="true">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 py-8 flex gap-0 min-h-[280px]">
 
@@ -182,3 +181,4 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
 
     </div>
 </div>
+</header>

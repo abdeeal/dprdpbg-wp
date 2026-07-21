@@ -18,19 +18,20 @@ document.addEventListener('DOMContentLoaded', () => {
         isOpen = true;
         toggle.setAttribute('aria-expanded', 'true');
         megamenu.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden'; // lock scroll
 
-        // Tampilkan elemen
-        megamenu.classList.remove('hidden');
+        // Tampilkan overlay
         overlay.classList.remove('hidden');
+        // Tampilkan mega menu: hapus invisible, tambah visible + opacity
+        megamenu.classList.remove('invisible', 'opacity-0');
+        megamenu.classList.add('opacity-100');
         requestAnimationFrame(() => {
-            megamenu.classList.remove('opacity-0', 'translate-y-[-8px]');
-            megamenu.classList.add('opacity-100', 'translate-y-0');
             overlay.classList.remove('opacity-0');
             overlay.classList.add('opacity-100');
         });
 
         // Toggle ikon
-        iconMenu.classList.add('hidden');    iconMenu.classList.remove('flex');
+        iconMenu.classList.add('hidden');     iconMenu.classList.remove('flex');
         iconClose.classList.remove('hidden'); iconClose.classList.add('flex');
     }
 
@@ -38,14 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
         isOpen = false;
         toggle.setAttribute('aria-expanded', 'false');
         megamenu.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = ''; // restore scroll
 
-        megamenu.classList.add('opacity-0', 'translate-y-[-8px]');
-        megamenu.classList.remove('opacity-100', 'translate-y-0');
+        // Sembunyikan mega menu
+        megamenu.classList.add('invisible', 'opacity-0');
+        megamenu.classList.remove('opacity-100');
         overlay.classList.add('opacity-0');
         overlay.classList.remove('opacity-100');
 
         setTimeout(() => {
-            megamenu.classList.add('hidden');
             overlay.classList.add('hidden');
         }, 300);
 
