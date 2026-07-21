@@ -22,12 +22,13 @@ if (empty($img_url)) {
     $img_url = get_template_directory_uri() . '/assets/images/default-berita.jpg'; // fallback
 }
 
-// Konten Berita dengan Dropcap otomatis pada huruf pertama
+// Konten Berita dengan Dropcap otomatis pada huruf pertama (Fase 4 - Kustom)
 $content = get_the_content();
 $content = apply_filters('the_content', $content);
-if (preg_match('/^<p>([A-Za-z])/u', $content, $matches)) {
+$content = trim($content);
+if (preg_match('/^<p[^>]*>([A-Za-z])/u', $content, $matches)) {
     $first_letter = $matches[1];
-    $content = preg_replace('/^<p>[A-Za-z]/u', '<p><span class="dropcap">' . $first_letter . '</span>', $content);
+    $content = preg_replace('/^<p([^>]*)>[A-Za-z]/u', '<p$1><span class="dropcap">' . $first_letter . '</span>', $content);
 }
 
 // Sisipkan Foto Tambahan di Tengah Paragraf (Fase 4 - Kustom)

@@ -83,13 +83,14 @@ function dprd_render_berita_additional_meta_box($post) {
             <th><label for="dprd_excerpt">Ringkasan Berita (Tampil di Halaman Depan)</label></th>
             <td>
                 <textarea name="excerpt" id="dprd_excerpt" rows="3" class="large-text" placeholder="Tulis 1-2 kalimat ringkasan singkat berita untuk ditampilkan di halaman utama..."><?php echo esc_textarea($excerpt); ?></textarea>
-                <p class="description">Teks ini akan muncul di bawah judul berita pada slide/daftar berita halaman utama.</p>
+                <p class="description">Teks ringkasan ini akan tampil di bawah judul berita pada halaman depan website. <em>*Catatan: Huruf pertama pada isi berita Anda otomatis akan diubah menjadi besar dan tebal (Gaya Dropcap) saat dibaca pengunjung, Anda tidak perlu menambahkan format apa pun.*</em></p>
             </td>
         </tr>
         <tr>
             <th><label for="dprd_image_caption">Keterangan Foto Utama</label></th>
             <td>
                 <textarea name="imageCaption" id="dprd_image_caption" rows="2" class="large-text" placeholder="Tulis keterangan foto atau sumber gambar utama di sini..."><?php echo esc_textarea($image_caption); ?></textarea>
+                <p class="description">Teks keterangan/caption singkat yang akan tampil tepat di bawah foto utama berita.</p>
             </td>
         </tr>
 
@@ -111,6 +112,7 @@ function dprd_render_berita_additional_meta_box($post) {
                     <button type="button" class="button button-secondary" id="dprd_additional_upload_button">Pilih / Unggah Foto Tambahan</button>
                     <button type="button" class="button-link" id="dprd_additional_remove_button" style="<?php echo $additional_image_id ? '' : 'display:none;'; ?> margin-left: 10px; color: #b32d2e; text-decoration: none;">Hapus Foto</button>
                 </div>
+                <p class="description" style="margin-top: 5px;">Pilih atau unggah foto pendukung tambahan untuk disisipkan di sela-sela paragraf isi berita.</p>
 
                 <script>
                 jQuery(document).ready(function($){
@@ -151,13 +153,14 @@ function dprd_render_berita_additional_meta_box($post) {
             <th><label for="dprd_additional_image_caption">Keterangan Foto Tambahan</label></th>
             <td>
                 <textarea name="additional_image_caption" id="dprd_additional_image_caption" rows="2" class="large-text" placeholder="Tulis keterangan foto tambahan di sini..."><?php echo esc_textarea($additional_image_caption); ?></textarea>
+                <p class="description">Tulis keterangan singkat/caption untuk foto tambahan di atas.</p>
             </td>
         </tr>
         <tr>
             <th><label for="dprd_additional_image_paragraph">Disisipkan pada Paragraf Ke-</label></th>
             <td>
                 <input type="number" name="additional_image_paragraph" id="dprd_additional_image_paragraph" value="<?php echo esc_attr($additional_image_paragraph); ?>" min="1" step="1" style="width: 80px;">
-                <p class="description">Masukkan nomor paragraf (contoh: 2 untuk disisipkan setelah paragraf ke-2).</p>
+                <p class="description">Tentukan setelah paragraf ke berapa foto tambahan ini akan diletakkan (Contoh: tulis 2 agar foto otomatis muncul tepat setelah paragraf kedua).</p>
             </td>
         </tr>
     </table>
