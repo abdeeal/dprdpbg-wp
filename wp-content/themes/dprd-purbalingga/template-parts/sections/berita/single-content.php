@@ -30,6 +30,37 @@ if (preg_match('/^<p>([A-Za-z])/u', $content, $matches)) {
     $content = preg_replace('/^<p>[A-Za-z]/u', '<p><span class="dropcap">' . $first_letter . '</span>', $content);
 }
 
+// Sisipkan Foto Tambahan di Tengah Paragraf (Fase 4 - Kustom)
+$additional_image_id = get_post_meta($post_id, 'additional_image_id', true);
+$additional_image_caption = get_post_meta($post_id, 'additional_image_caption', true);
+$additional_image_paragraph = get_post_meta($post_id, 'additional_image_paragraph', true);
+
+if ($additional_image_id && $additional_image_paragraph > 0) {
+    $additional_image_url = wp_get_attachment_image_url($additional_image_id, 'large');
+    if ($additional_image_url) {
+        $image_html = '
+        <figure class="my-10 w-full">
+            <div class="relative w-full aspect-[16/9] overflow-hidden rounded-card mb-3">
+                <img src="' . esc_url($additional_image_url) . '" class="object-cover w-full h-full" alt="Foto Tambahan" />
+            </div>';
+        if (!empty($additional_image_caption)) {
+            $image_html .= '<figcaption class="text-center font-sans text-xs md:text-[13px] text-body-secondary">' . esc_html($additional_image_caption) . '</figcaption>';
+        }
+        $image_html .= '</figure>';
+
+        // Pisahkan konten berdasarkan tag penutup paragraf </p>
+        $paragraphs = explode('</p>', $content);
+        $insert_index = intval($additional_image_paragraph) - 1; // 1-indexed ke 0-indexed
+        
+        if ($insert_index >= 0 && $insert_index < count($paragraphs)) {
+            $paragraphs[$insert_index] .= '</p>' . $image_html;
+            $content = implode('</p>', $paragraphs);
+        } else {
+            $content .= $image_html;
+        }
+    }
+}
+
 // Ambil Berita Terbaru untuk Sidebar (mengabaikan berita yang sedang aktif)
 $recent_news_posts = get_posts([
     'post_type'      => 'berita',
