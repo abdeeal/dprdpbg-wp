@@ -216,7 +216,9 @@ add_action('init', function() {
     );
 
     // Set flag sukses import
-    update_option('dprd_default_data_imported', tr    // --- IMPORT ALAT KELENGKAPAN GROUP (KOMISI, FRAKSI, DAN BADAN) ---
+    update_option('dprd_default_data_imported', true);
+
+    // --- IMPORT ALAT KELENGKAPAN GROUP (KOMISI, FRAKSI, DAN BADAN) ---
     if (!get_option('dprd_default_ak_group_imported_v3')) {
         // Helper untuk membuat/mendapatkan term jenis
         if (!function_exists('dprd_import_setup_term')) {
