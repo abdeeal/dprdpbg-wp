@@ -10,7 +10,8 @@ function dprd_register_post_types() {
         'berita' => [
             'singular' => 'Berita',
             'plural'   => 'Berita',
-            'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
+            'supports' => ['title', 'editor', 'thumbnail'],
+            'taxonomies' => ['post_tag'],
             'icon'     => 'dashicons-format-aside',
         ],
         'galeri' => [
@@ -87,6 +88,10 @@ function dprd_register_post_types() {
             'supports'           => $cpt['supports'],
             'rewrite'            => ['slug' => ($slug === 'alat-kelengkapan' ? 'profil-dprd' : $slug)],
         ];
+
+        if (isset($cpt['taxonomies'])) {
+            $args['taxonomies'] = $cpt['taxonomies'];
+        }
 
         register_post_type($slug, $args);
     }
