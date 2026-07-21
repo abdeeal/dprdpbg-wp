@@ -117,22 +117,4 @@ if (!defined('ABSPATH')) exit;
     ?>
 </div>
 
-<!-- 5. Banner Call to Action di Bagian Bawah -->
-<div class="w-full bg-[#A32B2E] mt-12 py-12 -mx-4 sm:-mx-6 lg:-mx-16 px-4 sm:px-6 lg:px-16">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-        <div class="text-white text-left">
-            <h3 class="font-sans font-bold text-[22px] md:text-2xl mb-1.5">Ingin Mengetahui Lebih Lanjut?</h3>
-            <p class="font-sans text-[15px] md:text-base text-white/90">Kunjungi Perpustakaan Daerah atau Sekretariat DPRD untuk dokumen sejarah lengkap.</p>
-        </div>
-        <button class="flex items-center gap-4 bg-white text-[#82111A] font-sans font-bold text-[15px] px-8 py-3.5 rounded-lg hover:bg-main transition-colors shrink-0">
-            <div class="flex flex-col items-center leading-snug">
-                <span>Perpustakaan Daerah</span>
-                <span>Purbalingga</span>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 w-6 h-6">
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-        </button>
-    </div>
-</div>
+
