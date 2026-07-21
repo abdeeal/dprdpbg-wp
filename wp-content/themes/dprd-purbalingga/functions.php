@@ -63,6 +63,7 @@ require get_template_directory() . '/inc/post-types.php';
 require get_template_directory() . '/inc/taxonomies.php';
 require get_template_directory() . '/inc/class-repeater-field.php';
 require get_template_directory() . '/inc/options-pages.php';
+require get_template_directory() . '/inc/sekilas-data.php';
 
 // Autoload all Meta Box controllers
 foreach (glob(get_template_directory() . '/inc/meta-boxes/*.php') as $file) {
