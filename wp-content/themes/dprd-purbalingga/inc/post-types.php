@@ -25,12 +25,6 @@ function dprd_register_post_types() {
             'supports' => ['title', 'editor'],
             'icon'     => 'dashicons-calendar-alt',
         ],
-        'video' => [
-            'singular' => 'Video',
-            'plural'   => 'Video',
-            'supports' => ['title', 'thumbnail'],
-            'icon'     => 'dashicons-video-alt3',
-        ],
         'anggota' => [
             'singular' => 'Anggota',
             'plural'   => 'Anggota',
