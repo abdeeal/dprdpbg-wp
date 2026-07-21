@@ -218,48 +218,52 @@ add_action('init', function() {
     // Set flag sukses import
     update_option('dprd_default_data_imported', true);
 
-    // --- IMPORT ALAT KELENGKAPAN (KOMISI & FRAKSI) ---
-    if (!get_option('dprd_default_ak_data_imported')) {
+    // --- IMPORT ALAT KELENGKAPAN GROUP (KOMISI & FRAKSI) ---
+    if (!get_option('dprd_default_ak_group_imported')) {
         // Helper untuk membuat/mendapatkan term jenis
-        function dprd_import_setup_term($name, $slug) {
-            $term = get_term_by('slug', $slug, 'jenis');
-            if (!$term) {
-                $inserted = wp_insert_term($name, 'jenis', ['slug' => $slug]);
-                if (!is_wp_error($inserted)) {
-                    return $inserted['term_id'];
+        if (!function_exists('dprd_import_setup_term')) {
+            function dprd_import_setup_term($name, $slug) {
+                $term = get_term_by('slug', $slug, 'jenis');
+                if (!$term) {
+                    $inserted = wp_insert_term($name, 'jenis', ['slug' => $slug]);
+                    if (!is_wp_error($inserted)) {
+                        return $inserted['term_id'];
+                    }
+                } else {
+                    return $term->term_id;
                 }
-            } else {
-                return $term->term_id;
+                return 0;
             }
-            return 0;
         }
 
         // Helper untuk membuat/mendapatkan post alat kelengkapan
-        function dprd_import_setup_ak($title, $slug, $term_id, $meta = []) {
-            $posts = get_posts([
-                'post_type'   => 'alat-kelengkapan',
-                'name'        => $slug,
-                'post_status' => 'any',
-                'numberposts' => 1
-            ]);
-
-            if (empty($posts)) {
-                $post_id = wp_insert_post([
-                    'post_title'  => $title,
-                    'post_name'   => $slug,
-                    'post_status' => 'publish',
+        if (!function_exists('dprd_import_setup_ak')) {
+            function dprd_import_setup_ak($title, $slug, $term_id, $meta = []) {
+                $posts = get_posts([
                     'post_type'   => 'alat-kelengkapan',
+                    'name'        => $slug,
+                    'post_status' => 'any',
+                    'numberposts' => 1
                 ]);
-            } else {
-                $post_id = $posts[0]->ID;
-            }
 
-            if ($post_id && !is_wp_error($post_id)) {
-                if ($term_id) {
-                    wp_set_post_terms($post_id, [$term_id], 'jenis');
+                if (empty($posts)) {
+                    $post_id = wp_insert_post([
+                        'post_title'  => $title,
+                        'post_name'   => $slug,
+                        'post_status' => 'publish',
+                        'post_type'   => 'alat-kelengkapan',
+                    ]);
+                } else {
+                    $post_id = $posts[0]->ID;
                 }
-                foreach ($meta as $key => $val) {
-                    update_post_meta($post_id, $key, $val);
+
+                if ($post_id && !is_wp_error($post_id)) {
+                    if ($term_id) {
+                        wp_set_post_terms($post_id, [$term_id], 'jenis');
+                    }
+                    foreach ($meta as $key => $val) {
+                        update_post_meta($post_id, $key, $val);
+                    }
                 }
             }
         }
@@ -267,81 +271,128 @@ add_action('init', function() {
         $term_komisi_id = dprd_import_setup_term('Komisi', 'komisi');
         $term_fraksi_id = dprd_import_setup_term('Fraksi', 'fraksi');
 
-        // Import Komisi I - IV
-        dprd_import_setup_ak('Komisi I', 'komisi-1', $term_komisi_id, [
-            'dprd_komisi_mitra_kerja_json' => wp_json_encode([
-                ['mitra' => 'Inspektorat Kabupaten'],
-                ['mitra' => 'Badan Kepegawaian, Pendidikan dan Pelatihan Daerah'],
-                ['mitra' => 'Dinas Pemberdayaan Masyarakat dan Desa'],
-                ['mitra' => 'Dinas Kependudukan dan Catatan Sipil'],
-                ['mitra' => 'Dinas Kearsipan dan Perpustakaan'],
-                ['mitra' => 'Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu'],
-                ['mitra' => 'Satuan Polisi Pamong Praja'],
-                ['mitra' => 'Kantor Kesatuan Bangsa dan Politik'],
-                ['mitra' => 'Bagian Hukum'],
-                ['mitra' => 'Bagian Pemerintahan'],
-                ['mitra' => 'Bagian Umum'],
-                ['mitra' => 'Bagian Organisasi dan Tata Laksana'],
-                ['mitra' => 'Bagian Humas dan Protokol'],
-                ['mitra' => 'Kecamatan'],
-                ['mitra' => 'Kelurahan']
-            ])
+        // 1. Setup Komisi Group JSON
+        $komisi_json = wp_json_encode([
+            'tipe' => 'grup',
+            'nama' => 'Komisi',
+            'children' => [
+                [
+                    'tipe' => 'badan',
+                    'nama' => 'Komisi I',
+                    'hierarki' => [],
+                    'mitra_kerja' => [
+                        'Inspektorat Kabupaten',
+                        'Badan Kepegawaian, Pendidikan dan Pelatihan Daerah',
+                        'Dinas Pemberdayaan Masyarakat dan Desa',
+                        'Dinas Kependudukan dan Catatan Sipil',
+                        'Dinas Kearsipan dan Perpustakaan',
+                        'Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu',
+                        'Satuan Polisi Pamong Praja',
+                        'Kantor Kesatuan Bangsa dan Politik',
+                        'Bagian Hukum',
+                        'Bagian Pemerintahan',
+                        'Bagian Umum',
+                        'Bagian Organisasi dan Tata Laksana',
+                        'Bagian Humas dan Protokol',
+                        'Kecamatan',
+                        'Kelurahan'
+                    ]
+                ],
+                [
+                    'tipe' => 'badan',
+                    'nama' => 'Komisi II',
+                    'hierarki' => [],
+                    'mitra_kerja' => [
+                        'Sekretariat DPRD',
+                        'Badan Keuangan Daerah',
+                        'Dinas Ketahanan Pangan dan Perikanan',
+                        'Dinas Pertanian',
+                        'Dinas Perindustrian dan Perdagangan',
+                        'Dinas Koperasi, Usaha Kecil dan Menengah',
+                        'Bagian Perekonomian',
+                        'PDAM',
+                        'Perumda BPR Artha Perwira',
+                        'Perumda Puspahastama',
+                        'Perumda BPR BKK Purbalingga',
+                        'Perumda BPR BKK Kejobong dan Rembang',
+                        'Perumda Owabong',
+                        'Bank Syariah Buana Mitra Perwira'
+                    ]
+                ],
+                [
+                    'tipe' => 'badan',
+                    'nama' => 'Komisi III',
+                    'hierarki' => [],
+                    'mitra_kerja' => [
+                        'Dinas Pendidikan dan Kebudayaan',
+                        'Dinas Pemuda, Olahraga dan Pariwisata',
+                        'Dinas Kesehatan',
+                        'Dinas Tenaga Kerja',
+                        'Dinas Sosial, Pengendalian Penduduk, Keluarga Berencana, Pemberdayaan Perempuan, dan Perlindungan Anak',
+                        'BPBD',
+                        'Bagian Kesra',
+                        'RSUD Goeteng Taroenadibrata',
+                        'RSUD Panti Nugroho'
+                    ]
+                ],
+                [
+                    'tipe' => 'badan',
+                    'nama' => 'Komisi IV',
+                    'hierarki' => [],
+                    'mitra_kerja' => [
+                        'Badan Perencanaan Pembangunan, Penelitian, dan Pengembangan Daerah',
+                        'Dinas Pekerjaan Umum dan Penataan Ruang',
+                        'Dinas Perumahan dan Permukiman',
+                        'Dinas Lingkungan Hidup',
+                        'Dinas Perhubungan',
+                        'Dinas Komunikasi dan Informatika',
+                        'Bagian Administrasi Pembangunan',
+                        'Bagian Layanan Pengadaan'
+                    ]
+                ]
+            ]
         ]);
 
-        dprd_import_setup_ak('Komisi II', 'komisi-2', $term_komisi_id, [
-            'dprd_komisi_mitra_kerja_json' => wp_json_encode([
-                ['mitra' => 'Sekretariat DPRD'],
-                ['mitra' => 'Badan Keuangan Daerah'],
-                ['mitra' => 'Dinas Ketahanan Pangan dan Perikanan'],
-                ['mitra' => 'Dinas Pertanian'],
-                ['mitra' => 'Dinas Perindustrian dan Perdagangan'],
-                ['mitra' => 'Dinas Koperasi, Usaha Kecil dan Menengah'],
-                ['mitra' => 'Bagian Perekonomian'],
-                ['mitra' => 'PDAM'],
-                ['mitra' => 'Perumda BPR Artha Perwira'],
-                ['mitra' => 'Perumda Puspahastama'],
-                ['mitra' => 'Perumda BPR BKK Purbalingga'],
-                ['mitra' => 'Perumda BPR BKK Kejobong dan Rembang'],
-                ['mitra' => 'Perumda Owabong'],
-                ['mitra' => 'Bank Syariah Buana Mitra Perwira']
-            ])
+        // 2. Setup Fraksi Group JSON
+        $fraksi_json = wp_json_encode([
+            'tipe' => 'grup',
+            'nama' => 'Fraksi',
+            'children' => [
+                ['tipe' => 'badan', 'nama' => 'Fraksi PDI Perjuangan', 'hierarki' => []],
+                ['tipe' => 'badan', 'nama' => 'Fraksi Partai Golkar', 'hierarki' => []],
+                ['tipe' => 'badan', 'nama' => 'Fraksi Partai Gerindra', 'hierarki' => []],
+                ['tipe' => 'badan', 'nama' => 'Fraksi PKB', 'hierarki' => []],
+                ['tipe' => 'badan', 'nama' => 'Fraksi PKS', 'hierarki' => []],
+                ['tipe' => 'badan', 'nama' => 'Fraksi PAN', 'hierarki' => []]
+            ]
         ]);
 
-        dprd_import_setup_ak('Komisi III', 'komisi-3', $term_komisi_id, [
-            'dprd_komisi_mitra_kerja_json' => wp_json_encode([
-                ['mitra' => 'Dinas Pendidikan dan Kebudayaan'],
-                ['mitra' => 'Dinas Pemuda, Olahraga dan Pariwisata'],
-                ['mitra' => 'Dinas Kesehatan'],
-                ['mitra' => 'Dinas Tenaga Kerja'],
-                ['mitra' => 'Dinas Sosial, Pengendalian Penduduk, Keluarga Berencana, Pemberdayaan Perempuan, dan Perlindungan Anak'],
-                ['mitra' => 'BPBD'],
-                ['mitra' => 'Bagian Kesra'],
-                ['mitra' => 'RSUD Goeteng Taroenadibrata'],
-                ['mitra' => 'RSUD Panti Nugroho']
-            ])
+        // Insert / Update pos Komisi & Fraksi Utama
+        dprd_import_setup_ak('Komisi', 'komisi', $term_komisi_id, [
+            'dprd_ak_struktur_json' => $komisi_json
+        ]);
+        dprd_import_setup_ak('Fraksi', 'fraksi', $term_fraksi_id, [
+            'dprd_ak_struktur_json' => $fraksi_json
         ]);
 
-        dprd_import_setup_ak('Komisi IV', 'komisi-4', $term_komisi_id, [
-            'dprd_komisi_mitra_kerja_json' => wp_json_encode([
-                ['mitra' => 'Badan Perencanaan Pembangunan, Penelitian, dan Pengembangan Daerah'],
-                ['mitra' => 'Dinas Pekerjaan Umum dan Penataan Ruang'],
-                ['mitra' => 'Dinas Perumahan dan Permukiman'],
-                ['mitra' => 'Dinas Lingkungan Hidup'],
-                ['mitra' => 'Dinas Perhubungan'],
-                ['mitra' => 'Dinas Komunikasi dan Informatika'],
-                ['mitra' => 'Bagian Administrasi Pembangunan'],
-                ['mitra' => 'Bagian Layanan Pengadaan']
-            ])
-        ]);
+        // Hapus post-post pecahan yang terbuat di import versi sebelumnya (jika ada)
+        $old_slugs = [
+            'komisi-1', 'komisi-2', 'komisi-3', 'komisi-4',
+            'fraksi-pdi-perjuangan', 'fraksi-partai-golkar', 'fraksi-partai-gerindra',
+            'fraksi-pkb', 'fraksi-pks', 'fraksi-pan'
+        ];
+        foreach ($old_slugs as $oslug) {
+            $oposts = get_posts([
+                'post_type' => 'alat-kelengkapan',
+                'name'      => $oslug,
+                'post_status' => 'any',
+                'numberposts' => -1
+            ]);
+            foreach ($oposts as $op) {
+                wp_delete_post($op->ID, true);
+            }
+        }
 
-        // Import Fraksi-Fraksi
-        dprd_import_setup_ak('Fraksi PDI Perjuangan', 'fraksi-pdi-perjuangan', $term_fraksi_id);
-        dprd_import_setup_ak('Fraksi Partai Golkar', 'fraksi-partai-golkar', $term_fraksi_id);
-        dprd_import_setup_ak('Fraksi Partai Gerindra', 'fraksi-partai-gerindra', $term_fraksi_id);
-        dprd_import_setup_ak('Fraksi PKB', 'fraksi-pkb', $term_fraksi_id);
-        dprd_import_setup_ak('Fraksi PKS', 'fraksi-pks', $term_fraksi_id);
-        dprd_import_setup_ak('Fraksi PAN', 'fraksi-pan', $term_fraksi_id);
-
-        update_option('dprd_default_ak_data_imported', true);
+        update_option('dprd_default_ak_group_imported', true);
     }
 });

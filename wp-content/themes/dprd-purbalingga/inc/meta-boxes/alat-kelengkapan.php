@@ -133,6 +133,28 @@ function dprd_render_ak_struktur_meta($post) {
             save();
         };
 
+        window.addMitra = function(pathStr) {
+            let path = JSON.parse(pathStr);
+            let node = getNode(path);
+            if (!node.mitra_kerja) node.mitra_kerja = [];
+            node.mitra_kerja.push('');
+            render();
+        };
+
+        window.removeMitra = function(pathStr, mIdx) {
+            let path = JSON.parse(pathStr);
+            let node = getNode(path);
+            node.mitra_kerja.splice(mIdx, 1);
+            render();
+        };
+
+        window.updateMitra = function(pathStr, mIdx, val) {
+            let path = JSON.parse(pathStr);
+            let node = getNode(path);
+            node.mitra_kerja[mIdx] = val;
+            save();
+        };
+
         function save() {
             hiddenInput.value = JSON.stringify(data);
         }
@@ -196,6 +218,22 @@ function dprd_render_ak_struktur_meta($post) {
                         </div>`;
                     });
                 }
+
+                // Render Mitra Kerja list
+                let mitras = node.mitra_kerja || [];
+                html += `<div style="border:1px solid #ccd0d4; padding:15px; margin-top:15px; background:#fff; border-radius:4px; margin-bottom:15px;">
+                    <h4 style="margin-top:0; margin-bottom:10px;">Daftar Mitra Kerja</h4>
+                    <div style="display:flex; flex-direction:column; gap:5px; margin-bottom:10px;">`;
+                mitras.forEach((m, mIdx) => {
+                    html += `<div style="display:flex; gap:5px; align-items:center;">
+                        <input type="text" class="widefat" value="${m || ''}" onchange="updateMitra('${pathStr}', ${mIdx}, this.value)" placeholder="Nama Instansi/Dinas Mitra Kerja" style="flex:1;">
+                        <button type="button" class="button" onclick="removeMitra('${pathStr}', ${mIdx})" style="color:#a00;">Hapus</button>
+                    </div>`;
+                });
+                html += `</div>
+                    <button type="button" class="button button-small" onclick="addMitra('${pathStr}')">+ Tambah Mitra Kerja</button>
+                </div>`;
+
                 html += `<div style="margin-top:10px;">
                     <button type="button" class="button" onclick="addHierarki('${pathStr}')">+ Tambah Level Hierarki</button>
                     <button type="button" class="button" onclick="removeHierarki('${pathStr}')">- Kurangi Level Hierarki</button>
