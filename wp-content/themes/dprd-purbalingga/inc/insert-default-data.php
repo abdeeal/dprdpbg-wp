@@ -10,216 +10,32 @@ if (!defined('ABSPATH')) exit;
 
 add_action('init', function() {
     // Jalankan sekali saja agar tidak menimpa pengeditan manual berikutnya
-    if (get_option('dprd_default_data_imported')) {
+    if (get_option('dprd_default_pages_cleanup_done_v2')) {
         return;
     }
 
-    // Helper untuk setup halaman dan post meta-nya
-    function dprd_import_setup_page($title, $slug, $template, $meta) {
-        $pages = get_posts([
-            'post_type'   => 'page',
-            'name'        => $slug,
-            'post_status' => 'any',
-            'numberposts' => 1
-        ]);
-
-        if (empty($pages)) {
-            $post_id = wp_insert_post([
-                'post_title'  => $title,
-                'post_name'   => $slug,
-                'post_status' => 'publish',
-                'post_type'   => 'page',
-            ]);
-        } else {
-            $post_id = $pages[0]->ID;
-        }
-
-        if ($post_id && !is_wp_error($post_id)) {
-            update_post_meta($post_id, '_wp_page_template', $template);
-            foreach ($meta as $key => $val) {
-                update_post_meta($post_id, $key, $val);
-            }
+    // Bersihkan halaman statis lama yang bentrok dengan CPT Alat Kelengkapan
+    $old_pages = [
+        'pimpinan-dprd',
+        'badan-musyawarah',
+        'badan-anggaran',
+        'bapemperda',
+        'badan-kehormatan',
+        'badan-pembentukan-peraturan-daerah'
+    ];
+    foreach ($old_pages as $oslug) {
+        $p = get_page_by_path($oslug);
+        if ($p) {
+            wp_delete_post($p->ID, true);
         }
     }
 
-    // 1. Pimpinan DPRD
-    dprd_import_setup_page(
-        'Pimpinan DPRD',
-        'pimpinan-dprd',
-        'page-pimpinan-dprd.php',
-        [
-            'dprd_pimpinan_dasar_penetapan' => 'Berdasarkan Undang-Undang Republik Indonesia, Pimpinan DPRD terdiri dari satu orang Ketua dan tiga orang Wakil Ketua untuk DPRD Kabupaten dengan jumlah anggota 45-50 orang. Komposisi pimpinan didasarkan pada urutan perolehan kursi terbanyak partai politik di tingkat Kabupaten Purbalingga hasil Pemilihan Umum Legislatif 2024.',
-            'dprd_pimpinan_note' => 'Penetapan ini diatur dalam Keputusan Gubernur Jawa Tengah dan Peraturan Tata Tertib DPRD Kabupaten Purbalingga untuk memastikan penyelenggaraan fungsi legislasi, anggaran, dan pengawasan berjalan secara kolektif kolegial.',
-            'dprd_pimpinan_tugas_json' => wp_json_encode([
-                [
-                    'kategori' => 'Kepemimpinan & Koordinasi',
-                    'icon'     => 'gavel',
-                    'poin'     => [
-                        'Memimpin sidang DPRD dan menyimpulkan hasil sidang untuk diambil keputusan.',
-                        'Menyusun rencana kerja pimpinan dan mengadakan pembagian kerja antara ketua dan wakil ketua.',
-                        'Melakukan koordinasi dalam upaya menyinergikan pelaksanaan agenda dan materi kegiatan dari alat kelengkapan DPRD.'
-                    ]
-                ],
-                [
-                    'kategori' => 'Perwakilan & Komunikasi',
-                    'icon'     => 'users',
-                    'poin'     => [
-                        'Menjadi juru bicara DPRD.',
-                        'Mewakili DPRD dalam berhubungan dengan lembaga/instansi lainnya.'
-                    ]
-                ]
-            ])
-        ]
-    );
+    update_option('dprd_default_pages_cleanup_done_v2', true);
+});
 
-    // 2. Badan Musyawarah
-    dprd_import_setup_page(
-        'Badan Musyawarah',
-        'badan-musyawarah',
-        'page-badan-musyawarah.php',
-        [
-            'dprd_badan_dasar_pembentukan' => 'Badan Musyawarah merupakan alat kelengkapan DPRD yang bersifat tetap, dibentuk oleh DPRD pada awal masa jabatan keanggotaan. Badan Musyawarah terdiri atas unsur-unsur fraksi berdasarkan perimbangan jumlah anggota, dengan jumlah anggota paling banyak setengah dari total anggota DPRD.',
-            'dprd_badan_tugas_json' => wp_json_encode([
-                [
-                    'kategori' => 'Perencanaan Agenda & Jadwal',
-                    'icon'     => 'calendar',
-                    'poin'     => [
-                        'Menetapkan agenda DPRD untuk 1 tahun sidang, 1 masa persidangan, atau sebagian masa sidang, termasuk perkiraan waktu penyelesaian masalah dan jangka waktu penyelesaian rancangan peraturan daerah — dengan tidak mengurangi kewenangan rapat paripurna untuk mengubahnya.',
-                        'Menetapkan jadwal acara rapat DPRD.'
-                    ]
-                ],
-                [
-                    'kategori' => 'Koordinasi & Pertimbangan',
-                    'icon'     => 'users',
-                    'poin'     => [
-                        'Memberikan pendapat kepada pimpinan dalam menentukan garis kebijakan yang menyangkut pelaksanaan tugas dan wewenang DPRD.',
-                        'Meminta dan/atau memberikan kesempatan kepada alat kelengkapan DPRD lain untuk memberikan keterangan/penjelasan mengenai pelaksanaan tugas masing-masing.',
-                        'Memberikan saran/pendapat untuk memperlancar kegiatan.'
-                    ]
-                ],
-                [
-                    'kategori' => 'Rekomendasi & Tugas Lain',
-                    'icon'     => 'file-text',
-                    'poin'     => [
-                        'Merekomendasikan pembentukan panitia khusus.',
-                        'Melaksanakan tugas lain yang diserahkan oleh rapat paripurna kepada Badan Musyawarah.'
-                    ]
-                ]
-            ])
-        ]
-    );
-
-    // 3. Badan Anggaran
-    dprd_import_setup_page(
-        'Badan Anggaran',
-        'badan-anggaran',
-        'page-badan-anggaran.php',
-        [
-            'dprd_badan_dasar_pembentukan' => 'Badan Anggaran merupakan alat kelengkapan DPRD yang bersifat tetap, dibentuk oleh DPRD pada awal masa jabatan keanggotaan.',
-            'dprd_badan_tugas_json' => wp_json_encode([
-                [
-                    'kategori' => 'Perencanaan & Pembahasan KUA-PPAS',
-                    'icon'     => 'calendar',
-                    'poin'     => [
-                        'Memberikan saran dan pendapat berupa pokok-pokok pikiran DPRD kepada Bupati dalam mempersiapkan RAPBD, paling lambat 5 (lima) bulan sebelum APBD ditetapkan.',
-                        'Melakukan konsultasi (dapat diwakili anggota) kepada komisi terkait untuk memperoleh masukan dalam pembahasan rancangan kebijakan umum APBD serta prioritas dan plafon anggaran sementara.',
-                        'Melakukan pembahasan bersama tim anggaran pemerintah daerah (TAPD) terhadap rancangan kebijakan umum APBD serta rancangan prioritas dan plafon anggaran sementara yang disampaikan Bupati.'
-                    ]
-                ],
-                [
-                    'kategori' => 'Penyusunan & Evaluasi APBD',
-                    'icon'     => 'file-text',
-                    'poin'     => [
-                        'Memberikan saran dan pendapat kepada Bupati dalam mempersiapkan raperda perubahan APBD dan raperda pertanggungjawaban pelaksanaan APBD.',
-                        'Melakukan penyelarasan hasil pembahasan komisi-komisi dalam pembahasan RAPBD dan perubahan APBD, disesuaikan dengan kemampuan keuangan daerah.',
-                        'Melakukan penyempurnaan raperda APBD dan raperda pertanggungjawaban pelaksanaan APBD berdasarkan hasil evaluasi Gubernur bersama TAPD.'
-                    ]
-                ],
-                [
-                    'kategori' => 'Anggaran Internal DPRD',
-                    'icon'     => 'wallet',
-                    'poin'     => [
-                        'Memberikan saran kepada pimpinan dalam penyusunan anggaran belanja DPRD.'
-                    ]
-                ]
-            ])
-        ]
-    );
-
-    // 4. Bapemperda
-    dprd_import_setup_page(
-        'Badan Pembentukan Peraturan Daerah',
-        'badan-pembentukan-peraturan-daerah',
-        'page-bapemperda.php',
-        [
-            'dprd_badan_dasar_pembentukan' => 'Badan Pembentukan Peraturan Daerah (Bapemperda) merupakan alat kelengkapan DPRD yang bersifat tetap, dibentuk dalam rapat paripurna.',
-            'dprd_badan_tugas_json' => wp_json_encode([
-                [
-                    'kategori' => 'Perencanaan Program Legislasi',
-                    'icon'     => 'calendar',
-                    'poin'     => [
-                        'Menyusun rancangan program legislasi daerah yang memuat daftar urutan dan prioritas raperda beserta alasannya untuk setiap tahun anggaran di lingkungan DPRD.',
-                        'Mengkoordinasikan penyusunan program legislasi daerah antara DPRD dan pemerintah daerah yang telah ditetapkan.'
-                    ]
-                ],
-                [
-                    'kategori' => 'Harmonisasi & Evaluasi Raperda',
-                    'icon'     => 'scale',
-                    'poin'     => [
-                        'Melakukan pengharmonisasian, pembulatan, dan pemantapan konsepsi raperda yang diajukan anggota, komisi, dan/atau gabungan komisi, di luar prioritas raperda tahun berjalan atau di luar raperda yang terdaftar dalam program legislasi daerah.',
-                        'Memberikan pertimbangan terhadap raperda yang diajukan anggota, komisi, dan/atau gabungan komisi, di luar prioritas raperda tahun berjalan atau di luar raperda yang terdaftar dalam program legislasi daerah.',
-                        'Mengikuti perkembangan dan melakukan evaluasi terhadap pembahasan materi muatan raperda melalui koordinasi dengan komisi and/atau panitia khusus.'
-                    ]
-                ],
-                [
-                    'kategori' => 'Pelaporan & Rekomendasi',
-                    'icon'     => 'file-text',
-                    'poin'     => [
-                        'Memberikan masukan kepada pimpinan DPRD atas raperda yang ditugaskan oleh Badan Musyawarah.',
-                        'Membuat laporan kinerja pada masa akhir keanggotaan DPRD — baik yang sudah maupun belum terselesaikan — sebagai bahan bagi komisi pada masa keanggotaan berikutnya.'
-                    ]
-                ]
-            ])
-        ]
-    );
-
-    // 5. Badan Kehormatan
-    dprd_import_setup_page(
-        'Badan Kehormatan',
-        'badan-kehormatan',
-        'page-badan-kehormatan.php',
-        [
-            'dprd_bk_dasar_pembentukan' => 'Badan Kehormatan dibentuk oleh DPRD dan merupakan alat kelengkapan DPRD yang bersifat tetap.',
-            'dprd_bk_jumlah_anggota' => '5 Orang',
-            'dprd_bk_jumlah_anggota_desc' => "JUMLAH ANGGOTA\nDipilih dari dan oleh anggota DPRD",
-            'dprd_bk_masa_tugas' => '2,5 Tahun',
-            'dprd_bk_masa_tugas_desc' => 'MASA TUGAS MAKSIMAL',
-            'dprd_bk_sanksi_json' => wp_json_encode([
-                [
-                    'sanksi'     => 'Teguran lisan',
-                    'keterangan' => ''
-                ],
-                [
-                    'sanksi'     => 'Teguran tertulis',
-                    'keterangan' => ''
-                ],
-                [
-                    'sanksi'     => 'Pemberhentian sebagai pimpinan alat kelengkapan DPRD',
-                    'keterangan' => ''
-                ],
-                [
-                    'sanksi'     => 'Pemberhentian sebagai anggota DPRD',
-                    'keterangan' => 'Sesuai ketentuan peraturan perundang-undangan'
-                ]
-            ])
-        ]
-    );
-
-    // Set flag sukses import
-    update_option('dprd_default_data_imported', true);
-
-    // --- IMPORT ALAT KELENGKAPAN GROUP (KOMISI, FRAKSI, DAN BADAN) ---
-    if (!get_option('dprd_default_ak_group_imported_v5')) {
+// --- IMPORT ALAT KELENGKAPAN GROUP (KOMISI, FRAKSI, DAN BADAN) ---
+add_action('init', function() {
+    if (!get_option('dprd_default_ak_group_imported_v9')) {
         // Helper untuk membuat/mendapatkan term jenis
         if (!function_exists('dprd_import_setup_term')) {
             function dprd_import_setup_term($name, $slug) {
@@ -266,7 +82,7 @@ add_action('init', function() {
 
         // Helper untuk membuat/mendapatkan post alat kelengkapan
         if (!function_exists('dprd_import_setup_ak')) {
-            function dprd_import_setup_ak($title, $slug, $term_id, $meta = []) {
+            function dprd_import_setup_ak($title, $slug, $term_id, $meta = [], $date = '') {
                 $posts = get_posts([
                     'post_type'   => 'alat-kelengkapan',
                     'name'        => $slug,
@@ -274,15 +90,25 @@ add_action('init', function() {
                     'numberposts' => 1
                 ]);
 
+                $post_arr = [
+                    'post_title'  => $title,
+                    'post_name'   => $slug,
+                    'post_status' => 'publish',
+                    'post_type'   => 'alat-kelengkapan',
+                ];
+                if ($date) {
+                    $post_arr['post_date'] = $date;
+                    $post_arr['post_date_gmt'] = get_gmt_from_date($date);
+                }
+
                 if (empty($posts)) {
-                    $post_id = wp_insert_post([
-                        'post_title'  => $title,
-                        'post_name'   => $slug,
-                        'post_status' => 'publish',
-                        'post_type'   => 'alat-kelengkapan',
-                    ]);
+                    $post_id = wp_insert_post($post_arr);
                 } else {
                     $post_id = $posts[0]->ID;
+                    if ($date) {
+                        $post_arr['ID'] = $post_id;
+                        wp_update_post($post_arr);
+                    }
                 }
 
                 if ($post_id && !is_wp_error($post_id)) {
@@ -293,6 +119,7 @@ add_action('init', function() {
                         update_post_meta($post_id, $key, $val);
                     }
                 }
+                return $post_id;
             }
         }
 
@@ -578,16 +405,44 @@ add_action('init', function() {
             ]
         ]);
 
-        // Insert / Update pos Komisi & Fraksi Utama
-        dprd_import_setup_ak('Komisi', 'komisi', $term_komisi_id, [
-            'dprd_ak_struktur_json' => $komisi_json
-        ]);
-        dprd_import_setup_ak('Fraksi', 'fraksi', $term_fraksi_id, [
-            'dprd_ak_struktur_json' => $fraksi_json
-        ]);
+        // 1. Pimpinan DPRD
+        dprd_import_setup_ak('Pimpinan DPRD', 'pimpinan-dprd', 0, [
+            'dprd_pimpinan_dasar_penetapan' => 'Berdasarkan Undang-Undang Republik Indonesia, Pimpinan DPRD terdiri dari satu orang Ketua dan tiga orang Wakil Ketua untuk DPRD Kabupaten dengan jumlah anggota 45-50 orang. Komposisi pimpinan didasarkan pada urutan perolehan kursi terbanyak partai politik di tingkat Kabupaten Purbalingga hasil Pemilihan Umum Legislatif 2024.',
+            'dprd_pimpinan_note' => 'Penetapan ini diatur dalam Keputusan Gubernur Jawa Tengah dan Peraturan Tata Tertib DPRD Kabupaten Purbalingga untuk memastikan penyelenggaraan fungsi legislasi, anggaran, dan pengawasan berjalan secara kolektif kolegial.',
+            'dprd_pimpinan_tugas_json' => wp_json_encode([
+                [
+                    'kategori' => 'Kepemimpinan & Koordinasi',
+                    'icon'     => 'gavel',
+                    'poin'     => [
+                        'Memimpin sidang DPRD and menyimpulkan hasil sidang untuk diambil keputusan.',
+                        'Menyusun rencana kerja pimpinan dan mengadakan pembagian kerja antara ketua dan wakil ketua.',
+                        'Melakukan koordinasi dalam upaya menyinergikan pelaksanaan agenda dan materi kegiatan dari alat kelengkapan DPRD.'
+                    ]
+                ],
+                [
+                    'kategori' => 'Perwakilan & Komunikasi',
+                    'icon'     => 'users',
+                    'poin'     => [
+                        'Menjadi juru bicara DPRD.',
+                        'Mewakili DPRD dalam berhubungan dengan lembaga/instansi lainnya.',
+                        'Mengadakan konsultasi dengan bupati dan pimpinan lembaga/instansi lainnya sesuai dengan keputusan DPRD.',
+                        'Mewakili DPRD di pengadilan.'
+                    ]
+                ],
+                [
+                    'kategori' => 'Administrasi & Akuntabilitas',
+                    'icon'     => 'file-text',
+                    'poin'     => [
+                        'Melaksanakan dan memasyarakatkan keputusan DPRD.',
+                        'Melaksanakan keputusan DPRD berkenaan dengan penetapan sanksi atau rehabilitasi anggota sesuai dengan ketentuan peraturan.',
+                        'Menyusun rencana anggaran DPRD bersama sekretariat DPRD yang pengesahannya dilakukan dalam rapat paripurna.',
+                        'Menyampaikan laporan kinerja pimpinan dalam rapat paripurna yang khusus diadakan untuk itu.'
+                    ]
+                ]
+            ])
+        ], '2026-07-21 12:00:06');
 
-        // 4. Setup Board Posts in CPT alat-kelengkapan
-        // a. Badan Musyawarah
+        // 2. Badan Musyawarah
         $bamus_json = wp_json_encode([
             'tipe' => 'badan',
             'nama' => 'Badan Musyawarah',
@@ -620,10 +475,38 @@ add_action('init', function() {
             ]
         ]);
         dprd_import_setup_ak('Badan Musyawarah', 'badan-musyawarah', $term_badan_id, [
-            'dprd_ak_struktur_json' => $bamus_json
-        ]);
+            'dprd_ak_struktur_json' => $bamus_json,
+            'dprd_badan_dasar_pembentukan' => 'Badan Musyawarah merupakan alat kelengkapan DPRD yang bersifat tetap, dibentuk oleh DPRD pada awal masa jabatan keanggotaan. Badan Musyawarah terdiri atas unsur-unsur fraksi berdasarkan perimbangan jumlah anggota, dengan jumlah anggota paling banyak setengah dari total anggota DPRD.',
+            'dprd_badan_tugas_json' => wp_json_encode([
+                [
+                    'kategori' => 'Perencanaan Agenda & Jadwal',
+                    'icon'     => 'calendar',
+                    'poin'     => [
+                        'Menetapkan agenda DPRD untuk 1 tahun sidang, 1 masa persidangan, atau sebagian masa sidang, termasuk perkiraan waktu penyelesaian masalah dan jangka waktu penyelesaian rancangan peraturan daerah — dengan tidak mengurangi kewenangan rapat paripurna untuk mengubahnya.',
+                        'Menetapkan jadwal acara rapat DPRD.'
+                    ]
+                ],
+                [
+                    'kategori' => 'Koordinasi & Pertimbangan',
+                    'icon'     => 'users',
+                    'poin'     => [
+                        'Memberikan pendapat kepada pimpinan dalam menentukan garis kebijakan yang menyangkut pelaksanaan tugas dan wewenang DPRD.',
+                        'Meminta dan/atau memberikan kesempatan kepada alat kelengkapan DPRD lain untuk memberikan keterangan/penjelasan mengenai pelaksanaan tugas masing-masing.',
+                        'Memberikan saran/pendapat untuk memperlancar kegiatan.'
+                    ]
+                ],
+                [
+                    'kategori' => 'Rekomendasi & Tugas Lain',
+                    'icon'     => 'file-text',
+                    'poin'     => [
+                        'Merekomendasikan pembentukan panitia khusus.',
+                        'Melaksanakan tugas lain yang diserahkan oleh rapat paripurna kepada Badan Musyawarah.'
+                    ]
+                ]
+            ])
+        ], '2026-07-21 12:00:05');
 
-        // b. Badan Anggaran
+        // 3. Badan Anggaran
         $banggar_json = wp_json_encode([
             'tipe' => 'badan',
             'nama' => 'Badan Anggaran',
@@ -656,13 +539,41 @@ add_action('init', function() {
             ]
         ]);
         dprd_import_setup_ak('Badan Anggaran', 'badan-anggaran', $term_badan_id, [
-            'dprd_ak_struktur_json' => $banggar_json
-        ]);
+            'dprd_ak_struktur_json' => $banggar_json,
+            'dprd_badan_dasar_pembentukan' => 'Badan Anggaran merupakan alat kelengkapan DPRD yang bersifat tetap, dibentuk oleh DPRD pada awal masa jabatan keanggotaan.',
+            'dprd_badan_tugas_json' => wp_json_encode([
+                [
+                    'kategori' => 'Perencanaan & Pembahasan KUA-PPAS',
+                    'icon'     => 'calendar',
+                    'poin'     => [
+                        'Memberikan saran dan pendapat berupa pokok-pokok pikiran DPRD kepada Bupati dalam mempersiapkan RAPBD, paling lambat 5 (lima) bulan sebelum APBD ditetapkan.',
+                        'Melakukan konsultasi (dapat diwakili anggota) kepada komisi terkait untuk memperoleh masukan dalam pembahasan rancangan kebijakan umum APBD serta prioritas dan plafon anggaran sementara.',
+                        'Melakukan pembahasan bersama tim anggaran pemerintah daerah (TAPD) terhadap rancangan kebijakan umum APBD serta rancangan prioritas dan plafon anggaran sementara yang disampaikan Bupati.'
+                    ]
+                ],
+                [
+                    'kategori' => 'Penyusunan & Evaluasi APBD',
+                    'icon'     => 'file-text',
+                    'poin'     => [
+                        'Memberikan saran dan pendapat kepada Bupati dalam mempersiapkan raperda perubahan APBD dan raperda pertanggungjawaban pelaksanaan APBD.',
+                        'Melakukan penyelarasan hasil pembahasan komisi-komisi dalam pembahasan RAPBD dan perubahan APBD, disesuaikan dengan kemampuan keuangan daerah.',
+                        'Melakukan penyempurnaan raperda APBD dan raperda pertanggungjawaban pelaksanaan APBD berdasarkan hasil evaluasi Gubernur bersama TAPD.'
+                    ]
+                ],
+                [
+                    'kategori' => 'Anggaran Internal DPRD',
+                    'icon'     => 'wallet',
+                    'poin'     => [
+                        'Memberikan saran kepada pimpinan dalam penyusunan anggaran belanja DPRD.'
+                    ]
+                ]
+            ])
+        ], '2026-07-21 12:00:04');
 
-        // c. Bapemperda
+        // 4. Badan Pembentukan Peraturan Daerah
         $bapemperda_json = wp_json_encode([
             'tipe' => 'badan',
-            'nama' => 'Bapemperda',
+            'nama' => 'Badan Pembentukan Peraturan Daerah',
             'hierarki' => [
                 [
                     'members' => [
@@ -682,11 +593,39 @@ add_action('init', function() {
                 ]
             ]
         ]);
-        dprd_import_setup_ak('Bapemperda', 'bapemperda', $term_badan_id, [
-            'dprd_ak_struktur_json' => $bapemperda_json
-        ]);
+        dprd_import_setup_ak('Badan Pembentukan Peraturan Daerah', 'badan-pembentukan-peraturan-daerah', $term_badan_id, [
+            'dprd_ak_struktur_json' => $bapemperda_json,
+            'dprd_badan_dasar_pembentukan' => 'Badan Pembentukan Peraturan Daerah (Bapemperda) merupakan alat kelengkapan DPRD yang bersifat tetap, dibentuk dalam rapat paripurna.',
+            'dprd_badan_tugas_json' => wp_json_encode([
+                [
+                    'kategori' => 'Perencanaan Program Legislasi',
+                    'icon'     => 'calendar',
+                    'poin'     => [
+                        'Menyusun rancangan program legislasi daerah yang memuat daftar urutan dan prioritas raperda beserta alasannya untuk setiap tahun anggaran di lingkungan DPRD.',
+                        'Mengkoordinasikan penyusunan program legislasi daerah antara DPRD dan pemerintah daerah yang telah ditetapkan.'
+                    ]
+                ],
+                [
+                    'kategori' => 'Harmonisasi & Evaluasi Raperda',
+                    'icon'     => 'scale',
+                    'poin'     => [
+                        'Melakukan pengharmonisasian, pembulatan, dan pemantapan konsepsi raperda yang diajukan anggota, komisi, dan/atau gabungan komisi, di luar prioritas raperda tahun berjalan atau di luar raperda yang terdaftar dalam program legislasi daerah.',
+                        'Memberikan pertimbangan terhadap raperda yang diajukan anggota, komisi, dan/atau gabungan komisi, di luar prioritas raperda tahun berjalan atau di luar raperda yang terdaftar dalam program legislasi daerah.',
+                        'Mengikuti perkembangan dan melakukan evaluasi terhadap pembahasan materi muatan raperda melalui koordinasi dengan komisi dan/atau panitia khusus.'
+                    ]
+                ],
+                [
+                    'kategori' => 'Pelaporan & Rekomendasi',
+                    'icon'     => 'file-text',
+                    'poin'     => [
+                        'Memberikan masukan kepada pimpinan DPRD atas raperda yang ditugaskan oleh Badan Musyawarah.',
+                        'Membuat laporan kinerja pada masa akhir keanggotaan DPRD — baik yang sudah maupun belum terselesaikan — sebagai bahan bagi komisi pada masa keanggotaan berikutnya.'
+                    ]
+                ]
+            ])
+        ], '2026-07-21 12:00:03');
 
-        // d. Badan Kehormatan
+        // 5. Badan Kehormatan
         $bk_json = wp_json_encode([
             'tipe' => 'badan',
             'nama' => 'Badan Kehormatan',
@@ -711,14 +650,47 @@ add_action('init', function() {
             ]
         ]);
         dprd_import_setup_ak('Badan Kehormatan', 'badan-kehormatan', $term_badan_id, [
-            'dprd_ak_struktur_json' => $bk_json
-        ]);
+            'dprd_ak_struktur_json' => $bk_json,
+            'dprd_bk_dasar_pembentukan' => 'Badan Kehormatan dibentuk oleh DPRD dan merupakan alat kelengkapan DPRD yang bersifat tetap.',
+            'dprd_bk_jumlah_anggota' => '5 Orang',
+            'dprd_bk_jumlah_anggota_desc' => "JUMLAH ANGGOTA\nDipilih dari dan oleh anggota DPRD",
+            'dprd_bk_masa_tugas' => '2,5 Tahun',
+            'dprd_bk_masa_tugas_desc' => 'MASA TUGAS MAKSIMAL',
+            'dprd_bk_sanksi_json' => wp_json_encode([
+                [
+                    'sanksi'     => 'Teguran lisan',
+                    'keterangan' => ''
+                ],
+                [
+                    'sanksi'     => 'Teguran tertulis',
+                    'keterangan' => ''
+                ],
+                [
+                    'sanksi'     => 'Pemberhentian sebagai pimpinan alat kelengkapan DPRD',
+                    'keterangan' => ''
+                ],
+                [
+                    'sanksi'     => 'Pemberhentian sebagai anggota DPRD',
+                    'keterangan' => 'Sesuai ketentuan peraturan perundang-undangan'
+                ]
+            ])
+        ], '2026-07-21 12:00:02');
+
+        // 6. Komisi
+        dprd_import_setup_ak('Komisi', 'komisi', $term_komisi_id, [
+            'dprd_ak_struktur_json' => $komisi_json
+        ], '2026-07-21 12:00:01');
+
+        // 7. Fraksi
+        dprd_import_setup_ak('Fraksi', 'fraksi', $term_fraksi_id, [
+            'dprd_ak_struktur_json' => $fraksi_json
+        ], '2026-07-21 12:00:00');
 
         // Hapus post-post pecahan yang terbuat di import versi sebelumnya (jika ada)
         $old_slugs = [
             'komisi-1', 'komisi-2', 'komisi-3', 'komisi-4',
             'fraksi-pdi-perjuangan', 'fraksi-partai-golkar', 'fraksi-partai-gerindra',
-            'fraksi-pkb', 'fraksi-pks', 'fraksi-pan'
+            'fraksi-pkb', 'fraksi-pks', 'fraksi-pan', 'bapemperda'
         ];
         foreach ($old_slugs as $oslug) {
             $oposts = get_posts([
@@ -732,6 +704,6 @@ add_action('init', function() {
             }
         }
 
-        update_option('dprd_default_ak_group_imported_v5', true);
+        update_option('dprd_default_ak_group_imported_v9', true);
     }
 });

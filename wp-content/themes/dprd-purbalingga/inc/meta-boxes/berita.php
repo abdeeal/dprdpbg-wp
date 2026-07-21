@@ -47,6 +47,15 @@ function dprd_render_berita_additional_meta_box($post) {
     $author = get_post_meta($post->ID, 'author', true);
     $excerpt = get_post_meta($post->ID, 'excerpt', true);
     $image_caption = get_post_meta($post->ID, 'imageCaption', true);
+    
+    // Fields untuk Foto Tambahan di Tengah Paragraf
+    $additional_image_id = get_post_meta($post->ID, 'additional_image_id', true);
+    $additional_image_caption = get_post_meta($post->ID, 'additional_image_caption', true);
+    $additional_image_paragraph = get_post_meta($post->ID, 'additional_image_paragraph', true);
+    
+    $additional_image_url = $additional_image_id ? wp_get_attachment_image_url($additional_image_id, 'medium') : '';
+
+    wp_enqueue_media();
     ?>
     <table class="form-table">
         <tr>
@@ -74,13 +83,84 @@ function dprd_render_berita_additional_meta_box($post) {
             <th><label for="dprd_excerpt">Ringkasan Berita (Tampil di Halaman Depan)</label></th>
             <td>
                 <textarea name="excerpt" id="dprd_excerpt" rows="3" class="large-text" placeholder="Tulis 1-2 kalimat ringkasan singkat berita untuk ditampilkan di halaman utama..."><?php echo esc_textarea($excerpt); ?></textarea>
-                <p class="description">Teks ini akan muncul di bawah judul berita pada slide/daftar berita halaman utama.</p>
+                <p class="description">Teks ringkasan ini akan tampil di bawah judul berita pada halaman depan website. <em>*Catatan: Huruf pertama pada isi berita Anda otomatis akan diubah menjadi besar dan tebal (Gaya Dropcap) saat dibaca pengunjung, Anda tidak perlu menambahkan format apa pun.*</em></p>
             </td>
         </tr>
         <tr>
             <th><label for="dprd_image_caption">Keterangan Foto Utama</label></th>
             <td>
                 <textarea name="imageCaption" id="dprd_image_caption" rows="2" class="large-text" placeholder="Tulis keterangan foto atau sumber gambar utama di sini..."><?php echo esc_textarea($image_caption); ?></textarea>
+                <p class="description">Teks keterangan/caption singkat yang akan tampil tepat di bawah foto utama berita.</p>
+            </td>
+        </tr>
+
+        <!-- Pembatas Sisi Foto Tambahan -->
+        <tr>
+            <td colspan="2"><hr style="border:0; border-top:1px solid #ccc; margin: 10px 0;"></td>
+        </tr>
+
+        <tr>
+            <th><label>Foto Tambahan (Di Tengah Paragraf)</label></th>
+            <td>
+                <div class="dprd-meta-image-uploader">
+                    <input type="hidden" name="additional_image_id" id="dprd_additional_image_id" value="<?php echo esc_attr($additional_image_id); ?>">
+                    <div id="dprd_additional_image_preview" style="margin-bottom: 10px;">
+                        <?php if ($additional_image_url): ?>
+                            <img src="<?php echo esc_url($additional_image_url); ?>" style="max-width: 200px; max-height: 200px; display: block; border: 1px solid #ccc; padding: 4px; border-radius: 4px;">
+                        <?php endif; ?>
+                    </div>
+                    <button type="button" class="button button-secondary" id="dprd_additional_upload_button">Pilih / Unggah Foto Tambahan</button>
+                    <button type="button" class="button-link" id="dprd_additional_remove_button" style="<?php echo $additional_image_id ? '' : 'display:none;'; ?> margin-left: 10px; color: #b32d2e; text-decoration: none;">Hapus Foto</button>
+                </div>
+                <p class="description" style="margin-top: 5px;">Pilih atau unggah foto pendukung tambahan untuk disisipkan di sela-sela paragraf isi berita.</p>
+
+                <script>
+                jQuery(document).ready(function($){
+                    var file_frame;
+                    $('#dprd_additional_upload_button').on('click', function(e){
+                        e.preventDefault();
+                        if (file_frame) {
+                            file_frame.open();
+                            return;
+                        }
+                        file_frame = wp.media.frames.file_frame = wp.media({
+                            title: 'Pilih atau Unggah Foto Tambahan',
+                            button: {
+                                text: 'Gunakan Foto Ini'
+                            },
+                            multiple: false
+                        });
+                        file_frame.on('select', function() {
+                            var attachment = file_frame.state().get('selection').first().toJSON();
+                            $('#dprd_additional_image_id').val(attachment.id);
+                            $('#dprd_additional_image_preview').html('<img src="'+attachment.url+'" style="max-width: 200px; max-height: 200px; display: block; border: 1px solid #ccc; padding: 4px; border-radius: 4px;">');
+                            $('#dprd_additional_remove_button').show();
+                        });
+                        file_frame.open();
+                    });
+
+                    $('#dprd_additional_remove_button').on('click', function(e){
+                        e.preventDefault();
+                        $('#dprd_additional_image_id').val('');
+                        $('#dprd_additional_image_preview').html('');
+                        $(this).hide();
+                    });
+                });
+                </script>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="dprd_additional_image_caption">Keterangan Foto Tambahan</label></th>
+            <td>
+                <textarea name="additional_image_caption" id="dprd_additional_image_caption" rows="2" class="large-text" placeholder="Tulis keterangan foto tambahan di sini..."><?php echo esc_textarea($additional_image_caption); ?></textarea>
+                <p class="description">Tulis keterangan singkat/caption untuk foto tambahan di atas.</p>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="dprd_additional_image_paragraph">Disisipkan pada Paragraf Ke-</label></th>
+            <td>
+                <input type="number" name="additional_image_paragraph" id="dprd_additional_image_paragraph" value="<?php echo esc_attr($additional_image_paragraph); ?>" min="1" step="1" style="width: 80px;">
+                <p class="description">Tentukan setelah paragraf ke berapa foto tambahan ini akan diletakkan (Contoh: tulis 2 agar foto otomatis muncul tepat setelah paragraf kedua).</p>
             </td>
         </tr>
     </table>
@@ -116,6 +196,15 @@ add_action('save_post', function ($post_id) {
                 }
                 if (isset($_POST['imageCaption'])) {
                     update_post_meta($post_id, 'imageCaption', sanitize_textarea_field($_POST['imageCaption']));
+                }
+                if (isset($_POST['additional_image_id'])) {
+                    update_post_meta($post_id, 'additional_image_id', absint($_POST['additional_image_id']));
+                }
+                if (isset($_POST['additional_image_caption'])) {
+                    update_post_meta($post_id, 'additional_image_caption', sanitize_textarea_field($_POST['additional_image_caption']));
+                }
+                if (isset($_POST['additional_image_paragraph'])) {
+                    update_post_meta($post_id, 'additional_image_paragraph', absint($_POST['additional_image_paragraph']));
                 }
             }
         }

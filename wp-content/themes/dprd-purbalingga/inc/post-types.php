@@ -11,6 +11,7 @@ function dprd_register_post_types() {
             'singular' => 'Berita',
             'plural'   => 'Berita',
             'supports' => ['title', 'editor', 'thumbnail'],
+            'taxonomies' => ['post_tag'],
             'icon'     => 'dashicons-format-aside',
         ],
         'galeri' => [
@@ -85,8 +86,12 @@ function dprd_register_post_types() {
             'show_in_rest'       => true, // Mengaktifkan editor Gutenberg
             'menu_icon'          => $cpt['icon'],
             'supports'           => $cpt['supports'],
-            'rewrite'            => ['slug' => $slug],
+            'rewrite'            => ['slug' => ($slug === 'alat-kelengkapan' ? 'profil-dprd' : $slug)],
         ];
+
+        if (isset($cpt['taxonomies'])) {
+            $args['taxonomies'] = $cpt['taxonomies'];
+        }
 
         register_post_type($slug, $args);
     }
@@ -109,9 +114,9 @@ function dprd_custom_rewrite_rules() {
     );
     
     // Flush rewrite rules sekali saja jika belum dilakukan
-    if (!get_option('dprd_rules_flushed_v3')) {
+    if (!get_option('dprd_rules_flushed_v4')) {
         flush_rewrite_rules(false);
-        update_option('dprd_rules_flushed_v3', true);
+        update_option('dprd_rules_flushed_v4', true);
     }
 }
 add_action('init', 'dprd_custom_rewrite_rules', 20);

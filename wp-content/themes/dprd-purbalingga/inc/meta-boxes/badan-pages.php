@@ -53,18 +53,20 @@ add_action('admin_init', function() {
 });
 
 /**
- * Register meta boxes untuk template halaman badan
+ * Register meta boxes untuk pos CPT alat-kelengkapan berdasarkan slug
  */
-add_action('add_meta_boxes_page', function ($post) {
-    $template = get_post_meta($post->ID, '_wp_page_template', true);
+add_action('add_meta_boxes', function () {
+    global $post;
+    if (!$post || $post->post_type !== 'alat-kelengkapan') return;
+    $slug = $post->post_name;
 
     // 1. Badan Kehormatan
-    if ($template === 'page-badan-kehormatan.php') {
+    if ($slug === 'badan-kehormatan') {
         add_meta_box(
             'dprd_bk_page_details',
             'Pengaturan Konten Badan Kehormatan',
             'dprd_render_bk_page_details',
-            'page',
+            'alat-kelengkapan',
             'normal',
             'high'
         );
@@ -72,19 +74,19 @@ add_action('add_meta_boxes_page', function ($post) {
             'dprd_bk_sanksi_meta',
             'Jenis Sanksi yang Dapat Dijatuhkan',
             'dprd_render_bk_sanksi_meta_box',
-            'page',
+            'alat-kelengkapan',
             'normal',
             'default'
         );
     }
 
-    // 2. Badan Musyawarah, Badan Anggaran, Bapemperda
-    if (in_array($template, ['page-badan-musyawarah.php', 'page-badan-anggaran.php', 'page-bapemperda.php'], true)) {
+    // 2. Badan Musyawarah, Badan Anggaran, Badan Pembentukan Peraturan Daerah
+    if (in_array($slug, ['badan-musyawarah', 'badan-anggaran', 'badan-pembentukan-peraturan-daerah'], true)) {
         add_meta_box(
             'dprd_badan_generic_details',
             'Pengaturan Dasar Pembentukan Badan',
             'dprd_render_badan_generic_details',
-            'page',
+            'alat-kelengkapan',
             'normal',
             'high'
         );
@@ -92,7 +94,7 @@ add_action('add_meta_boxes_page', function ($post) {
             'dprd_badan_generic_tugas',
             'Tugas Alat Kelengkapan',
             'dprd_render_badan_generic_tugas_meta_box',
-            'page',
+            'alat-kelengkapan',
             'normal',
             'default'
         );
