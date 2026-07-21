@@ -113,7 +113,7 @@ add_action('save_post', function ($post_id) {
 
 // Ubah placeholder "Tambahkan judul" khusus untuk CPT Berita
 add_filter('enter_title_here', function ($title, $post) {
-    if ($post->post_type === 'berita') {
+    if (is_object($post) && isset($post->post_type) && $post->post_type === 'berita') {
         return 'Tambahkan judul berita';
     }
     return $title;
