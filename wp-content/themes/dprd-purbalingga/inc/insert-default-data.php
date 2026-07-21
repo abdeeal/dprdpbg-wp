@@ -219,7 +219,7 @@ add_action('init', function() {
     update_option('dprd_default_data_imported', true);
 
     // --- IMPORT ALAT KELENGKAPAN GROUP (KOMISI, FRAKSI, DAN BADAN) ---
-    if (!get_option('dprd_default_ak_group_imported_v3')) {
+    if (!get_option('dprd_default_ak_group_imported_v5')) {
         // Helper untuk membuat/mendapatkan term jenis
         if (!function_exists('dprd_import_setup_term')) {
             function dprd_import_setup_term($name, $slug) {
@@ -732,6 +732,6 @@ add_action('init', function() {
             }
         }
 
-        update_option('dprd_default_ak_group_imported_v3', true);
+        update_option('dprd_default_ak_group_imported_v5', true);
     }
 });
