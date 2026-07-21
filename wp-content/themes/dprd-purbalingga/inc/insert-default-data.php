@@ -216,10 +216,8 @@ add_action('init', function() {
     );
 
     // Set flag sukses import
-    update_option('dprd_default_data_imported', true);
-
-    // --- IMPORT ALAT KELENGKAPAN GROUP (KOMISI & FRAKSI) ---
-    if (!get_option('dprd_default_ak_group_imported')) {
+    update_option('dprd_default_data_imported', tr    // --- IMPORT ALAT KELENGKAPAN GROUP (KOMISI, FRAKSI, DAN BADAN) ---
+    if (!get_option('dprd_default_ak_group_imported_v3')) {
         // Helper untuk membuat/mendapatkan term jenis
         if (!function_exists('dprd_import_setup_term')) {
             function dprd_import_setup_term($name, $slug) {
@@ -233,6 +231,34 @@ add_action('init', function() {
                     return $term->term_id;
                 }
                 return 0;
+            }
+        }
+
+        // Helper untuk membuat/mendapatkan post anggota
+        if (!function_exists('dprd_import_setup_anggota')) {
+            function dprd_import_setup_anggota($name, $content) {
+                $posts = get_posts([
+                    'post_type'   => 'anggota',
+                    'title'       => $name,
+                    'post_status' => 'any',
+                    'numberposts' => 1
+                ]);
+
+                if (empty($posts)) {
+                    $post_id = wp_insert_post([
+                        'post_title'   => $name,
+                        'post_content' => $content,
+                        'post_status'  => 'publish',
+                        'post_type'    => 'anggota',
+                    ]);
+                } else {
+                    $post_id = $posts[0]->ID;
+                    wp_update_post([
+                        'ID'           => $post_id,
+                        'post_content' => $content
+                    ]);
+                }
+                return $post_id;
             }
         }
 
@@ -268,10 +294,29 @@ add_action('init', function() {
             }
         }
 
+        // 1. Setup Anggota DPRD
+        $id_bambang = dprd_import_setup_anggota(
+            'H.R Bambang Irawan, S.H., S.Sos., M.M.',
+            'Setelah mendapatkan kepercayaan untuk memimpin DPRD Kabupaten Purbalingga, H.R. Bambang Irawan, S.H., S.Sos., M.M. mengemban amanah sebagai Ketua DPRD dengan komitmen memperjuangkan aspirasi masyarakat, memperkuat fungsi legislasi, penganggaran, dan pengawasan, serta mendorong terwujudnya pemerintahan daerah yang transparan, akuntabel, dan berpihak pada kepentingan rakyat demi meningkatkan kesejahteraan masyarakat Purbalingga.'
+        );
+        $id_aris = dprd_import_setup_anggota(
+            'Aris Widiarso, S.H.',
+            'Sebagai Wakil Ketua DPRD Kabupaten Purbalingga, Aris Widiarso, S.H. berkomitmen mendukung terciptanya pemerintahan daerah yang efektif, transparan, dan responsif melalui penguatan fungsi legislasi, penganggaran, serta pengawasan. Dengan mengedepankan sinergi bersama seluruh pemangku kepentingan, ia terus memperjuangkan aspirasi masyarakat demi mendorong pembangunan daerah yang berkelanjutan dan meningkatkan kesejahteraan warga Purbalingga.'
+        );
+        $id_aman = dprd_import_setup_anggota(
+            'H. Aman Waliyudin, S.E., M.S.I.',
+            'Sebagai Wakil Ketua DPRD Kabupaten Purbalingga, H. Aman Waliyudin, S.E., M.S.I. berkomitmen mengawal pelaksanaan tugas dan fungsi DPRD melalui kerja sama yang harmonis, penguatan pengawasan terhadap jalannya pemerintahan daerah, serta penyusunan kebijakan yang berpihak pada kepentingan masyarakat. Dengan mengedepankan integritas dan semangat pelayanan, ia terus mendorong pembangunan yang inklusif, berkelanjutan, dan berorientasi pada peningkatan kesejahteraan masyarakat Purbalingga.'
+        );
+        $id_tenny = dprd_import_setup_anggota(
+            'HJ. Tenny Juliawaty, S.E., M.Si.',
+            'Sebagai Wakil Ketua DPRD Kabupaten Purbalingga, Hj. Tenny Juliawaty, S.E., M.Si. berkomitmen memperkuat peran DPRD dalam menyerap dan memperjuangkan aspirasi masyarakat melalui pelaksanaan fungsi legislasi, penganggaran, dan pengawasan yang efektif. Dengan mengedepankan kolaborasi, profesionalisme, dan kepedulian terhadap kepentingan publik, ia terus mendorong terwujudnya pembangunan daerah yang berkelanjutan, inklusif, dan berorientasi pada peningkatan kesejahteraan masyarakat Purbalingga.'
+        );
+
         $term_komisi_id = dprd_import_setup_term('Komisi', 'komisi');
         $term_fraksi_id = dprd_import_setup_term('Fraksi', 'fraksi');
+        $term_badan_id  = dprd_import_setup_term('Badan', 'badan');
 
-        // 1. Setup Komisi Group JSON
+        // 2. Setup Komisi Group JSON
         $komisi_json = wp_json_encode([
             'tipe' => 'grup',
             'nama' => 'Komisi',
@@ -279,7 +324,6 @@ add_action('init', function() {
                 [
                     'tipe' => 'badan',
                     'nama' => 'Komisi I',
-                    'hierarki' => [],
                     'mitra_kerja' => [
                         'Inspektorat Kabupaten',
                         'Badan Kepegawaian, Pendidikan dan Pelatihan Daerah',
@@ -296,12 +340,29 @@ add_action('init', function() {
                         'Bagian Humas dan Protokol',
                         'Kecamatan',
                         'Kelurahan'
+                    ],
+                    'hierarki' => [
+                        [
+                            'members' => [
+                                ['jabatan' => 'Ketua Komisi', 'anggota_id' => $id_bambang]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Wakil Ketua Komisi', 'anggota_id' => $id_aris],
+                                ['jabatan' => 'Sekretaris Komisi', 'anggota_id' => $id_aman]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Anggota', 'anggota_id' => $id_tenny]
+                            ]
+                        ]
                     ]
                 ],
                 [
                     'tipe' => 'badan',
                     'nama' => 'Komisi II',
-                    'hierarki' => [],
                     'mitra_kerja' => [
                         'Sekretariat DPRD',
                         'Badan Keuangan Daerah',
@@ -317,12 +378,29 @@ add_action('init', function() {
                         'Perumda BPR BKK Kejobong dan Rembang',
                         'Perumda Owabong',
                         'Bank Syariah Buana Mitra Perwira'
+                    ],
+                    'hierarki' => [
+                        [
+                            'members' => [
+                                ['jabatan' => 'Ketua Komisi', 'anggota_id' => $id_bambang]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Wakil Ketua Komisi', 'anggota_id' => $id_aris],
+                                ['jabatan' => 'Sekretaris Komisi', 'anggota_id' => $id_aman]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Anggota', 'anggota_id' => $id_tenny]
+                            ]
+                        ]
                     ]
                 ],
                 [
                     'tipe' => 'badan',
                     'nama' => 'Komisi III',
-                    'hierarki' => [],
                     'mitra_kerja' => [
                         'Dinas Pendidikan dan Kebudayaan',
                         'Dinas Pemuda, Olahraga dan Pariwisata',
@@ -333,12 +411,29 @@ add_action('init', function() {
                         'Bagian Kesra',
                         'RSUD Goeteng Taroenadibrata',
                         'RSUD Panti Nugroho'
+                    ],
+                    'hierarki' => [
+                        [
+                            'members' => [
+                                ['jabatan' => 'Ketua Komisi', 'anggota_id' => $id_bambang]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Wakil Ketua Komisi', 'anggota_id' => $id_aris],
+                                ['jabatan' => 'Sekretaris Komisi', 'anggota_id' => $id_aman]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Anggota', 'anggota_id' => $id_tenny]
+                            ]
+                        ]
                     ]
                 ],
                 [
                     'tipe' => 'badan',
                     'nama' => 'Komisi IV',
-                    'hierarki' => [],
                     'mitra_kerja' => [
                         'Badan Perencanaan Pembangunan, Penelitian, dan Pengembangan Daerah',
                         'Dinas Pekerjaan Umum dan Penataan Ruang',
@@ -348,22 +443,136 @@ add_action('init', function() {
                         'Dinas Komunikasi dan Informatika',
                         'Bagian Administrasi Pembangunan',
                         'Bagian Layanan Pengadaan'
+                    ],
+                    'hierarki' => [
+                        [
+                            'members' => [
+                                ['jabatan' => 'Ketua Komisi', 'anggota_id' => $id_bambang]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Wakil Ketua Komisi', 'anggota_id' => $id_aris],
+                                ['jabatan' => 'Sekretaris Komisi', 'anggota_id' => $id_aman]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Anggota', 'anggota_id' => $id_tenny]
+                            ]
+                        ]
                     ]
                 ]
             ]
         ]);
 
-        // 2. Setup Fraksi Group JSON
+        // 3. Setup Fraksi Group JSON
         $fraksi_json = wp_json_encode([
             'tipe' => 'grup',
             'nama' => 'Fraksi',
             'children' => [
-                ['tipe' => 'badan', 'nama' => 'Fraksi PDI Perjuangan', 'hierarki' => []],
-                ['tipe' => 'badan', 'nama' => 'Fraksi Partai Golkar', 'hierarki' => []],
-                ['tipe' => 'badan', 'nama' => 'Fraksi Partai Gerindra', 'hierarki' => []],
-                ['tipe' => 'badan', 'nama' => 'Fraksi PKB', 'hierarki' => []],
-                ['tipe' => 'badan', 'nama' => 'Fraksi PKS', 'hierarki' => []],
-                ['tipe' => 'badan', 'nama' => 'Fraksi PAN', 'hierarki' => []]
+                [
+                    'tipe' => 'badan',
+                    'nama' => 'Fraksi PDI Perjuangan',
+                    'hierarki' => [
+                        [
+                            'members' => [
+                                ['jabatan' => 'Ketua Fraksi', 'anggota_id' => $id_bambang]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Sekretaris Fraksi', 'anggota_id' => $id_aris],
+                                ['jabatan' => 'Bendahara Fraksi', 'anggota_id' => $id_aman]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Anggota', 'anggota_id' => $id_tenny]
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'tipe' => 'badan',
+                    'nama' => 'Fraksi Partai Golkar',
+                    'hierarki' => [
+                        [
+                            'members' => [
+                                ['jabatan' => 'Ketua Fraksi', 'anggota_id' => $id_bambang]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Sekretaris Fraksi', 'anggota_id' => $id_aris]
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'tipe' => 'badan',
+                    'nama' => 'Fraksi Partai Gerindra',
+                    'hierarki' => [
+                        [
+                            'members' => [
+                                ['jabatan' => 'Ketua Fraksi', 'anggota_id' => $id_bambang]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Sekretaris Fraksi', 'anggota_id' => $id_aris]
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'tipe' => 'badan',
+                    'nama' => 'Fraksi PKB',
+                    'hierarki' => [
+                        [
+                            'members' => [
+                                ['jabatan' => 'Ketua Fraksi', 'anggota_id' => $id_bambang]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Sekretaris Fraksi', 'anggota_id' => $id_aris]
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'tipe' => 'badan',
+                    'nama' => 'Fraksi PKS',
+                    'hierarki' => [
+                        [
+                            'members' => [
+                                ['jabatan' => 'Ketua Fraksi', 'anggota_id' => $id_bambang]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Sekretaris Fraksi', 'anggota_id' => $id_aris]
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'tipe' => 'badan',
+                    'nama' => 'Fraksi PAN',
+                    'hierarki' => [
+                        [
+                            'members' => [
+                                ['jabatan' => 'Ketua Fraksi', 'anggota_id' => $id_bambang]
+                            ]
+                        ],
+                        [
+                            'members' => [
+                                ['jabatan' => 'Sekretaris Fraksi', 'anggota_id' => $id_aris]
+                            ]
+                        ]
+                    ]
+                ]
             ]
         ]);
 
@@ -373,6 +582,134 @@ add_action('init', function() {
         ]);
         dprd_import_setup_ak('Fraksi', 'fraksi', $term_fraksi_id, [
             'dprd_ak_struktur_json' => $fraksi_json
+        ]);
+
+        // 4. Setup Board Posts in CPT alat-kelengkapan
+        // a. Badan Musyawarah
+        $bamus_json = wp_json_encode([
+            'tipe' => 'badan',
+            'nama' => 'Badan Musyawarah',
+            'hierarki' => [
+                [
+                    'members' => [
+                        ['jabatan' => 'Ketua', 'anggota_id' => $id_bambang]
+                    ]
+                ],
+                [
+                    'members' => [
+                        ['jabatan' => 'Wakil Ketua', 'anggota_id' => $id_aris],
+                        ['jabatan' => 'Wakil Ketua', 'anggota_id' => $id_aman],
+                        ['jabatan' => 'Wakil Ketua', 'anggota_id' => $id_tenny]
+                    ]
+                ],
+                [
+                    'members' => [
+                        ['jabatan' => 'Sekretaris (Bukan Anggota)', 'anggota_id' => $id_bambang]
+                    ]
+                ],
+                [
+                    'members' => [
+                        ['jabatan' => 'Anggota', 'anggota_id' => $id_bambang],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $id_aris],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $id_aman],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $id_tenny]
+                    ]
+                ]
+            ]
+        ]);
+        dprd_import_setup_ak('Badan Musyawarah', 'badan-musyawarah', $term_badan_id, [
+            'dprd_ak_struktur_json' => $bamus_json
+        ]);
+
+        // b. Badan Anggaran
+        $banggar_json = wp_json_encode([
+            'tipe' => 'badan',
+            'nama' => 'Badan Anggaran',
+            'hierarki' => [
+                [
+                    'members' => [
+                        ['jabatan' => 'Ketua Merangkap Anggota', 'anggota_id' => $id_bambang]
+                    ]
+                ],
+                [
+                    'members' => [
+                        ['jabatan' => 'Wakil Ketua Merangkap Anggota', 'anggota_id' => $id_aris],
+                        ['jabatan' => 'Wakil Ketua Merangkap Anggota', 'anggota_id' => $id_aman],
+                        ['jabatan' => 'Wakil Ketua Merangkap Anggota', 'anggota_id' => $id_tenny]
+                    ]
+                ],
+                [
+                    'members' => [
+                        ['jabatan' => 'Sekretaris Bukan Anggota', 'anggota_id' => $id_bambang]
+                    ]
+                ],
+                [
+                    'members' => [
+                        ['jabatan' => 'Anggota', 'anggota_id' => $id_bambang],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $id_aris],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $id_aman],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $id_tenny]
+                    ]
+                ]
+            ]
+        ]);
+        dprd_import_setup_ak('Badan Anggaran', 'badan-anggaran', $term_badan_id, [
+            'dprd_ak_struktur_json' => $banggar_json
+        ]);
+
+        // c. Bapemperda
+        $bapemperda_json = wp_json_encode([
+            'tipe' => 'badan',
+            'nama' => 'Bapemperda',
+            'hierarki' => [
+                [
+                    'members' => [
+                        ['jabatan' => 'Ketua', 'anggota_id' => $id_bambang]
+                    ]
+                ],
+                [
+                    'members' => [
+                        ['jabatan' => 'Wakil Ketua', 'anggota_id' => $id_aris]
+                    ]
+                ],
+                [
+                    'members' => [
+                        ['jabatan' => 'Anggota', 'anggota_id' => $id_aman],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $id_tenny]
+                    ]
+                ]
+            ]
+        ]);
+        dprd_import_setup_ak('Bapemperda', 'bapemperda', $term_badan_id, [
+            'dprd_ak_struktur_json' => $bapemperda_json
+        ]);
+
+        // d. Badan Kehormatan
+        $bk_json = wp_json_encode([
+            'tipe' => 'badan',
+            'nama' => 'Badan Kehormatan',
+            'hierarki' => [
+                [
+                    'members' => [
+                        ['jabatan' => 'Ketua', 'anggota_id' => $id_bambang]
+                    ]
+                ],
+                [
+                    'members' => [
+                        ['jabatan' => 'Wakil Ketua', 'anggota_id' => $id_aris]
+                    ]
+                ],
+                [
+                    'members' => [
+                        ['jabatan' => 'Anggota', 'anggota_id' => $id_aman],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $id_tenny],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $id_bambang]
+                    ]
+                ]
+            ]
+        ]);
+        dprd_import_setup_ak('Badan Kehormatan', 'badan-kehormatan', $term_badan_id, [
+            'dprd_ak_struktur_json' => $bk_json
         ]);
 
         // Hapus post-post pecahan yang terbuat di import versi sebelumnya (jika ada)
@@ -393,6 +730,6 @@ add_action('init', function() {
             }
         }
 
-        update_option('dprd_default_ak_group_imported', true);
+        update_option('dprd_default_ak_group_imported_v3', true);
     }
 });
