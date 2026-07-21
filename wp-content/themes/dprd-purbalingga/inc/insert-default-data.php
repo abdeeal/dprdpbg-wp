@@ -217,4 +217,131 @@ add_action('init', function() {
 
     // Set flag sukses import
     update_option('dprd_default_data_imported', true);
+
+    // --- IMPORT ALAT KELENGKAPAN (KOMISI & FRAKSI) ---
+    if (!get_option('dprd_default_ak_data_imported')) {
+        // Helper untuk membuat/mendapatkan term jenis
+        function dprd_import_setup_term($name, $slug) {
+            $term = get_term_by('slug', $slug, 'jenis');
+            if (!$term) {
+                $inserted = wp_insert_term($name, 'jenis', ['slug' => $slug]);
+                if (!is_wp_error($inserted)) {
+                    return $inserted['term_id'];
+                }
+            } else {
+                return $term->term_id;
+            }
+            return 0;
+        }
+
+        // Helper untuk membuat/mendapatkan post alat kelengkapan
+        function dprd_import_setup_ak($title, $slug, $term_id, $meta = []) {
+            $posts = get_posts([
+                'post_type'   => 'alat-kelengkapan',
+                'name'        => $slug,
+                'post_status' => 'any',
+                'numberposts' => 1
+            ]);
+
+            if (empty($posts)) {
+                $post_id = wp_insert_post([
+                    'post_title'  => $title,
+                    'post_name'   => $slug,
+                    'post_status' => 'publish',
+                    'post_type'   => 'alat-kelengkapan',
+                ]);
+            } else {
+                $post_id = $posts[0]->ID;
+            }
+
+            if ($post_id && !is_wp_error($post_id)) {
+                if ($term_id) {
+                    wp_set_post_terms($post_id, [$term_id], 'jenis');
+                }
+                foreach ($meta as $key => $val) {
+                    update_post_meta($post_id, $key, $val);
+                }
+            }
+        }
+
+        $term_komisi_id = dprd_import_setup_term('Komisi', 'komisi');
+        $term_fraksi_id = dprd_import_setup_term('Fraksi', 'fraksi');
+
+        // Import Komisi I - IV
+        dprd_import_setup_ak('Komisi I', 'komisi-1', $term_komisi_id, [
+            'dprd_komisi_mitra_kerja_json' => wp_json_encode([
+                ['mitra' => 'Inspektorat Kabupaten'],
+                ['mitra' => 'Badan Kepegawaian, Pendidikan dan Pelatihan Daerah'],
+                ['mitra' => 'Dinas Pemberdayaan Masyarakat dan Desa'],
+                ['mitra' => 'Dinas Kependudukan dan Catatan Sipil'],
+                ['mitra' => 'Dinas Kearsipan dan Perpustakaan'],
+                ['mitra' => 'Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu'],
+                ['mitra' => 'Satuan Polisi Pamong Praja'],
+                ['mitra' => 'Kantor Kesatuan Bangsa dan Politik'],
+                ['mitra' => 'Bagian Hukum'],
+                ['mitra' => 'Bagian Pemerintahan'],
+                ['mitra' => 'Bagian Umum'],
+                ['mitra' => 'Bagian Organisasi dan Tata Laksana'],
+                ['mitra' => 'Bagian Humas dan Protokol'],
+                ['mitra' => 'Kecamatan'],
+                ['mitra' => 'Kelurahan']
+            ])
+        ]);
+
+        dprd_import_setup_ak('Komisi II', 'komisi-2', $term_komisi_id, [
+            'dprd_komisi_mitra_kerja_json' => wp_json_encode([
+                ['mitra' => 'Sekretariat DPRD'],
+                ['mitra' => 'Badan Keuangan Daerah'],
+                ['mitra' => 'Dinas Ketahanan Pangan dan Perikanan'],
+                ['mitra' => 'Dinas Pertanian'],
+                ['mitra' => 'Dinas Perindustrian dan Perdagangan'],
+                ['mitra' => 'Dinas Koperasi, Usaha Kecil dan Menengah'],
+                ['mitra' => 'Bagian Perekonomian'],
+                ['mitra' => 'PDAM'],
+                ['mitra' => 'Perumda BPR Artha Perwira'],
+                ['mitra' => 'Perumda Puspahastama'],
+                ['mitra' => 'Perumda BPR BKK Purbalingga'],
+                ['mitra' => 'Perumda BPR BKK Kejobong dan Rembang'],
+                ['mitra' => 'Perumda Owabong'],
+                ['mitra' => 'Bank Syariah Buana Mitra Perwira']
+            ])
+        ]);
+
+        dprd_import_setup_ak('Komisi III', 'komisi-3', $term_komisi_id, [
+            'dprd_komisi_mitra_kerja_json' => wp_json_encode([
+                ['mitra' => 'Dinas Pendidikan dan Kebudayaan'],
+                ['mitra' => 'Dinas Pemuda, Olahraga dan Pariwisata'],
+                ['mitra' => 'Dinas Kesehatan'],
+                ['mitra' => 'Dinas Tenaga Kerja'],
+                ['mitra' => 'Dinas Sosial, Pengendalian Penduduk, Keluarga Berencana, Pemberdayaan Perempuan, dan Perlindungan Anak'],
+                ['mitra' => 'BPBD'],
+                ['mitra' => 'Bagian Kesra'],
+                ['mitra' => 'RSUD Goeteng Taroenadibrata'],
+                ['mitra' => 'RSUD Panti Nugroho']
+            ])
+        ]);
+
+        dprd_import_setup_ak('Komisi IV', 'komisi-4', $term_komisi_id, [
+            'dprd_komisi_mitra_kerja_json' => wp_json_encode([
+                ['mitra' => 'Badan Perencanaan Pembangunan, Penelitian, dan Pengembangan Daerah'],
+                ['mitra' => 'Dinas Pekerjaan Umum dan Penataan Ruang'],
+                ['mitra' => 'Dinas Perumahan dan Permukiman'],
+                ['mitra' => 'Dinas Lingkungan Hidup'],
+                ['mitra' => 'Dinas Perhubungan'],
+                ['mitra' => 'Dinas Komunikasi dan Informatika'],
+                ['mitra' => 'Bagian Administrasi Pembangunan'],
+                ['mitra' => 'Bagian Layanan Pengadaan']
+            ])
+        ]);
+
+        // Import Fraksi-Fraksi
+        dprd_import_setup_ak('Fraksi PDI Perjuangan', 'fraksi-pdi-perjuangan', $term_fraksi_id);
+        dprd_import_setup_ak('Fraksi Partai Golkar', 'fraksi-partai-golkar', $term_fraksi_id);
+        dprd_import_setup_ak('Fraksi Partai Gerindra', 'fraksi-partai-gerindra', $term_fraksi_id);
+        dprd_import_setup_ak('Fraksi PKB', 'fraksi-pkb', $term_fraksi_id);
+        dprd_import_setup_ak('Fraksi PKS', 'fraksi-pks', $term_fraksi_id);
+        dprd_import_setup_ak('Fraksi PAN', 'fraksi-pan', $term_fraksi_id);
+
+        update_option('dprd_default_ak_data_imported', true);
+    }
 });
