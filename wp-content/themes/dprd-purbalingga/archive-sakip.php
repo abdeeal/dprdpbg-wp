@@ -17,10 +17,10 @@ get_header();
         ?>
         
         <header class="mb-12 mt-6">
-            <h1 class="font-display text-4xl text-primary font-bold mb-4">Sistem Akuntabilitas Kinerja Instansi Pemerintah (SAKIP)</h1>
-            <p class="font-sans text-body-secondary text-[15px] max-w-2xl">
-                Dokumen akuntabilitas kinerja dan laporan pertanggungjawaban Sekretariat DPRD Kabupaten Purbalingga.
-            </p>
+            <div class="text-left">
+                <h1 class="font-display font-black text-3xl md:text-[36px] text-primary mb-2">SAKIP</h1>
+                <p class="font-mono text-sm md:text-[15px] text-body-secondary tracking-wide">Sistem Akuntabilitas Kinerja Instansi Pemerintah</p>
+            </div>
         </header>
 
         <?php

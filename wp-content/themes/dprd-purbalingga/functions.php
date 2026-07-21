@@ -74,7 +74,7 @@ foreach (glob(get_template_directory() . '/inc/meta-boxes/*.php') as $file) {
 // --- Kompresi Gambar Otomatis & Konversi ke WEBP saat Upload ---
 add_filter('wp_handle_upload', 'dprd_convert_upload_to_webp');
 function dprd_convert_upload_to_webp($upload) {
-    if ($upload['type'] == 'image/jpeg' || $upload['type'] == 'image/png') {
+    if ($upload['type'] == 'image/jpeg' || $upload['type'] == 'image/png' || $upload['type'] == 'image/webp') {
         $file_path = $upload['file'];
         $image = null;
         
@@ -92,16 +92,54 @@ function dprd_convert_upload_to_webp($upload) {
                     imagesavealpha($image, true);
                 }
             }
+        } elseif ($upload['type'] == 'image/webp') {
+            if (function_exists('imagecreatefromwebp')) {
+                $image = imagecreatefromwebp($file_path);
+                if ($image) {
+                    imagepalettetotruecolor($image);
+                    imagealphablending($image, true);
+                    imagesavealpha($image, true);
+                }
+            }
         }
 
         if ($image) {
-            // Ubah ekstensi file asli menjadi .webp
-            $webp_path = preg_replace('/\\.(jpg|jpeg|png)$/i', '.webp', $file_path);
+            // Resize gambar jika ukurannya terlalu besar untuk membatasi file size di bawah 200KB
+            $width = imagesx($image);
+            $height = imagesy($image);
+            $max_size = 1200; // Maksimal lebar/tinggi 1200px sudah sangat tajam untuk web
             
-            // Simpan gambar sebagai WebP dengan kualitas 80% (optimal kompresi)
-            if (function_exists('imagewebp') && imagewebp($image, $webp_path, 80)) {
-                // Hapus file JPG/PNG asli agar hemat kapasitas disk
-                unlink($file_path);
+            if ($width > $max_size || $height > $max_size) {
+                if ($width > $height) {
+                    $new_width = $max_size;
+                    $new_height = floor($height * ($max_size / $width));
+                } else {
+                    $new_height = $max_size;
+                    $new_width = floor($width * ($max_size / $height));
+                }
+                $resized_image = imagecreatetruecolor($new_width, $new_height);
+                
+                // Preserve transparency
+                imagealphablending($resized_image, false);
+                imagesavealpha($resized_image, true);
+                
+                imagecopyresampled($resized_image, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+                imagedestroy($image);
+                $image = $resized_image;
+            }
+
+            // Tentukan jalur file WebP
+            $webp_path = $file_path;
+            if ($upload['type'] !== 'image/webp') {
+                $webp_path = preg_replace('/\\.(jpg|jpeg|png)$/i', '.webp', $file_path);
+            }
+            
+            // Simpan gambar sebagai WebP dengan kualitas 75%
+            if (function_exists('imagewebp') && imagewebp($image, $webp_path, 75)) {
+                // Hapus file JPG/PNG asli (jika ekstensinya bukan .webp sejak awal)
+                if ($webp_path !== $file_path) {
+                    unlink($file_path);
+                }
                 
                 // Perbarui informasi file upload di WordPress
                 $upload['file'] = $webp_path;
@@ -121,3 +159,9 @@ add_filter('wp_editor_set_quality', function($quality, $mime_type) {
     }
     return $quality;
 }, 10, 2);
+
+// Prioritaskan GD library dibanding Imagick untuk memproses gambar.
+// Ini memperbaiki error upload WebP di lingkungan local XAMPP/PHP yang Imagick-nya tidak memiliki library WebP.
+add_filter('wp_image_editors', function($editors) {
+    return ['WP_Image_Editor_GD', 'WP_Image_Editor_Imagick'];
+});
