@@ -172,8 +172,7 @@ $recent_news_posts = get_posts([
                     if (empty($r_img)) {
                         $r_img = get_template_directory_uri() . '/assets/images/default-berita.jpg';
                     }
-                    $r_slug = $r_post->post_name;
-                    $r_url = home_url("/berita/{$r_slug}-{$r_post_id}");
+                    $r_url = get_permalink($r_post_id);
                     ?>
                     <a href="<?php echo esc_url($r_url); ?>" class="group flex gap-4 items-center">
                         <div class="relative w-[70px] h-[70px] shrink-0 rounded-md overflow-hidden bg-surface">

@@ -78,8 +78,7 @@ $recent_query = new WP_Query($recent_args);
             if (empty($img_url)) {
                 $img_url = get_template_directory_uri() . '/assets/images/default-berita.jpg'; // fallback
             }
-            $slug = $featured_post->post_name;
-            $news_url = home_url("/berita/{$slug}-{$post_id}");
+            $news_url = get_permalink($post_id);
             
             $excerpt = get_post_meta($post_id, 'excerpt', true);
             if (empty($excerpt)) {
@@ -123,8 +122,7 @@ $recent_query = new WP_Query($recent_args);
                         if (empty($r_img_url)) {
                             $r_img_url = get_template_directory_uri() . '/assets/images/default-berita.jpg'; // fallback
                         }
-                        $r_slug = get_post($r_post_id)->post_name;
-                        $r_news_url = home_url("/berita/{$r_slug}-{$r_post_id}");
+                        $r_news_url = get_permalink($r_post_id);
                         ?>
                         <a href="<?php echo esc_url($r_news_url); ?>" class="flex gap-4 group cursor-pointer py-7 first:pt-0 last:pb-0 block">
                             <div class="relative w-[120px] h-[80px] sm:w-[160px] sm:h-[100px] overflow-hidden shrink-0 rounded-md">
