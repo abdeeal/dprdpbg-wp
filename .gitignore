@@ -47,3 +47,6 @@ Thumbs.db
 # Log
 *.log
 error_log
+
+# Next.js reference repository for migration
+wp-content/themes/dprd-purbalingga/nextjs-reference/

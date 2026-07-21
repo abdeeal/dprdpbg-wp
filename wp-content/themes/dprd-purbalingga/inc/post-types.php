@@ -34,7 +34,7 @@ function dprd_register_post_types() {
         'anggota' => [
             'singular' => 'Anggota',
             'plural'   => 'Anggota',
-            'supports' => ['title', 'thumbnail'],
+            'supports' => ['title'],
             'icon'     => 'dashicons-groups',
         ],
         'alat-kelengkapan' => [
@@ -104,6 +104,10 @@ add_action('init', 'dprd_register_post_types');
  */
 function dprd_change_title_placeholder($title, $post) {
     switch ($post->post_type) {
+        case 'anggota':
+            return 'Nama Anggota';
+        case 'alat-kelengkapan':
+            return 'Nama Alat Kelengkapan';
         case 'tokoh-sejarah':
             return 'Masukkan Nama Tokoh Sejarah';
         case 'propemperda':

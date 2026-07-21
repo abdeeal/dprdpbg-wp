@@ -6,28 +6,7 @@
 if (!defined('ABSPATH')) exit;
 
 function dprd_register_taxonomies() {
-    // Taksonomi Jabatan untuk CPT Anggota
-    register_taxonomy('jabatan', ['anggota'], [
-        'hierarchical'      => true,
-        'labels'            => [
-            'name'              => 'Jabatan',
-            'singular_name'     => 'Jabatan',
-            'search_items'      => 'Cari Jabatan',
-            'all_items'         => 'Semua Jabatan',
-            'parent_item'       => 'Induk Jabatan',
-            'parent_item_colon' => 'Induk Jabatan:',
-            'edit_item'         => 'Edit Jabatan',
-            'update_item'       => 'Perbarui Jabatan',
-            'add_new_item'      => 'Tambah Jabatan Baru',
-            'new_item_name'     => 'Nama Jabatan Baru',
-            'menu_name'         => 'Jabatan',
-        ],
-        'show_ui'           => true,
-        'show_admin_column' => true,
-        'query_var'         => true,
-        'show_in_rest'      => true,
-        'rewrite'           => ['slug' => 'jabatan'],
-    ]);
+    // Taksonomi Jabatan dihapus karena dikelola via Alat Kelengkapan
 
     // Taksonomi Jenis untuk CPT Alat Kelengkapan (Komisi, Fraksi, Badan)
     register_taxonomy('jenis', ['alat-kelengkapan'], [
