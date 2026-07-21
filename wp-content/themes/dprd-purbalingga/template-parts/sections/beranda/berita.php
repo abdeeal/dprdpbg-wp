@@ -8,6 +8,8 @@ if (!defined('ABSPATH')) exit;
 $featured_query = new WP_Query([
     'post_type'      => 'berita',
     'posts_per_page' => 1,
+    'orderby'        => 'date',
+    'order'          => 'DESC',
     'meta_query'     => [
         [
             'key'     => 'isFeatured',
@@ -27,6 +29,8 @@ if ($featured_query->have_posts()) {
     $backup_query = new WP_Query([
         'post_type'      => 'berita',
         'posts_per_page' => 1,
+        'orderby'        => 'date',
+        'order'          => 'DESC',
     ]);
     if ($backup_query->have_posts()) {
         $backup_query->the_post();
@@ -39,6 +43,8 @@ if ($featured_query->have_posts()) {
 $recent_args = [
     'post_type'      => 'berita',
     'posts_per_page' => 4,
+    'orderby'        => 'date',
+    'order'          => 'DESC',
 ];
 if ($featured_post) {
     $recent_args['post__not_in'] = [$featured_post->ID];
@@ -74,6 +80,14 @@ $recent_query = new WP_Query($recent_args);
             }
             $slug = $featured_post->post_name;
             $news_url = home_url("/berita/{$slug}-{$post_id}");
+            
+            $excerpt = get_post_meta($post_id, 'excerpt', true);
+            if (empty($excerpt)) {
+                $excerpt = $featured_post->post_excerpt;
+            }
+            if (empty($excerpt)) {
+                $excerpt = wp_trim_words(strip_shortcodes($featured_post->post_content), 25);
+            }
             ?>
             <a href="<?php echo esc_url($news_url); ?>" class="lg:col-span-7 group cursor-pointer block">
                 <div class="relative w-full aspect-[16/10] overflow-hidden mb-4 rounded-card">
@@ -90,7 +104,7 @@ $recent_query = new WP_Query($recent_args);
                     <?php echo esc_html($featured_post->post_title); ?>
                 </h3>
                 <p class="font-sans text-sm sm:text-base text-body-secondary line-clamp-2">
-                    <?php echo esc_html(wp_strip_all_tags(get_the_excerpt($post_id))); ?>
+                    <?php echo esc_html(wp_strip_all_tags($excerpt)); ?>
                 </p>
             </a>
         <?php endif; ?>

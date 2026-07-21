@@ -1,3 +1,10 @@
+:root {
+  --font-fraunces: 'Fraunces', serif;
+  --font-jakarta: 'Plus Jakarta Sans', sans-serif;
+  --font-jetbrains: 'JetBrains Mono', monospace;
+  --font-montserrat: 'Montserrat', sans-serif;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

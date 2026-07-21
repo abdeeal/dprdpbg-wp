@@ -41,10 +41,11 @@ function dprd_render_berita_meta_box($post) {
 }
 
 function dprd_render_berita_additional_meta_box($post) {
-    wp_nonce_field('dprd_save_berita_additional_meta', 'dprd_berita_additional_meta_nonce');
+    wp_nonce_field('dprd_save_berita_additional_meta', 'dprd_save_berita_additional_meta_nonce');
     $day = get_post_meta($post->ID, 'day', true);
     $time = get_post_meta($post->ID, 'time', true);
     $author = get_post_meta($post->ID, 'author', true);
+    $excerpt = get_post_meta($post->ID, 'excerpt', true);
     $image_caption = get_post_meta($post->ID, 'imageCaption', true);
     ?>
     <table class="form-table">
@@ -70,6 +71,13 @@ function dprd_render_berita_additional_meta_box($post) {
             </td>
         </tr>
         <tr>
+            <th><label for="dprd_excerpt">Ringkasan Berita (Tampil di Halaman Depan)</label></th>
+            <td>
+                <textarea name="excerpt" id="dprd_excerpt" rows="3" class="large-text" placeholder="Tulis 1-2 kalimat ringkasan singkat berita untuk ditampilkan di halaman utama..."><?php echo esc_textarea($excerpt); ?></textarea>
+                <p class="description">Teks ini akan muncul di bawah judul berita pada slide/daftar berita halaman utama.</p>
+            </td>
+        </tr>
+        <tr>
             <th><label for="dprd_image_caption">Keterangan Foto Utama</label></th>
             <td>
                 <textarea name="imageCaption" id="dprd_image_caption" rows="2" class="large-text" placeholder="Tulis keterangan foto atau sumber gambar utama di sini..."><?php echo esc_textarea($image_caption); ?></textarea>
@@ -91,7 +99,7 @@ add_action('save_post', function ($post_id) {
     }
 
     // 2. Simpan metadata tambahan
-    if (isset($_POST['dprd_berita_additional_meta_nonce']) && wp_verify_nonce($_POST['dprd_berita_additional_meta_nonce'], 'dprd_save_berita_additional_meta')) {
+    if (isset($_POST['dprd_save_berita_additional_meta_nonce']) && wp_verify_nonce($_POST['dprd_save_berita_additional_meta_nonce'], 'dprd_save_berita_additional_meta')) {
         if (!defined('DOING_AUTOSAVE') || !DOING_AUTOSAVE) {
             if (current_user_can('edit_post', $post_id)) {
                 if (isset($_POST['day'])) {
@@ -102,6 +110,9 @@ add_action('save_post', function ($post_id) {
                 }
                 if (isset($_POST['author'])) {
                     update_post_meta($post_id, 'author', sanitize_text_field($_POST['author']));
+                }
+                if (isset($_POST['excerpt'])) {
+                    update_post_meta($post_id, 'excerpt', sanitize_textarea_field($_POST['excerpt']));
                 }
                 if (isset($_POST['imageCaption'])) {
                     update_post_meta($post_id, 'imageCaption', sanitize_textarea_field($_POST['imageCaption']));

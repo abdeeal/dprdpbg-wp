@@ -10,7 +10,7 @@ function dprd_register_post_types() {
         'berita' => [
             'singular' => 'Berita',
             'plural'   => 'Berita',
-            'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
+            'supports' => ['title', 'editor', 'thumbnail'],
             'icon'     => 'dashicons-format-aside',
         ],
         'galeri' => [
