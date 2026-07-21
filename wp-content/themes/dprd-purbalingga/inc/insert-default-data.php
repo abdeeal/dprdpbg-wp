@@ -35,7 +35,7 @@ add_action('init', function() {
 
 // --- IMPORT ALAT KELENGKAPAN GROUP (KOMISI, FRAKSI, DAN BADAN) ---
 add_action('init', function() {
-    if (!get_option('dprd_default_ak_group_imported_v8')) {
+    if (!get_option('dprd_default_ak_group_imported_v9')) {
         // Helper untuk membuat/mendapatkan term jenis
         if (!function_exists('dprd_import_setup_term')) {
             function dprd_import_setup_term($name, $slug) {
@@ -414,7 +414,7 @@ add_action('init', function() {
                     'kategori' => 'Kepemimpinan & Koordinasi',
                     'icon'     => 'gavel',
                     'poin'     => [
-                        'Memimpin sidang DPRD dan menyimpulkan hasil sidang untuk diambil keputusan.',
+                        'Memimpin sidang DPRD and menyimpulkan hasil sidang untuk diambil keputusan.',
                         'Menyusun rencana kerja pimpinan dan mengadakan pembagian kerja antara ketua dan wakil ketua.',
                         'Melakukan koordinasi dalam upaya menyinergikan pelaksanaan agenda dan materi kegiatan dari alat kelengkapan DPRD.'
                     ]
@@ -424,7 +424,19 @@ add_action('init', function() {
                     'icon'     => 'users',
                     'poin'     => [
                         'Menjadi juru bicara DPRD.',
-                        'Mewakili DPRD dalam berhubungan dengan lembaga/instansi lainnya.'
+                        'Mewakili DPRD dalam berhubungan dengan lembaga/instansi lainnya.',
+                        'Mengadakan konsultasi dengan bupati dan pimpinan lembaga/instansi lainnya sesuai dengan keputusan DPRD.',
+                        'Mewakili DPRD di pengadilan.'
+                    ]
+                ],
+                [
+                    'kategori' => 'Administrasi & Akuntabilitas',
+                    'icon'     => 'file-text',
+                    'poin'     => [
+                        'Melaksanakan dan memasyarakatkan keputusan DPRD.',
+                        'Melaksanakan keputusan DPRD berkenaan dengan penetapan sanksi atau rehabilitasi anggota sesuai dengan ketentuan peraturan.',
+                        'Menyusun rencana anggaran DPRD bersama sekretariat DPRD yang pengesahannya dilakukan dalam rapat paripurna.',
+                        'Menyampaikan laporan kinerja pimpinan dalam rapat paripurna yang khusus diadakan untuk itu.'
                     ]
                 ]
             ])
@@ -692,6 +704,6 @@ add_action('init', function() {
             }
         }
 
-        update_option('dprd_default_ak_group_imported_v8', true);
+        update_option('dprd_default_ak_group_imported_v9', true);
     }
 });
