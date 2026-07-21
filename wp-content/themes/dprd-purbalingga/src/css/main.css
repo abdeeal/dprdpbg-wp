@@ -9,6 +9,13 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --font-fraunces: 'Fraunces', serif;
+  --font-jakarta: 'Plus Jakarta Sans', sans-serif;
+  --font-jetbrains: 'JetBrains Mono', monospace;
+  --font-montserrat: 'Montserrat', sans-serif;
+}
+
 @layer utilities {
   .bg-primary {
     background-color: #A32B2E;

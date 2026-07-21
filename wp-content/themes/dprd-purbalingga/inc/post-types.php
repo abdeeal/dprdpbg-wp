@@ -94,6 +94,36 @@ function dprd_register_post_types() {
 add_action('init', 'dprd_register_post_types');
 
 /**
+ * Register Custom Rewrite Rules for Alat Kelengkapan (Komisi & Fraksi)
+ */
+function dprd_custom_rewrite_rules() {
+    add_rewrite_rule(
+        '^profil-dprd/komisi/([1-4])/?$',
+        'index.php?alat-kelengkapan=komisi&komisi_num=$matches[1]',
+        'top'
+    );
+    add_rewrite_rule(
+        '^profil-dprd/fraksi/([^/]+)/?$',
+        'index.php?alat-kelengkapan=fraksi&fraksi_slug=$matches[1]',
+        'top'
+    );
+    
+    // Flush rewrite rules sekali saja jika belum dilakukan
+    if (!get_option('dprd_rules_flushed_v3')) {
+        flush_rewrite_rules(false);
+        update_option('dprd_rules_flushed_v3', true);
+    }
+}
+add_action('init', 'dprd_custom_rewrite_rules', 20);
+
+// Register custom query vars
+add_filter('query_vars', function($vars) {
+    $vars[] = 'komisi_num';
+    $vars[] = 'fraksi_slug';
+    return $vars;
+});
+
+/**
  * Ubah teks placeholder "Tambahkan judul" agar sesuai dengan konteks masing-masing tipe konten.
  */
 function dprd_change_title_placeholder($title, $post) {
