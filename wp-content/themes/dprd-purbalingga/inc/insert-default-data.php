@@ -807,3 +807,53 @@ add_action('init', function() {
     }
 });
 
+// --- IMPORT DEFAULT DATA PROPEMPERDA (2020 - 2026) 1:1 VERCEL ---
+add_action('init', function() {
+    if (!get_option('dprd_default_propemperda_imported_v1')) {
+        $propemperda_data = [
+            ['tahun' => '2026', 'deskripsi' => 'Dokumen Program Pembentukan Peraturan Daerah Tahun 2026'],
+            ['tahun' => '2025', 'deskripsi' => 'Dokumen Program Pembentukan Peraturan Daerah Tahun 2025'],
+            ['tahun' => '2024', 'deskripsi' => 'Dokumen Program Pembentukan Peraturan Daerah Tahun 2024'],
+            ['tahun' => '2023', 'deskripsi' => 'Dokumen Program Pembentukan Peraturan Daerah Tahun 2023'],
+            ['tahun' => '2022', 'deskripsi' => 'Dokumen Program Pembentukan Peraturan Daerah Tahun 2022'],
+            ['tahun' => '2021', 'deskripsi' => 'Dokumen Program Pembentukan Peraturan Daerah Tahun 2021'],
+            ['tahun' => '2020', 'deskripsi' => 'Dokumen Program Pembentukan Peraturan Daerah Tahun 2020'],
+        ];
+
+        foreach ($propemperda_data as $item) {
+            $slug = 'tahun-' . $item['tahun'];
+            $title = 'Tahun ' . $item['tahun'];
+
+            $posts = get_posts([
+                'post_type'   => 'propemperda',
+                'name'        => $slug,
+                'post_status' => 'any',
+                'numberposts' => 1
+            ]);
+
+            $post_data = [
+                'post_title'  => $title,
+                'post_name'   => $slug,
+                'post_status' => 'publish',
+                'post_type'   => 'propemperda',
+            ];
+
+            if (empty($posts)) {
+                $post_id = wp_insert_post($post_data);
+            } else {
+                $post_id = $posts[0]->ID;
+                $post_data['ID'] = $post_id;
+                wp_update_post($post_data);
+            }
+
+            if ($post_id && !is_wp_error($post_id)) {
+                update_post_meta($post_id, 'tahun', $item['tahun']);
+                update_post_meta($post_id, 'deskripsi', $item['deskripsi']);
+            }
+        }
+
+        update_option('dprd_default_propemperda_imported_v1', true);
+    }
+});
+
+

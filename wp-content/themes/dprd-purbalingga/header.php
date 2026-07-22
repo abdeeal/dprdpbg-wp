@@ -79,12 +79,12 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
         </div>
     </div>
 
-    <!-- ── Overlay gelap saat menu terbuka (Hanya menutupi area DI BAWAH header) ── -->
-    <div id="dprd-overlay" class="absolute top-full left-0 w-full h-screen bg-ink/20 backdrop-blur-sm z-30 hidden opacity-0 transition-opacity duration-500 ease-out"></div>
+    <!-- ── Overlay gelap saat menu terbuka ── -->
+    <div id="dprd-overlay" class="absolute top-full left-0 w-full h-screen bg-ink/20 backdrop-blur-sm z-30 hidden opacity-0 transition-opacity duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"></div>
 
     <!-- ── Mega Menu Panel (Desktop + Mobile Layout) ────── -->
     <div id="dprd-megamenu"
-         class="absolute top-full left-0 w-full bg-white border-t border-b border-line/50 shadow-xl z-40 invisible opacity-0 transition-all duration-300 ease-out"
+         class="absolute top-full left-0 w-full bg-white border-t border-b border-line/50 shadow-xl z-40 invisible opacity-0 -translate-y-[15px] transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
          aria-hidden="true">
 
         <?php
@@ -197,7 +197,7 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
                                 <?php echo esc_html($item->title); ?>
                             </a>
                             <?php if ($has_children) : ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dprd-mobile-level0-icon text-body/60 transition-transform duration-300 shrink-0" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dprd-mobile-level0-icon text-body/60 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] shrink-0" aria-hidden="true">
                                     <path d="m9 18 6-6-6-6"/>
                                 </svg>
                             <?php endif; ?>
@@ -205,7 +205,7 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
 
                         <!-- Level 1 Accordion Body -->
                         <?php if ($has_children) : ?>
-                            <div id="dprd-mobile-level0-body-<?php echo esc_attr($i); ?>" class="dprd-mobile-level0-body flex-col overflow-hidden transition-all duration-300 max-h-0 opacity-0 hidden">
+                            <div id="dprd-mobile-level0-body-<?php echo esc_attr($i); ?>" class="dprd-mobile-level0-body flex-col overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] max-h-0 opacity-0 hidden">
                                 <ul class="flex flex-col gap-1 pl-4 border-l-2 border-line ml-2">
                                     <?php foreach ($item->children as $j => $sub) :
                                         $has_sub = !empty($sub->children);
@@ -223,7 +223,7 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
                                                     <?php echo esc_html($sub->title); ?>
                                                 </a>
                                                 <?php if ($has_sub) : ?>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dprd-mobile-level1-icon text-body/60 transition-transform duration-300 shrink-0" aria-hidden="true">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dprd-mobile-level1-icon text-body/60 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] shrink-0" aria-hidden="true">
                                                         <path d="m9 18 6-6-6-6"/>
                                                     </svg>
                                                 <?php endif; ?>
@@ -231,7 +231,7 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
 
                                             <!-- Level 2 Accordion Body -->
                                             <?php if ($has_sub) : ?>
-                                                <div id="dprd-mobile-level1-body-<?php echo esc_attr($sub_key); ?>" class="dprd-mobile-level1-body flex-col overflow-hidden transition-all duration-300 max-h-0 opacity-0 hidden">
+                                                <div id="dprd-mobile-level1-body-<?php echo esc_attr($sub_key); ?>" class="dprd-mobile-level1-body flex-col overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] max-h-0 opacity-0 hidden">
                                                     <ul class="flex flex-col gap-1 pl-4 border-l-2 border-line ml-2">
                                                         <?php foreach ($sub->children as $child) : ?>
                                                             <li>

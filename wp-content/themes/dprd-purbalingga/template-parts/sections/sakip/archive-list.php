@@ -57,7 +57,7 @@ if (empty($terms) || is_wp_error($terms)) {
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-down-left transition-transform" aria-hidden="true"><path d="M17 7 7 17"></path><path d="M17 17H7V7"></path></svg>
                 </div>
             </button>
-            <div class="dprd-accordion-content h-0 opacity-0 overflow-hidden transition-all duration-300">
+            <div class="dprd-accordion-content overflow-hidden">
                 <div class="pt-6 flex flex-col gap-3">
                     <?php while ($query->have_posts()) : $query->the_post();
                         $file_url   = get_post_meta(get_the_ID(), 'file_url', true);
@@ -91,6 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const iconContainer = item.querySelector('.dprd-accordion-icon');
         const itemId = item.getAttribute('data-id');
         
+        content.style.transition = 'max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
+
         let shouldOpen = false;
         if (activeId && activeId === itemId) {
             shouldOpen = true;
@@ -100,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (shouldOpen) {
-            content.style.height = 'auto';
+            content.style.maxHeight = content.scrollHeight + 'px';
             content.style.opacity = '1';
             content.classList.add('is-open');
             iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true"><path d="M7 17 17 7"></path><path d="M7 7h10v10"></path></svg>`;
@@ -110,6 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     item.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 100);
             }
+        } else {
+            content.style.maxHeight = '0px';
+            content.style.opacity = '0';
         }
 
         toggle.addEventListener('click', () => {
@@ -119,15 +124,19 @@ document.addEventListener('DOMContentLoaded', () => {
             items.forEach(otherItem => {
                 const otherContent = otherItem.querySelector('.dprd-accordion-content');
                 const otherIcon = otherItem.querySelector('.dprd-accordion-icon');
-                otherContent.style.height = '0px';
-                otherContent.style.opacity = '0';
-                otherContent.classList.remove('is-open');
-                otherIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-down-left" aria-hidden="true"><path d="M17 7 7 17"></path><path d="M17 17H7V7"></path></svg>`;
+                if (otherContent) {
+                    otherContent.style.maxHeight = '0px';
+                    otherContent.style.opacity = '0';
+                    otherContent.classList.remove('is-open');
+                }
+                if (otherIcon) {
+                    otherIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-down-left" aria-hidden="true"><path d="M17 7 7 17"></path><path d="M17 17H7V7"></path></svg>`;
+                }
             });
             
             // Buka yang di-klik jika sebelumnya tertutup
             if (!isOpen) {
-                content.style.height = 'auto';
+                content.style.maxHeight = content.scrollHeight + 'px';
                 content.style.opacity = '1';
                 content.classList.add('is-open');
                 iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true"><path d="M7 17 17 7"></path><path d="M7 7h10v10"></path></svg>`;
@@ -139,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (activeId && !isAnyOpened && items.length > 0) {
         const firstContent = items[0].querySelector('.dprd-accordion-content');
         const firstIconContainer = items[0].querySelector('.dprd-accordion-icon');
-        firstContent.style.height = 'auto';
+        firstContent.style.maxHeight = firstContent.scrollHeight + 'px';
         firstContent.style.opacity = '1';
         firstContent.classList.add('is-open');
         firstIconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true"><path d="M7 17 17 7"></path><path d="M7 7h10v10"></path></svg>`;

@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             megamenu.classList.add('invisible');
             overlay.classList.add('hidden');
-        }, 300);
+        }, 700);
 
         iconMenu.classList.remove('hidden'); iconMenu.classList.add('flex');
         iconClose.classList.add('hidden');   iconClose.classList.remove('flex');
@@ -334,16 +334,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ── Interaksi Accordion PPID (Exclusive Accordion / Hanya 1 terbuka) ──
+    // ── Interaksi Accordion PPID (Exclusive Accordion / Dynamic ScrollHeight Smooth) ──
     const ppidItems = document.querySelectorAll('.dprd-accordion-item');
 
-    ppidItems.forEach(item => {
+    ppidItems.forEach((item, index) => {
         const btn = item.querySelector('.dprd-accordion-btn');
         const content = item.querySelector('.dprd-accordion-content');
 
         if (btn && content) {
+            content.style.transition = 'max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
+
+            if (index === 0) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                content.style.opacity = '1';
+                content.classList.add('is-open');
+            } else {
+                content.style.maxHeight = '0px';
+                content.style.opacity = '0';
+            }
+
             btn.addEventListener('click', () => {
-                const isHidden = content.classList.contains('hidden');
+                const isOpen = content.classList.contains('is-open');
 
                 // Tutup semua item PPID terlebih dahulu
                 ppidItems.forEach(otherItem => {
@@ -351,27 +362,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     const otherOpen = otherItem.querySelector('.dprd-icon-open');
                     const otherClosed = otherItem.querySelector('.dprd-icon-closed');
 
-                    if (otherContent && !otherContent.classList.contains('hidden')) {
-                        otherContent.classList.add('max-h-0', 'opacity-0');
-                        otherContent.classList.remove('max-h-[1000px]', 'opacity-100');
-                        setTimeout(() => {
-                            otherContent.classList.add('hidden');
-                        }, 300);
+                    if (otherContent) {
+                        otherContent.style.maxHeight = '0px';
+                        otherContent.style.opacity = '0';
+                        otherContent.classList.remove('is-open');
                     }
                     if (otherOpen) otherOpen.classList.add('hidden');
                     if (otherClosed) otherClosed.classList.remove('hidden');
                 });
 
                 // Jika sebelumnya tertutup, buka item yang diklik
-                if (isHidden) {
+                if (!isOpen) {
                     const iconOpen = item.querySelector('.dprd-icon-open');
                     const iconClosed = item.querySelector('.dprd-icon-closed');
 
-                    content.classList.remove('hidden');
-                    requestAnimationFrame(() => {
-                        content.classList.remove('max-h-0', 'opacity-0');
-                        content.classList.add('max-h-[1000px]', 'opacity-100');
-                    });
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    content.style.opacity = '1';
+                    content.classList.add('is-open');
                     if (iconOpen) iconOpen.classList.remove('hidden');
                     if (iconClosed) iconClosed.classList.add('hidden');
                 }
