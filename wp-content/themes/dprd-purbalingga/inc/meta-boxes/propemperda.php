@@ -18,10 +18,13 @@ add_action('add_meta_boxes', function () {
 
 function dprd_render_propemperda_meta_box($post) {
     wp_nonce_field('dprd_save_propemperda_meta', 'dprd_propemperda_meta_nonce');
-    $tahun = get_post_meta($post->ID, 'tahun', true);
-    $deskripsi = get_post_meta($post->ID, 'deskripsi', true);
-    $propemperda_file = get_post_meta($post->ID, 'propemperda_file', true);
+    $tahun             = get_post_meta($post->ID, 'tahun', true);
+    $deskripsi         = get_post_meta($post->ID, 'deskripsi', true);
+    $propemperda_file  = get_post_meta($post->ID, 'propemperda_file', true);
     $sk_penetapan_file = get_post_meta($post->ID, 'sk_penetapan_file', true);
+
+    $perda_filename = $propemperda_file ? basename(parse_url($propemperda_file, PHP_URL_PATH)) : '';
+    $sk_filename    = $sk_penetapan_file ? basename(parse_url($sk_penetapan_file, PHP_URL_PATH)) : '';
     ?>
     <table class="form-table">
         <tr>
@@ -38,54 +41,88 @@ function dprd_render_propemperda_meta_box($post) {
                 <p class="description">Keterangan singkat yang akan muncul di bawah judul tahun.</p>
             </td>
         </tr>
+
+        <!-- File 1: Dokumen Propemperda -->
         <tr>
-            <th><label for="dprd_propemperda_file">Berkas Propemperda Kabupaten Purbalingga (PDF)</label></th>
+            <th><label>Dokumen Propemperda (PDF)</label></th>
             <td>
-                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 5px;">
-                    <input type="text" name="propemperda_file" id="dprd_propemperda_file" value="<?php echo esc_url($propemperda_file); ?>" class="large-text" placeholder="https://..." style="flex-grow: 1;">
-                    <button type="button" class="button dprd-select-pdf-btn" data-target="dprd_propemperda_file">Pilih Berkas PDF</button>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <input type="hidden" name="propemperda_file" id="propemperda_file" value="<?php echo esc_url($propemperda_file); ?>">
+                    <button type="button" class="button button-secondary dprd-upload-pdf-btn" data-target="propemperda_file" data-label="label_propemperda_file">
+                        📎 Pilih PDF Propemperda
+                    </button>
+                    <span id="label_propemperda_file" style="font-size:13px; color:#50575e; font-weight:500;">
+                        <?php echo $perda_filename ? esc_html($perda_filename) : '<em>Belum ada file dipilih</em>'; ?>
+                    </span>
+                    <button type="button" class="button-link dprd-remove-pdf-btn" data-target="propemperda_file" data-label="label_propemperda_file" style="color:#b32d2e; text-decoration:none; <?php echo $propemperda_file ? '' : 'display:none;'; ?>">
+                        ✕ Hapus
+                    </button>
                 </div>
-                <p class="description">Unggah berkas PDF untuk Dokumen Propemperda Kabupaten Purbalingga.</p>
             </td>
         </tr>
+
+        <!-- File 2: SK Penetapan -->
         <tr>
-            <th><label for="dprd_sk_penetapan_file">Berkas SK Penetapan Propemperda (PDF)</label></th>
+            <th><label>Dokumen SK Penetapan (PDF)</label></th>
             <td>
-                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 5px;">
-                    <input type="text" name="sk_penetapan_file" id="dprd_sk_penetapan_file" value="<?php echo esc_url($sk_penetapan_file); ?>" class="large-text" placeholder="https://..." style="flex-grow: 1;">
-                    <button type="button" class="button dprd-select-pdf-btn" data-target="dprd_sk_penetapan_file">Pilih Berkas PDF</button>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <input type="hidden" name="sk_penetapan_file" id="sk_penetapan_file" value="<?php echo esc_url($sk_penetapan_file); ?>">
+                    <button type="button" class="button button-secondary dprd-upload-pdf-btn" data-target="sk_penetapan_file" data-label="label_sk_penetapan_file">
+                        📎 Pilih PDF SK Penetapan
+                    </button>
+                    <span id="label_sk_penetapan_file" style="font-size:13px; color:#50575e; font-weight:500;">
+                        <?php echo $sk_filename ? esc_html($sk_filename) : '<em>Belum ada file dipilih</em>'; ?>
+                    </span>
+                    <button type="button" class="button-link dprd-remove-pdf-btn" data-target="sk_penetapan_file" data-label="label_sk_penetapan_file" style="color:#b32d2e; text-decoration:none; <?php echo $sk_penetapan_file ? '' : 'display:none;'; ?>">
+                        ✕ Hapus
+                    </button>
                 </div>
-                <p class="description">Unggah berkas PDF untuk Dokumen SK Penetapan Propemperda.</p>
             </td>
         </tr>
     </table>
+
     <script>
-    jQuery(document).ready(function($){
-        $('.dprd-select-pdf-btn').click(function(e) {
+    jQuery(document).ready(function($) {
+        $('.dprd-upload-pdf-btn').on('click', function(e) {
             e.preventDefault();
-            var targetId = $(this).data('target');
-            var pdfFrame = wp.media({
-                title: 'Pilih Berkas PDF',
-                button: {
-                    text: 'Gunakan Berkas Ini'
-                },
+            var btn       = $(this);
+            var targetId  = btn.data('target');
+            var labelId   = btn.data('label');
+            var removeBtn = btn.siblings('.dprd-remove-pdf-btn');
+
+            var frame = wp.media({
+                title: 'Pilih File PDF',
+                button: { text: 'Gunakan File Ini' },
                 multiple: false,
-                library: {
-                    type: 'application/pdf'
-                }
+                library: { type: ['application/pdf'] }
             });
-            pdfFrame.on('select', function() {
-                var attachment = pdfFrame.state().get('selection').first().toJSON();
+
+            frame.on('select', function() {
+                var attachment = frame.state().get('selection').first().toJSON();
                 $('#' + targetId).val(attachment.url);
+                $('#' + labelId).html('<strong>' + attachment.filename + '</strong>');
+                removeBtn.show();
             });
-            pdfFrame.open();
+
+            frame.open();
+        });
+
+        $('.dprd-remove-pdf-btn').on('click', function(e) {
+            e.preventDefault();
+            var btn      = $(this);
+            var targetId = btn.data('target');
+            var labelId  = btn.data('label');
+
+            $('#' + targetId).val('');
+            $('#' + labelId).html('<em>Belum ada file dipilih</em>');
+            btn.hide();
         });
     });
     </script>
     <?php
 }
 
-add_action('save_post', function ($post_id) {
+function dprd_save_propemperda_meta($post_id) {
     if (!isset($_POST['dprd_propemperda_meta_nonce']) || !wp_verify_nonce($_POST['dprd_propemperda_meta_nonce'], 'dprd_save_propemperda_meta')) {
         return;
     }
@@ -97,7 +134,38 @@ add_action('save_post', function ($post_id) {
     }
 
     if (isset($_POST['tahun'])) {
-        update_post_meta($post_id, 'tahun', sanitize_text_field($_POST['tahun']));
+        $raw_tahun = sanitize_text_field($_POST['tahun']);
+        if (preg_match('/\d{4}/', $raw_tahun, $matches)) {
+            $clean_tahun = intval($matches[0]);
+        } else {
+            $clean_tahun = intval(preg_replace('/[^0-9]/', '', $raw_tahun)) ?: date('Y');
+        }
+
+        // ── Strict Duplicate Year Handler (Gagal & Notifikasi saat Typo) ──
+        $existing_posts = get_posts([
+            'post_type'      => 'propemperda',
+            'meta_key'       => 'tahun',
+            'meta_value'     => $clean_tahun,
+            'post__not_in'   => [$post_id],
+            'posts_per_page' => 1,
+            'post_status'    => 'publish'
+        ]);
+
+        if (!empty($existing_posts)) {
+            // Unhook agar tidak infinite loop, lalu kembalikan status post ke draft (GAGAL PUBLISH)
+            remove_action('save_post', 'dprd_save_propemperda_meta');
+            wp_update_post([
+                'ID'          => $post_id,
+                'post_status' => 'draft'
+            ]);
+            add_action('save_post', 'dprd_save_propemperda_meta');
+
+            // Set notifikasi error untuk admin
+            set_transient('dprd_propemperda_duplicate_error_' . get_current_user_id(), $clean_tahun, 45);
+            return;
+        }
+
+        update_post_meta($post_id, 'tahun', $clean_tahun);
     }
     if (isset($_POST['deskripsi'])) {
         update_post_meta($post_id, 'deskripsi', sanitize_textarea_field($_POST['deskripsi']));
@@ -107,6 +175,21 @@ add_action('save_post', function ($post_id) {
     }
     if (isset($_POST['sk_penetapan_file'])) {
         update_post_meta($post_id, 'sk_penetapan_file', esc_url_raw($_POST['sk_penetapan_file']));
+    }
+}
+add_action('save_post', 'dprd_save_propemperda_meta');
+
+// Admin Notice jika Terjadi Duplikasi Tahun (Penolakan Publikasi)
+add_action('admin_notices', function () {
+    $user_id = get_current_user_id();
+    $error_tahun = get_transient('dprd_propemperda_duplicate_error_' . $user_id);
+    if ($error_tahun) {
+        delete_transient('dprd_propemperda_duplicate_error_' . $user_id);
+        ?>
+        <div class="notice notice-error is-dismissible">
+            <p><strong>⚠️ GAGAL MEMPUBLIKASIKAN DOKUMEN:</strong> Dokumen Propemperda untuk <strong>Tahun <?php echo esc_html($error_tahun); ?></strong> sudah terdaftar di database! Dokumen baru ini disimpan sebagai <em>Draft</em> agar tidak menimpa file lama. Silakan periksa kembali tahun atau edit pos tahun <?php echo esc_html($error_tahun); ?> yang sudah ada.</p>
+        </div>
+        <?php
     }
 });
 

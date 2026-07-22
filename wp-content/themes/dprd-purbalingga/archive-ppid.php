@@ -79,7 +79,7 @@ $ppid_query = new WP_Query([
                         </button>
 
                         <!-- Accordion Content -->
-                        <div class="dprd-accordion-content overflow-hidden transition-all duration-300 ease-in-out <?php echo $is_open ? 'opacity-100 max-h-[1000px]' : 'opacity-0 max-h-0 hidden'; ?>">
+                        <div class="dprd-accordion-content overflow-hidden">
                             <div class="pt-6 flex flex-col gap-3">
                                 <?php if (!empty($documents)) : ?>
                                     <?php foreach ($documents as $doc) :
