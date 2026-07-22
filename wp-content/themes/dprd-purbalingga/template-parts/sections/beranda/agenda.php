@@ -4,13 +4,28 @@
  */
 if (!defined('ABSPATH')) exit;
 
-// Query 3 Agenda terbaru
+// Ambil parameter halaman dari URL (untuk pagination Agenda)
+$agenda_paged = isset($_GET['agenda_paged']) ? max(1, intval($_GET['agenda_paged'])) : 1;
+
+// Tanggal hari ini (WP timezone lokal atau GMT+7)
+$today = current_time('Y-m-d');
+
+// Query Agenda (3 per halaman, mulai dari hari ini)
 $agenda_query = new WP_Query([
     'post_type'      => 'agenda',
     'posts_per_page' => 3,
+    'paged'          => $agenda_paged,
     'meta_key'       => 'tanggal',
     'orderby'        => 'meta_value',
     'order'          => 'ASC',
+    'meta_query'     => [
+        [
+            'key'     => 'tanggal',
+            'value'   => $today,
+            'compare' => '>=',
+            'type'    => 'DATE'
+        ]
+    ]
 ]);
 
 // Helper format bulan Indonesia
@@ -28,7 +43,7 @@ function dprd_get_indo_month($date_str) {
 }
 ?>
 
-<section class="bg-[#7D1A1D] text-white w-full py-16">
+<section id="agenda-section" class="bg-[#7D1A1D] text-white w-full py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16">
         <div class="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12 lg:gap-16">
             
@@ -71,29 +86,70 @@ function dprd_get_indo_month($date_str) {
                             endwhile;
                             wp_reset_postdata();
                         else : ?>
-                            <div class="p-6 text-center text-body-secondary font-sans">Belum ada agenda kegiatan.</div>
+                            <div class="flex-grow flex flex-col items-center justify-center p-8 text-center min-h-[250px]">
+                                <h4 class="font-sans font-bold text-body text-[15px] mb-1">Tidak Ada Agenda</h4>
+                                <p class="font-sans text-[13px] text-body-secondary">Belum ada jadwal sidang atau kegiatan dalam waktu dekat.</p>
+                            </div>
                         <?php endif; ?>
                     </div>
                     
-                    <!-- Pagination (Placeholder) -->
+                    <!-- Pagination -->
+                    <?php
+                    $total_pages = $agenda_query->max_num_pages;
+                    if ($total_pages > 1) :
+                        $prev_url = $agenda_paged > 1 ? esc_url(add_query_arg('agenda_paged', $agenda_paged - 1) . '#agenda-section') : '';
+                        $next_url = $agenda_paged < $total_pages ? esc_url(add_query_arg('agenda_paged', $agenda_paged + 1) . '#agenda-section') : '';
+                    ?>
                     <div class="flex items-center justify-center gap-2 py-5 mt-auto border-t border-line/40">
-                        <button class="text-body-secondary hover:text-body transition-colors p-1" aria-label="Previous page">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </button>
+                        <?php if ($prev_url) : ?>
+                            <a href="<?php echo $prev_url; ?>" class="text-body-secondary hover:text-body transition-colors p-1" aria-label="Previous page">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
+                            </a>
+                        <?php else : ?>
+                            <span class="text-line p-1 cursor-not-allowed">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
+                            </span>
+                        <?php endif; ?>
                         
-                        <button class="text-body font-bold text-sm px-2 font-mono">1</button>
-                        <button class="text-body-secondary hover:text-body transition-colors text-sm px-2 font-mono font-medium">2</button>
-                        <span class="text-body-secondary text-sm px-1 font-mono">...</span>
-                        <button class="text-body-secondary hover:text-body transition-colors text-sm px-2 font-mono font-medium">5</button>
+                        <?php
+                        $links = paginate_links([
+                            'base'      => add_query_arg('agenda_paged', '%#%') . '#agenda-section',
+                            'format'    => '',
+                            'current'   => $agenda_paged,
+                            'total'     => $total_pages,
+                            'prev_next' => false,
+                            'type'      => 'array',
+                            'mid_size'  => 1
+                        ]);
+                        
+                        if (is_array($links)) {
+                            foreach ($links as $link) {
+                                if (strpos($link, 'current') !== false) {
+                                    $num = strip_tags($link);
+                                    echo '<span class="text-body font-bold text-sm px-2 font-mono">' . $num . '</span>';
+                                } elseif (strpos($link, 'dots') !== false) {
+                                    echo '<span class="text-body-secondary text-sm px-1 font-mono">...</span>';
+                                } else {
+                                    preg_match('/href=[\'"]([^\'"]+)[\'"]/', $link, $matches);
+                                    $url = !empty($matches[1]) ? $matches[1] : '#';
+                                    $num = strip_tags($link);
+                                    echo '<a href="' . esc_url($url) . '" class="text-body-secondary hover:text-body transition-colors text-sm px-2 font-mono font-medium">' . $num . '</a>';
+                                }
+                            }
+                        }
+                        ?>
 
-                        <button class="text-body-secondary hover:text-body transition-colors p-1" aria-label="Next page">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </button>
+                        <?php if ($next_url) : ?>
+                            <a href="<?php echo $next_url; ?>" class="text-body-secondary hover:text-body transition-colors p-1" aria-label="Next page">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
+                            </a>
+                        <?php else : ?>
+                            <span class="text-line p-1 cursor-not-allowed">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
+                            </span>
+                        <?php endif; ?>
                     </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
