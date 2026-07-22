@@ -216,5 +216,106 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ── Interaksi Mobile Menu Accordion (1:1 Vercel NavbarDropdown.jsx) ───
+    const mobL0Headers = document.querySelectorAll('.dprd-mobile-level0-header');
+    const mobL1Headers = document.querySelectorAll('.dprd-mobile-level1-header');
+
+    mobL0Headers.forEach(header => {
+        header.addEventListener('click', (e) => {
+            const index = header.dataset.index;
+            const body  = document.getElementById('dprd-mobile-level0-body-' + index);
+            const icon  = header.querySelector('.dprd-mobile-level0-icon');
+            const link  = header.querySelector('.dprd-mobile-level0-link');
+
+            if (!body) return;
+
+            // Jika link memiliki anak, cegah navigasi langsung
+            if (link && link.classList.contains('dprd-has-children')) {
+                e.preventDefault();
+            }
+
+            const isExpanded = !body.classList.contains('hidden');
+
+            // Tutup semua level 0 lain
+            document.querySelectorAll('.dprd-mobile-level0-body').forEach(b => {
+                b.classList.add('hidden', 'max-h-0', 'opacity-0');
+            });
+            document.querySelectorAll('.dprd-mobile-level0-icon').forEach(ic => {
+                ic.classList.remove('rotate-90', 'text-primary');
+                ic.classList.add('text-body/60');
+            });
+            document.querySelectorAll('.dprd-mobile-level0-link').forEach(l => {
+                l.classList.remove('text-primary', 'font-bold');
+            });
+
+            // Toggle item yang diklik jika sebelumnya tertutup
+            if (!isExpanded) {
+                body.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    body.classList.remove('max-h-0', 'opacity-0');
+                    body.classList.add('max-h-[1000px]', 'opacity-100', 'mb-3');
+                });
+                if (icon) {
+                    icon.classList.add('rotate-90', 'text-primary');
+                    icon.classList.remove('text-body/60');
+                }
+                if (link) {
+                    link.classList.add('text-primary', 'font-bold');
+                }
+            }
+        });
+    });
+
+    mobL1Headers.forEach(header => {
+        header.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const key  = header.dataset.key;
+            const body = document.getElementById('dprd-mobile-level1-body-' + key);
+            const icon = header.querySelector('.dprd-mobile-level1-icon');
+            const link = header.querySelector('.dprd-mobile-level1-link');
+
+            if (!body) return;
+
+            if (link && link.classList.contains('dprd-has-children')) {
+                e.preventDefault();
+            }
+
+            const isExpanded = !body.classList.contains('hidden');
+
+            // Tutup semua level 1 di kontainer yang sama
+            const parentContainer = header.closest('.dprd-mobile-level0-body');
+            if (parentContainer) {
+                parentContainer.querySelectorAll('.dprd-mobile-level1-body').forEach(b => {
+                    b.classList.add('hidden', 'max-h-0', 'opacity-0');
+                });
+                parentContainer.querySelectorAll('.dprd-mobile-level1-icon').forEach(ic => {
+                    ic.classList.remove('rotate-90', 'text-primary');
+                    ic.classList.add('text-body/60');
+                });
+                parentContainer.querySelectorAll('.dprd-mobile-level1-link').forEach(l => {
+                    l.classList.remove('text-primary', 'font-bold');
+                });
+            }
+
+            if (!isExpanded) {
+                body.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    body.classList.remove('max-h-0', 'opacity-0');
+                    body.classList.add('max-h-[500px]', 'opacity-100', 'mb-2');
+                });
+                if (icon) {
+                    icon.classList.add('rotate-90', 'text-primary');
+                    icon.classList.remove('text-body/60');
+                }
+                if (link) {
+                    link.classList.add('text-primary', 'font-bold');
+                }
+            }
+        });
+    });
+
 });
+
+
+
 

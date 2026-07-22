@@ -79,105 +79,190 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
         </div>
     </div>
 
-    <!-- ── Overlay gelap saat menu terbuka (absolute, mulai tepat di bawah header) ── -->
+    <!-- ── Overlay gelap saat menu terbuka ── -->
     <div id="dprd-overlay" class="absolute top-full left-0 w-screen h-screen bg-ink/20 backdrop-blur-sm z-30 hidden opacity-0 transition-opacity duration-500 ease-out"></div>
 
-    <!-- ── Mega Menu Panel (absolute top-full = tepat di bawah header bar) ────── -->
+    <!-- ── Mega Menu Panel (Desktop + Mobile Layout) ────── -->
     <div id="dprd-megamenu"
          class="absolute top-full left-0 w-screen bg-white border-t border-b border-line/50 shadow-xl z-40 invisible opacity-0 transition-all duration-300 ease-out"
          aria-hidden="true">
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 py-6 flex gap-0 min-h-[220px]">
-
-        <!-- ── Kolom 1: Menu Level 1 ────────────────────────────────────── -->
         <?php
-        // Temukan index pertama yang punya anak (untuk default active)
         $default_l1_index = null;
         foreach ($menu_tree as $i => $item) {
             if (!empty($item->children)) { $default_l1_index = $i; break; }
         }
         ?>
-        <nav class="w-1/3 border-r border-line/40 pr-8 overflow-y-auto" aria-label="Menu utama">
-            <ul class="flex flex-col gap-1 font-mono text-[14px] text-body">
+
+        <!-- ── Desktop View (sm:flex) ───────────────────────────────────────── -->
+        <div class="hidden sm:flex max-w-7xl mx-auto h-fit min-h-[220px] py-6 px-4 sm:px-6 lg:px-16">
+            <!-- Kolom 1 -->
+            <nav class="w-1/3 border-r border-line/40 pr-8 overflow-y-auto" aria-label="Menu utama">
+                <ul class="flex flex-col gap-1 font-mono text-[14px] text-body">
+                    <?php foreach ($menu_tree as $i => $item) :
+                        $has_children = !empty($item->children);
+                        $is_default   = ($i === $default_l1_index);
+                        ?>
+                        <li>
+                            <button
+                                class="dprd-l1-item w-full flex items-center justify-between py-1.5 px-2 rounded-none text-left transition-colors hover:text-primary border-0 bg-transparent outline-none focus:outline-none cursor-pointer <?php echo $is_default ? 'dprd-active text-primary font-bold' : ''; ?>"
+                                data-index="<?php echo esc_attr($i); ?>"
+                                data-url="<?php echo esc_url($item->url); ?>"
+                                data-has-children="<?php echo $has_children ? 'true' : 'false'; ?>"
+                            >
+                                <span><?php echo esc_html($item->title); ?></span>
+                                <?php if ($has_children) : ?>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="shrink-0 opacity-60" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                                <?php endif; ?>
+                            </button>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </nav>
+
+            <!-- Kolom 2 -->
+            <div class="w-1/3 border-r border-line/40 px-8 overflow-y-auto">
                 <?php foreach ($menu_tree as $i => $item) :
-                    $has_children = !empty($item->children);
-                    $is_default   = ($i === $default_l1_index);
+                    if (empty($item->children)) continue;
+                    $is_default_panel = ($i === $default_l1_index);
                     ?>
-                    <li>
-                        <button
-                            class="dprd-l1-item w-full flex items-center justify-between py-1.5 px-2 rounded-none text-left transition-colors hover:text-primary border-0 bg-transparent outline-none focus:outline-none cursor-pointer <?php echo $is_default ? 'dprd-active text-primary font-bold' : ''; ?>"
-                            data-index="<?php echo esc_attr($i); ?>"
-                            data-url="<?php echo esc_url($item->url); ?>"
-                            data-has-children="<?php echo $has_children ? 'true' : 'false'; ?>"
-                        >
-                            <span><?php echo esc_html($item->title); ?></span>
-                            <?php if ($has_children) : ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="shrink-0 opacity-60" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-                            <?php endif; ?>
-                        </button>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        </nav>
-
-        <!-- ── Kolom 2: Sub-menu Level 2 ───────────────────────────────── -->
-        <div class="w-1/3 border-r border-line/40 px-8 overflow-y-auto">
-            <?php foreach ($menu_tree as $i => $item) :
-                if (empty($item->children)) continue;
-                $is_default_panel = ($i === $default_l1_index);
-                ?>
-                <nav id="dprd-l2-<?php echo esc_attr($i); ?>"
-                     class="dprd-l2-panel <?php echo $is_default_panel ? '' : 'hidden'; ?>"
-                     aria-label="Sub-menu <?php echo esc_attr($item->title); ?>">
-                    <ul class="flex flex-col gap-1 font-mono text-[14px] text-body">
-                        <?php foreach ($item->children as $j => $sub) :
-                            $has_sub = !empty($sub->children);
-                            ?>
-                            <li>
-                                <button
-                                    class="dprd-l2-item w-full flex items-center justify-between py-1.5 px-2 rounded-none text-left transition-colors hover:text-primary border-0 bg-transparent outline-none focus:outline-none cursor-pointer <?php echo ($is_default_panel && $j === 0) ? 'dprd-active text-primary font-bold' : ''; ?>"
-                                    data-parent="<?php echo esc_attr($i); ?>"
-                                    data-index="<?php echo esc_attr($i . '-' . $j); ?>"
-                                    data-url="<?php echo esc_url($sub->url); ?>"
-                                    data-has-children="<?php echo $has_sub ? 'true' : 'false'; ?>"
-                                >
-                                    <span><?php echo esc_html($sub->title); ?></span>
-                                    <?php if ($has_sub) : ?>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="shrink-0 opacity-60" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-                                    <?php endif; ?>
-                                </button>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </nav>
-            <?php endforeach; ?>
-        </div>
-
-        <!-- ── Kolom 3: Sub-sub-menu Level 3 ───────────────────────────── -->
-        <div class="w-1/3 pl-8 overflow-y-auto">
-            <?php foreach ($menu_tree as $i => $item) :
-                foreach ($item->children as $j => $sub) :
-                    if (empty($sub->children)) continue;
-                    $key = $i . '-' . $j;
-                    ?>
-                    <nav id="dprd-l3-<?php echo esc_attr($key); ?>"
-                         class="dprd-l3-panel hidden"
-                         aria-label="Sub-menu <?php echo esc_attr($sub->title); ?>">
+                    <nav id="dprd-l2-<?php echo esc_attr($i); ?>"
+                         class="dprd-l2-panel <?php echo $is_default_panel ? '' : 'hidden'; ?>"
+                         aria-label="Sub-menu <?php echo esc_attr($item->title); ?>">
                         <ul class="flex flex-col gap-1 font-mono text-[14px] text-body">
-                            <?php foreach ($sub->children as $child) : ?>
+                            <?php foreach ($item->children as $j => $sub) :
+                                $has_sub = !empty($sub->children);
+                                ?>
                                 <li>
-                                    <a href="<?php echo esc_url($child->url); ?>"
-                                       class="w-full flex items-center py-1.5 px-2 rounded-none transition-colors hover:text-primary">
-                                        <?php echo esc_html($child->title); ?>
-                                    </a>
+                                    <button
+                                        class="dprd-l2-item w-full flex items-center justify-between py-1.5 px-2 rounded-none text-left transition-colors hover:text-primary border-0 bg-transparent outline-none focus:outline-none cursor-pointer <?php echo ($is_default_panel && $j === 0) ? 'dprd-active text-primary font-bold' : ''; ?>"
+                                        data-parent="<?php echo esc_attr($i); ?>"
+                                        data-index="<?php echo esc_attr($i . '-' . $j); ?>"
+                                        data-url="<?php echo esc_url($sub->url); ?>"
+                                        data-has-children="<?php echo $has_sub ? 'true' : 'false'; ?>"
+                                    >
+                                        <span><?php echo esc_html($sub->title); ?></span>
+                                        <?php if ($has_sub) : ?>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="shrink-0 opacity-60" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                                        <?php endif; ?>
+                                    </button>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
                     </nav>
-                <?php endforeach;
-            endforeach; ?>
+                <?php endforeach; ?>
+            </div>
+
+            <!-- Kolom 3 -->
+            <div class="w-1/3 pl-8 overflow-y-auto">
+                <?php foreach ($menu_tree as $i => $item) :
+                    foreach ($item->children as $j => $sub) :
+                        if (empty($sub->children)) continue;
+                        $key = $i . '-' . $j;
+                        ?>
+                        <nav id="dprd-l3-<?php echo esc_attr($key); ?>"
+                             class="dprd-l3-panel hidden"
+                             aria-label="Sub-menu <?php echo esc_attr($sub->title); ?>">
+                            <ul class="flex flex-col gap-1 font-mono text-[14px] text-body">
+                                <?php foreach ($sub->children as $child) : ?>
+                                    <li>
+                                        <a href="<?php echo esc_url($child->url); ?>"
+                                           class="w-full flex items-center py-1.5 px-2 rounded-none transition-colors hover:text-primary">
+                                            <?php echo esc_html($child->title); ?>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </nav>
+                    <?php endforeach;
+                endforeach; ?>
+            </div>
+        </div>
+
+        <!-- ── Mobile View Accordion (sm:hidden) ─────────────────────────────── -->
+        <div class="sm:hidden w-full max-h-[75vh] overflow-y-auto custom-scrollbar px-4 py-2">
+            <ul class="flex flex-col font-mono text-[15px] text-body">
+                <?php foreach ($menu_tree as $i => $item) :
+                    $has_children = !empty($item->children);
+                    ?>
+                    <li class="flex flex-col border-line/50 last:border-b-0">
+                        <div
+                            class="dprd-mobile-level0-header flex justify-between items-center py-3.5 <?php echo $has_children ? 'cursor-pointer' : ''; ?>"
+                            data-index="<?php echo esc_attr($i); ?>"
+                        >
+                            <a href="<?php echo esc_url($item->url); ?>"
+                               class="dprd-mobile-level0-link flex-1 <?php echo $has_children ? 'dprd-has-children' : ''; ?>"
+                               data-index="<?php echo esc_attr($i); ?>"
+                            >
+                                <?php echo esc_html($item->title); ?>
+                            </a>
+                            <?php if ($has_children) : ?>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dprd-mobile-level0-icon text-body/60 transition-transform duration-300 shrink-0" aria-hidden="true">
+                                    <path d="m9 18 6-6-6-6"/>
+                                </svg>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Level 1 Accordion Body -->
+                        <?php if ($has_children) : ?>
+                            <div id="dprd-mobile-level0-body-<?php echo esc_attr($i); ?>" class="dprd-mobile-level0-body flex-col overflow-hidden transition-all duration-300 max-h-0 opacity-0 hidden">
+                                <ul class="flex flex-col gap-1 pl-4 border-l-2 border-line ml-2">
+                                    <?php foreach ($item->children as $j => $sub) :
+                                        $has_sub = !empty($sub->children);
+                                        $sub_key = $i . '-' . $j;
+                                        ?>
+                                        <li class="flex flex-col">
+                                            <div
+                                                class="dprd-mobile-level1-header flex justify-between items-center py-2.5 <?php echo $has_sub ? 'cursor-pointer' : ''; ?>"
+                                                data-key="<?php echo esc_attr($sub_key); ?>"
+                                            >
+                                                <a href="<?php echo esc_url($sub->url); ?>"
+                                                   class="dprd-mobile-level1-link flex-1 text-[14px] <?php echo $has_sub ? 'dprd-has-children' : ''; ?>"
+                                                   data-key="<?php echo esc_attr($sub_key); ?>"
+                                                >
+                                                    <?php echo esc_html($sub->title); ?>
+                                                </a>
+                                                <?php if ($has_sub) : ?>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dprd-mobile-level1-icon text-body/60 transition-transform duration-300 shrink-0" aria-hidden="true">
+                                                        <path d="m9 18 6-6-6-6"/>
+                                                    </svg>
+                                                <?php endif; ?>
+                                            </div>
+
+                                            <!-- Level 2 Accordion Body -->
+                                            <?php if ($has_sub) : ?>
+                                                <div id="dprd-mobile-level1-body-<?php echo esc_attr($sub_key); ?>" class="dprd-mobile-level1-body flex-col overflow-hidden transition-all duration-300 max-h-0 opacity-0 hidden">
+                                                    <ul class="flex flex-col gap-1 pl-4 border-l-2 border-line ml-2">
+                                                        <?php foreach ($sub->children as $child) : ?>
+                                                            <li>
+                                                                <a href="<?php echo esc_url($child->url); ?>" class="block py-2 text-[13px] hover:text-primary transition-colors">
+                                                                    <?php echo esc_html($child->title); ?>
+                                                                </a>
+                                                            </li>
+                                                        <?php endforeach; ?>
+                                                    </ul>
+                                                </div>
+                                            <?php endif; ?>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        <?php endif; ?>
+                    </li>
+                <?php endforeach; ?>
+
+                <!-- Mobile Only: Reservasi Kunjungan -->
+                <li class="flex flex-col border-t border-line/50 mt-1">
+                    <div class="flex justify-between items-center py-3.5">
+                        <a href="<?php echo esc_url(home_url('/reservasi')); ?>" class="flex-1 font-bold text-primary">
+                            Reservasi Kunjungan
+                        </a>
+                    </div>
+                </li>
+            </ul>
         </div>
 
     </div>
-</div>
 </header>
+
+
