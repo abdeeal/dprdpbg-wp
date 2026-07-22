@@ -63,7 +63,7 @@ $slug = get_post_field('post_name', $post_id);
 // Resolve Breadcrumbs
 $breadcrumbs = [
     ['label' => 'Beranda', 'href' => home_url('/')],
-    ['label' => 'Profil DPRD', 'href' => '#'],
+    ['label' => 'Profil DPRD', 'href' => home_url('/profil-dprd/')],
 ];
 
 // Flat members list resolved from dprd_ak_struktur_json
@@ -275,6 +275,7 @@ if ($slug === 'pimpinan-dprd') {
         </div>
         <?php
         $dasar_content = ob_get_clean();
+        $dasar_is_html = true;
         
         // Build BK Sanksi HTML (instead of tasks list)
         if (!empty($sanksi_data)) {
@@ -513,23 +514,14 @@ if ($slug === 'pimpinan-dprd') {
 ?>
 
 <!-- Breadcrumbs -->
-<div class="mb-6 md:mb-8">
-    <div class="flex items-center gap-1.5 flex-wrap font-sans text-xs md:text-sm text-body-secondary font-medium">
-        <?php foreach ($breadcrumbs as $i => $bc) : 
-            $is_last = ($i === count($breadcrumbs) - 1);
-            ?>
-            <?php if (!$is_last && isset($bc['href'])) : ?>
-                <a href="<?php echo esc_url($bc['href']); ?>" class="hover:text-primary transition-colors"><?php echo esc_html($bc['label']); ?></a>
-                <span class="text-body-secondary/60 text-xs mt-[1px] font-normal mx-0.5">›</span>
-            <?php else : ?>
-                <span class="text-body font-semibold"><?php echo esc_html($bc['label']); ?></span>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </div>
-</div>
+<?php
+get_template_part('template-parts/ui/breadcrumbs', null, [
+    'items' => $breadcrumbs
+]);
+?>
 
 <!-- Page Header -->
-<div class="mb-10 max-w-4xl mx-auto w-full">
+<div class="mb-10 w-full text-left">
     <h1 class="font-display font-black text-3xl md:text-[36px] text-primary mb-2 leading-tight">
         <?php echo esc_html($title); ?>
     </h1>
@@ -566,7 +558,7 @@ if ($slug === 'pimpinan-dprd') {
                     <?php foreach ($lvl_members as $member) : ?>
                         <div class="w-full sm:w-[calc(50%-1.5rem)] md:w-[calc(33.333%-2.5rem)] max-w-[280px] flex justify-center">
                             <div class="flex flex-col items-center w-full">
-                                <h3 class="font-display text-lg md:text-[19px] font-bold text-body text-center mb-3 leading-snug">
+                                <h3 class="font-display text-lg md:text-[19px] font-normal text-body text-center mb-3 leading-snug h-[2.6em] min-h-[2.6em] flex items-center justify-center">
                                     <?php echo esc_html($member['name']); ?>
                                 </h3>
                                 
@@ -604,12 +596,12 @@ if ($slug === 'pimpinan-dprd') {
         <h2 class="font-display font-bold text-[22px] md:text-[32px] text-body mb-4">
             <?php echo esc_html($dasar_title); ?>
         </h2>
-        <?php if (is_string($dasar_content)) : ?>
+        <?php if (!empty($dasar_is_html)) : ?>
+            <?php echo $dasar_content; ?>
+        <?php else : ?>
             <p class="font-sans text-[15px] md:text-base text-body leading-[1.8] md:leading-[1.8] mb-4">
                 <?php echo esc_html($dasar_content); ?>
             </p>
-        <?php else : ?>
-            <?php echo $dasar_content; ?>
         <?php endif; ?>
     </div>
 <?php endif; ?>

@@ -1,5 +1,5 @@
 # Progress Migrasi DPRD Kabupaten Purbalingga
-Hari ini: Selasa, 21 Juli 2026
+Hari ini: Rabu, 22 Juli 2026
 
 ## 1. Fase 0.5 & 2 — Penataan CPT & Database Cleanup
 - [x] Perbaikan error sintaksis trailing brackets pada `insert-default-data.php`.
@@ -18,9 +18,10 @@ Hari ini: Selasa, 21 Juli 2026
 ## 2. Penyesuaian Routing & Rewrite Rules (`/profil-dprd/`)
 - [x] Pembaruan rewrite slug CPT `alat-kelengkapan` di `post-types.php` menjadi `profil-dprd`.
 - [x] Registrasi query vars custom (`komisi_num` dan `fraksi_slug`).
-- [x] Pemicuan *flush rewrite rules* (v4) agar WordPress mengenali routing baru lokal secara instan.
+- [x] Pemicuan *flush rewrite rules* (v6) agar WordPress mengenali routing baru lokal secara instan.
+- [x] Sanitasi dan perbaikan otomatis URL menu navigasi di database via hook `functions.php` agar seluruh link navigasi (`/profil-dprd/pimpinan-dprd/`, dll.) tidak error 404.
 
-## 3. Fase 4 — Konversi Komponen ke PHP Template (Profil DPRD)
+## 3. Fase 4 — Konversi Komponen ke PHP Template (Profil DPRD & Footer)
 - [x] Pembuatan berkas helper ikon SVG Lucide di `inc/lucide-icons.php` (tanpa dependensi luar).
 - [x] Pembuatan berkas template arsip CPT `archive-alat-kelengkapan.php` untuk menampilkan halaman indeks landing `/profil-dprd` (gaya `NavigationIndex`).
 - [x] Pembuatan berkas template tunggal `template-parts/sections/alat-kelengkapan/single-content.php` yang mengelola sub-routing dinamis:
@@ -29,10 +30,18 @@ Hari ini: Selasa, 21 Juli 2026
   - Halaman Fraksi-Fraksi dengan grid keanggotaan.
   - Halaman BK dengan red banner statistik dan sanksi khusus.
   - Halaman Bamus, Banggar, Bapemperda dengan Dasar Hukum & Tugas.
-- [x] Penghapusan berkas template halaman statis lama (`page-pimpinan-dprd.php`, `page-badan-musyawarah.php`, dsb.) untuk menjaga kerapian tema.
+- [x] Pembuatan berkas `footer.php` 100% 1:1 persis source code Next.js `Footer.jsx`:
+  - Judul brand **DPRD Purbalingga** menggunakan `font-montserrat`.
+  - Tata letak 4 kolom (`Tautan Cepat`, `Informasi`, `Hubungi Kami`, `Brand & Alamat`).
+  - 3 tombol lingkaran aksen (*Pill buttons*).
+  - Tautan bermodel `font-mono` dan ikon kontak merah.
+  - Baris Hak Cipta & Tautan Kebijakan di bagian bawah.
 
-## 4. Pembaruan & Polish Halaman Pimpinan DPRD (Sesuai Screenshot User)
+## 4. Pembaruan & Polish Halaman Pimpinan DPRD & Alat Kelengkapan
 - [x] Pembaruan data tasks pimpinan di database mencakup ke-3 kategori lengkap (*Kepemimpinan*, *Perwakilan*, *Administrasi*).
-- [x] Penyesuaian lebar foto pimpinan menjadi `w-[220px]` (tanpa border/shadow tebal).
-- [x] Penataan ulang margin Dasar Hukum (tanpa garis pemisah horizontal) dan list bullet points tugas pimpinan (titik merah kecil, garis pembatas abu-abu tipis).
-- [x] Pengubahan pemisah breadcrumbs di seluruh halaman profil DPRD dari garis miring `/` menjadi karakter chevron `›` berwarna abu-abu redup.
+- [x] Standardisasi komponen Breadcrumbs (`template-parts/ui/breadcrumbs`) di seluruh 14 halaman Alat Kelengkapan.
+- [x] Perataan kontainer judul & deskripsi halaman ke sebelah kiri sejajar breadcrumbs (`w-full text-left`).
+- [x] Styling nama anggota non-bold (`font-normal`) dengan container tinggi seragam 2 baris (`h-[2.6em] min-h-[2.6em] flex items-center justify-center`).
+- [x] Pengenalan flag `$dasar_is_html` pada `single-content.php` sehingga Dasar Pembentukan Badan Kehormatan (Red Banner Stats) dirender utuh sebagai HTML tanpa terbungkus `esc_html()`.
+- [x] Penerapan `md:leading-[1.8]` pada deskripsi dasar pembentukan agar jarak antar baris desktop konsisten 1.8.
+- [x] Kompilasi ulang aset produksi Vite/Tailwind (`npm run build`).

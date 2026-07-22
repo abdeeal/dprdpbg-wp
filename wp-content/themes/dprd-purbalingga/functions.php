@@ -166,3 +166,36 @@ add_filter('wp_editor_set_quality', function($quality, $mime_type) {
 add_filter('wp_image_editors', function($editors) {
     return ['WP_Image_Editor_GD', 'WP_Image_Editor_Imagick'];
 });
+
+/**
+ * Auto-fix nav menu item URLs if missing home_url base or containing double slashes
+ */
+add_action('init', function() {
+    if (get_option('dprd_menu_urls_cleaned_v4')) return;
+
+    $locations = get_nav_menu_locations();
+    if (isset($locations['primary'])) {
+        $menu_items = wp_get_nav_menu_items($locations['primary']);
+        if ($menu_items) {
+            foreach ($menu_items as $mi) {
+                $url = $mi->url;
+                if (strpos($url, 'jdih.purbalinggakab.go.id') !== false) continue;
+
+                $parsed = wp_parse_url($url);
+                if (isset($parsed['path'])) {
+                    $path = $parsed['path'];
+                    $site_path = wp_parse_url(home_url(), PHP_URL_PATH) ?: '';
+                    if ($site_path && strpos($path, $site_path) === 0) {
+                        $path = substr($path, strlen($site_path));
+                    }
+                    $clean_path = '/' . ltrim(preg_replace('#/+#', '/', $path), '/');
+                    $new_url = home_url($clean_path);
+                    if ($new_url !== $url) {
+                        update_post_meta($mi->ID, '_menu_item_url', $new_url);
+                    }
+                }
+            }
+        }
+    }
+    update_option('dprd_menu_urls_cleaned_v4', true);
+});
