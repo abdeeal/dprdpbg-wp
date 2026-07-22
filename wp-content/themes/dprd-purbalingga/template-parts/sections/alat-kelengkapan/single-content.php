@@ -63,7 +63,7 @@ $slug = get_post_field('post_name', $post_id);
 // Resolve Breadcrumbs
 $breadcrumbs = [
     ['label' => 'Beranda', 'href' => home_url('/')],
-    ['label' => 'Profil DPRD', 'href' => '#'],
+    ['label' => 'Profil DPRD', 'href' => home_url('/profil-dprd/')],
 ];
 
 // Flat members list resolved from dprd_ak_struktur_json
@@ -155,10 +155,10 @@ if ($slug === 'pimpinan-dprd') {
                     <?php endif; ?>
                 </div>
                 <div class="flex flex-col flex-grow pt-2">
-                    <h3 class="font-display text-[26px] md:text-[28px] font-bold text-body mb-1 leading-tight">
+                    <h3 class="font-display text-[26px] md:text-[28px] text-body mb-1 leading-tight">
                         <?php echo esc_html($p['name']); ?>
                     </h3>
-                    <span class="font-sans text-[13px] md:text-sm text-body-secondary mb-4 block">
+                    <span class="font-sans text-[13px] md:text-sm text-body-secondary mb-6 block">
                         <?php echo esc_html($p['position']); ?>
                     </span>
                     <p class="font-sans text-[15px] md:text-[16px] text-body leading-[1.8]">
@@ -212,7 +212,7 @@ if ($slug === 'pimpinan-dprd') {
                                     if (is_array($points)) :
                                         foreach ($points as $pt) : ?>
                                             <li class="flex gap-3 items-start">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-2" />
+                                                <span class="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-2"></span>
                                                 <span class="font-sans text-[14px] md:text-[15px] text-body-secondary leading-relaxed">
                                                     <?php echo esc_html($pt); ?>
                                                 </span>
@@ -513,20 +513,11 @@ if ($slug === 'pimpinan-dprd') {
 ?>
 
 <!-- Breadcrumbs -->
-<div class="mb-6 md:mb-8">
-    <div class="flex items-center gap-1.5 flex-wrap font-sans text-xs md:text-sm text-body-secondary font-medium">
-        <?php foreach ($breadcrumbs as $i => $bc) : 
-            $is_last = ($i === count($breadcrumbs) - 1);
-            ?>
-            <?php if (!$is_last && isset($bc['href'])) : ?>
-                <a href="<?php echo esc_url($bc['href']); ?>" class="hover:text-primary transition-colors"><?php echo esc_html($bc['label']); ?></a>
-                <span class="text-body-secondary/60 text-xs mt-[1px] font-normal mx-0.5">›</span>
-            <?php else : ?>
-                <span class="text-body font-semibold"><?php echo esc_html($bc['label']); ?></span>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </div>
-</div>
+<?php
+get_template_part('template-parts/ui/breadcrumbs', null, [
+    'items' => $breadcrumbs
+]);
+?>
 
 <!-- Page Header -->
 <div class="mb-10 max-w-4xl mx-auto w-full">
@@ -571,7 +562,7 @@ if ($slug === 'pimpinan-dprd') {
                                 </h3>
                                 
                                 <!-- Divider line -->
-                                <div class="w-full h-px bg-body/30 mb-3" />
+                                <div class="w-full h-px bg-body/30 mb-3"></div>
                                 
                                 <span class="font-sans text-sm md:text-[15px] font-semibold text-primary mb-4 text-center">
                                     <?php echo esc_html($member['position']); ?>
@@ -590,7 +581,7 @@ if ($slug === 'pimpinan-dprd') {
                 <!-- Subtle separator line between levels -->
                 <?php if (!$is_last_lvl) : ?>
                     <div class="w-full flex justify-center my-12">
-                        <div class="w-3/4 max-w-2xl h-px bg-line/60" />
+                        <div class="w-3/4 max-w-2xl h-px bg-line/60"></div>
                     </div>
                 <?php endif; ?>
             </div>
@@ -638,7 +629,7 @@ if ($slug === 'pimpinan-dprd') {
                             <ul class="flex flex-col gap-2">
                                 <?php foreach ($tugas['items'] as $item) : ?>
                                     <li class="flex gap-3 items-start">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-2" />
+                                        <span class="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-2"></span>
                                         <span class="font-sans text-[14px] md:text-[16px] text-body-secondary leading-relaxed">
                                             <?php echo esc_html($item); ?>
                                         </span>

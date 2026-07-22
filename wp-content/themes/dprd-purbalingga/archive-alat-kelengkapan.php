@@ -7,10 +7,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-$breadcrumbs = [
-    ['label' => 'Beranda', 'href' => home_url('/')],
-    ['label' => 'Profil DPRD'],
-];
+
 
 $children_links = [
     [
@@ -49,20 +46,7 @@ get_header();
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16">
     
     <!-- Breadcrumbs -->
-    <div class="mb-6 md:mb-8">
-        <div class="flex items-center gap-1.5 flex-wrap font-sans text-xs md:text-sm text-body-secondary font-medium">
-            <?php foreach ($breadcrumbs as $i => $bc) : 
-                $is_last = ($i === count($breadcrumbs) - 1);
-                ?>
-                <?php if (!$is_last && isset($bc['href'])) : ?>
-                    <a href="<?php echo esc_url($bc['href']); ?>" class="hover:text-primary transition-colors"><?php echo esc_html($bc['label']); ?></a>
-                    <span class="text-body-secondary/60 text-xs mt-[1px] font-normal mx-0.5">›</span>
-                <?php else : ?>
-                    <span class="text-body font-semibold"><?php echo esc_html($bc['label']); ?></span>
-                <?php endif; ?>
-            <?php endforeach; ?>
-        </div>
-    </div>
+    <?php get_template_part('template-parts/ui/breadcrumbs'); ?>
 
     <!-- Page Header -->
     <div class="text-left mb-10">
