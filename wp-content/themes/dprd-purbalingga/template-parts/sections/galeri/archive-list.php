@@ -61,7 +61,7 @@ $categories = [
                 type="text" 
                 id="dprd-galeri-search"
                 placeholder="Cari Galeri" 
-                class="w-full border border-line rounded-none px-5 py-3.5 text-sm md:text-base outline-none focus:border-primary transition-colors text-body bg-transparent" 
+                class="w-full border border-primary/30 rounded-none px-5 py-3.5 text-sm md:text-base outline-none focus:border-primary transition-colors text-body" 
             />
             <svg class="absolute right-4 top-1/2 -translate-y-1/2 text-body-secondary pointer-events-none w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -70,11 +70,11 @@ $categories = [
     </div>
 
     <!-- Filter Tabs — layout justify-between, border pada tombol aktif -->
-    <div class="flex flex-wrap items-center justify-center md:justify-between gap-2 md:gap-4 mb-10 w-full overflow-x-auto" id="dprd-galeri-filters">
+    <div class="flex flex-wrap items-center justify-center md:justify-between gap-2 md:gap-4 mb-10 w-full overflow-x-auto no-scrollbar" id="dprd-galeri-filters">
         <?php foreach ($categories as $cat) : ?>
             <button 
                 data-category="<?php echo esc_attr($cat); ?>"
-                class="dprd-filter-btn px-6 py-2 text-xs md:text-[13px] tracking-wider uppercase whitespace-nowrap transition-colors border <?php echo $cat === 'Semua' ? 'bg-[#82111A] text-white border-[#82111A] hover:text-white' : 'text-body-secondary border-transparent hover:text-primary bg-transparent'; ?>"
+                class="dprd-filter-btn px-6 py-2 text-xs md:text-[13px] tracking-wider uppercase whitespace-nowrap transition-colors border <?php echo $cat === 'Semua' ? 'bg-[#82111A] text-white border-[#82111A] hover:text-white' : 'text-body-secondary border-transparent hover:text-black bg-transparent'; ?>"
             >
                 <?php echo esc_html($cat); ?>
             </button>
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var activeCategory = 'Semua';
     var searchQuery = '';
     var currentPage = 1;
-    var itemsPerPage = 8;
+    var itemsPerPage = 4; // Diturunkan sementara ke 4 agar pagination muncul
 
     var grid = document.getElementById('dprd-galeri-grid');
     var searchInput = document.getElementById('dprd-galeri-search');
@@ -140,20 +140,43 @@ document.addEventListener('DOMContentLoaded', function() {
         // Render Grid — kartu sesuai GaleriCard.jsx
         grid.innerHTML = pageItems.map(function(item) {
             return `
-                <div class="relative w-full aspect-[3/2] group overflow-hidden bg-surface cursor-pointer">
+                <div class="relative w-full aspect-[3/2] group overflow-hidden bg-surface cursor-pointer dprd-galeri-card">
                     <img 
                         src="${item.image}" 
                         alt="${item.title}" 
-                        class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                        class="object-cover w-full h-full transition-transform duration-500"
                     />
-                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6 md:p-8 text-center">
-                        <h3 class="text-white font-display text-lg md:text-xl leading-snug">
+                    <div class="absolute inset-0 bg-black/50 opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6 md:p-8 card-overlay">
+                        <h3 class="text-white font-display text-lg md:text-xl text-center leading-snug">
                             ${item.title}
                         </h3>
                     </div>
                 </div>
             `;
         }).join('');
+
+        // Attach click listener for mobile tap support like GaleriCard.jsx
+        var cards = grid.querySelectorAll('.dprd-galeri-card');
+        cards.forEach(function(card) {
+            card.addEventListener('click', function() {
+                if (window.innerWidth < 1024) {
+                    var overlay = this.querySelector('.card-overlay');
+                    var isCurrentlyActive = overlay.classList.contains('opacity-100');
+                    
+                    // Reset all
+                    document.querySelectorAll('.card-overlay').forEach(function(el) {
+                        el.classList.remove('opacity-100');
+                        el.classList.add('opacity-0');
+                    });
+
+                    // Toggle current
+                    if (!isCurrentlyActive) {
+                        overlay.classList.remove('opacity-0');
+                        overlay.classList.add('opacity-100');
+                    }
+                }
+            });
+        });
 
         // Render Pagination — kotak w-8 h-8 sesuai Pagination.jsx
         var pagHtml = '';
@@ -213,10 +236,10 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             filterBtns.forEach(function(b) {
                 b.classList.remove('bg-[#82111A]', 'text-white', 'border-[#82111A]', 'hover:text-white');
-                b.classList.add('text-body-secondary', 'border-transparent', 'bg-transparent', 'hover:text-primary');
+                b.classList.add('text-body-secondary', 'border-transparent', 'bg-transparent', 'hover:text-black');
             });
             this.classList.add('bg-[#82111A]', 'text-white', 'border-[#82111A]', 'hover:text-white');
-            this.classList.remove('text-body-secondary', 'border-transparent', 'bg-transparent', 'hover:text-primary');
+            this.classList.remove('text-body-secondary', 'border-transparent', 'bg-transparent', 'hover:text-black');
             
             activeCategory = this.getAttribute('data-category');
             currentPage = 1;

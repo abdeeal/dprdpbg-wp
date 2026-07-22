@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) exit;
 
 $data = dprd_get_sekilas_data_static()['luasWilayah'];
 ?>
-<section id="luas-wilayah" class="mb-16 scroll-mt-24">
+<section data-fade id="luas-wilayah" class="mb-16 scroll-mt-24">
   <h2 class="font-display text-2xl md:text-3xl text-ink mb-6">
     Luas Wilayah
   </h2>

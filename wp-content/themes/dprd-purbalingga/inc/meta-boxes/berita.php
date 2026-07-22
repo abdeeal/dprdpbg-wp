@@ -146,13 +146,53 @@ function dprd_render_berita_additional_meta_box($post) {
             </td>
         </tr>
         <tr>
-            <th><label for="dprd_image_caption">Keterangan Foto Utama (Caption & Sumber Foto)</label></th>
+            <th>
+                <label for="dprd_image_caption">Keterangan Foto Utama (Caption & Sumber Foto) <span style="color: #d63638;">*</span></label>
+            </th>
             <td>
-                <textarea name="imageCaption" id="dprd_image_caption" rows="2" class="large-text" placeholder="Contoh: Suasana Rapat Paripurna DPRD Purbalingga bersama Bupati (Foto: Humas DPRD)"><?php echo esc_textarea($image_caption); ?></textarea>
-                <p class="description">Teks keterangan atau sumber foto (caption) yang akan tampil tepat di bawah foto utama di halaman detail berita.</p>
+                <textarea name="imageCaption" id="dprd_image_caption" rows="2" class="large-text" required placeholder="Contoh: Suasana Rapat Paripurna DPRD Purbalingga bersama Bupati (Foto: Humas DPRD)"><?php echo esc_textarea($image_caption); ?></textarea>
+                <p class="description">Teks keterangan atau sumber foto (caption) yang akan tampil tepat di bawah foto utama di halaman detail berita. <strong>Wajib diisi.</strong></p>
             </td>
         </tr>
     </table>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var captionField = document.getElementById('dprd_image_caption');
+        if (!captionField) return;
+
+        // Validasi untuk Editor Gutenberg
+        if (typeof wp !== 'undefined' && wp.data && wp.data.dispatch && wp.data.select) {
+            function validateCaption() {
+                var val = captionField.value.trim();
+                if (val === '') {
+                    wp.data.dispatch('core/editor').lockPostSaving('empty_caption_lock');
+                } else {
+                    wp.data.dispatch('core/editor').unlockPostSaving('empty_caption_lock');
+                }
+            }
+            
+            // Cek saat pertama kali dimuat (diberi jeda agar Gutenberg siap)
+            setTimeout(validateCaption, 1000);
+            
+            // Cek setiap kali diketik
+            captionField.addEventListener('input', validateCaption);
+            captionField.addEventListener('change', validateCaption);
+        }
+
+        // Validasi untuk Classic Editor / Form standar
+        var form = captionField.closest('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (captionField.value.trim() === '') {
+                    alert('Keterangan Foto Utama pada Berita harus diisi!');
+                    captionField.focus();
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+    </script>
     <?php
 }
 

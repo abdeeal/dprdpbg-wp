@@ -233,8 +233,12 @@ $recent_news_posts = get_posts([
                 
                 <!-- Share Button -->
                 <button onclick="window.dprdShareUrl()" class="flex items-center gap-2 text-body hover:text-primary transition-colors text-sm font-semibold">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 10.742l4.828-2.414m0 0a3 3 0 10-3-3m3 3a3 3 0 103 5.414l-4.828 2.414m0 0a3 3 0 103 3.414M12 17h.01" />
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
                     </svg>
                     Bagikan
                 </button>

@@ -11,7 +11,7 @@ if (!empty($db_desc)) {
     $data['deskripsi'] = $db_desc;
 }
 ?>
-<section id="letak-geografis" className="mb-16 scroll-mt-24">
+<section data-fade id="letak-geografis" class="mb-16 scroll-mt-24">
   <h2 class="font-display text-2xl md:text-3xl text-ink mb-4">
     Letak Geografis
   </h2>

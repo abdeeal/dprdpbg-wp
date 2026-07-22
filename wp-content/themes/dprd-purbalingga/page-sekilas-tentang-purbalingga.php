@@ -25,12 +25,12 @@ get_header();
     ?>
 
     <!-- Page Title -->
-    <h1 class="font-display text-3xl md:text-[36px] font-black tracking-tight text-primary mt-8 mb-6">
+    <h1 data-fade class="font-display text-3xl md:text-[36px] font-black tracking-tight text-primary mt-8 mb-6">
       Sekilas Tentang Purbalingga
     </h1>
 
     <!-- Alert Information Box -->
-    <div class="bg-primary-light border border-primary/20 rounded-[4px] p-4 flex gap-4 items-start mb-12">
+    <div data-fade class="bg-primary-light border border-primary/20 rounded-[4px] p-4 flex gap-4 items-start mb-12">
       <svg class="w-6 h-6 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>

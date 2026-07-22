@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) exit;
 
 $data = dprd_get_sekilas_data_static()['topografiTanah'];
 ?>
-<section id="topografi-tanah" class="mb-16 scroll-mt-24">
+<section data-fade id="topografi-tanah" class="mb-16 scroll-mt-24">
   <h2 class="font-display text-2xl md:text-3xl text-ink mb-6">
     Topografi & Tanah
   </h2>

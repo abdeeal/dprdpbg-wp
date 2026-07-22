@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) exit;
 
 $data = dprd_get_sekilas_data_static()['kepegawaian'];
 ?>
-<section id="kepegawaian" class="mb-16 scroll-mt-24">
+<section data-fade id="kepegawaian" class="mb-16 scroll-mt-24">
   <h2 class="font-display text-2xl md:text-3xl text-ink mb-6">
     Kepegawaian
   </h2>
@@ -18,7 +18,7 @@ $data = dprd_get_sekilas_data_static()['kepegawaian'];
         TOTAL APARATUR SIPIL NEGARA
       </div>
       <div class="flex items-baseline">
-        <span class="font-mono text-[32px] md:text-[36px] font-bold text-primary tracking-tight">
+        <span class="font-mono text-[32px] md:text-[36px] font-bold text-primary tracking-tight" data-counter>
           <?php echo esc_html($data['totalAsn']); ?>
         </span>
         <span class="font-sans text-[15px] font-bold text-primary ml-1">
@@ -48,7 +48,7 @@ $data = dprd_get_sekilas_data_static()['kepegawaian'];
           <?php foreach ($data['distribusiGolongan'] as $item) : ?>
             <tr class="border-b border-line last:border-b">
               <td class="py-4 px-4 font-sans text-body text-[14px]"><?php echo esc_html($item['golongan']); ?></td>
-              <td class="py-4 px-4 font-mono text-body text-[14px] text-right"><?php echo esc_html($item['jumlah']); ?></td>
+              <td class="py-4 px-4 font-mono text-body text-[14px] text-right" data-counter><?php echo esc_html($item['jumlah']); ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>

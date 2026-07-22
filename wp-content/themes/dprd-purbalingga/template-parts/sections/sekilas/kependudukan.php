@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) exit;
 
 $data = dprd_get_sekilas_data_static()['kependudukan'];
 ?>
-<section id="kependudukan" class="mb-16 scroll-mt-24">
+<section data-fade id="kependudukan" class="mb-16 scroll-mt-24">
   <h2 class="font-display text-2xl md:text-3xl text-ink mb-6">
     Kependudukan
   </h2>
@@ -19,7 +19,7 @@ $data = dprd_get_sekilas_data_static()['kependudukan'];
         <div class="font-sans text-[13px] text-body-secondary uppercase tracking-wider mb-4">
           TOTAL PENDUDUK
         </div>
-        <div class="font-mono text-[32px] font-bold text-primary tracking-tight">
+        <div class="font-mono text-[32px] font-bold text-primary tracking-tight" data-counter>
           <?php echo esc_html($data['totalPenduduk']); ?>
         </div>
       </div>
@@ -29,7 +29,7 @@ $data = dprd_get_sekilas_data_static()['kependudukan'];
         <div class="font-sans text-[13px] text-body-secondary uppercase tracking-wider mb-4">
           KEPADATAN (/KM²)
         </div>
-        <div class="font-mono text-[32px] font-bold text-primary tracking-tight">
+        <div class="font-mono text-[32px] font-bold text-primary tracking-tight" data-counter>
           <?php echo esc_html($data['kepadatan']); ?>
         </div>
       </div>
@@ -40,7 +40,7 @@ $data = dprd_get_sekilas_data_static()['kependudukan'];
           LAJU PERTUMBUHAN
         </div>
         <div class="flex items-baseline">
-          <span class="font-mono text-[32px] font-bold text-primary tracking-tight">
+          <span class="font-mono text-[32px] font-bold text-primary tracking-tight" data-counter>
             <?php echo esc_html($data['lajuPertumbuhan']); ?>
           </span>
           <span class="font-sans text-[18px] font-bold text-primary ml-0.5">
@@ -57,7 +57,7 @@ $data = dprd_get_sekilas_data_static()['kependudukan'];
         <div class="font-sans text-[13px] text-body-secondary uppercase tracking-wider mb-4">
           RASIO JENIS KELAMIN
         </div>
-        <div class="font-mono text-[32px] font-bold text-primary tracking-tight">
+        <div class="font-mono text-[32px] font-bold text-primary tracking-tight" data-counter>
           <?php echo esc_html($data['rasioJenisKelamin']); ?>
         </div>
       </div>
@@ -67,7 +67,7 @@ $data = dprd_get_sekilas_data_static()['kependudukan'];
         <div class="font-sans text-[13px] text-body-secondary uppercase tracking-wider mb-4">
           TOTAL RUMAH TANGGA
         </div>
-        <div class="font-mono text-[32px] font-bold text-primary tracking-tight">
+        <div class="font-mono text-[32px] font-bold text-primary tracking-tight" data-counter>
           <?php echo esc_html($data['jumlahRumahTangga']); ?>
         </div>
       </div>
