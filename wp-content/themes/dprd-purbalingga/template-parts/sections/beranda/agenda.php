@@ -166,18 +166,30 @@ function dprd_get_indo_month($date_str) {
                         <h4 class="font-mono font-bold text-sm sm:text-[15px] mb-6">Propemperda</h4>
                         <div class="flex flex-col gap-3 mb-6">
                             <?php
-                            $propemperda_items = [
-                                ['label' => 'Tahun 2026', 'id' => '2026'],
-                                ['label' => 'Tahun 2025', 'id' => '2025'],
-                                ['label' => 'Tahun 2024', 'id' => '2024'],
-                                ['label' => 'Tahun 2023', 'id' => '2023']
-                            ];
-                            foreach ($propemperda_items as $item) :
+                            // Query propemperda dari database
+                            $propemperda_query = new WP_Query([
+                                'post_type'      => 'propemperda',
+                                'posts_per_page' => 4, // Ambil 4 terbaru untuk di beranda
+                                'meta_key'       => 'tahun',
+                                'orderby'        => 'meta_value_num',
+                                'order'          => 'DESC'
+                            ]);
+
+                            if ($propemperda_query->have_posts()) :
+                                while ($propemperda_query->have_posts()) : $propemperda_query->the_post();
+                                    $tahun = get_post_meta(get_the_ID(), 'tahun', true);
+                                    if (!$tahun) continue;
                             ?>
-                                <a href="<?php echo esc_url(home_url('/propemperda?id=' . $item['id'])); ?>" class="bg-[#F4F4F4] rounded-[6px] px-4 py-3 text-sm font-sans font-bold text-body hover:bg-line transition-colors cursor-pointer block">
-                                    <?php echo esc_html($item['label']); ?>
-                                </a>
-                            <?php endforeach; ?>
+                                    <a href="<?php echo esc_url(home_url('/propemperda?id=' . $tahun)); ?>" class="bg-[#F4F4F4] rounded-[6px] px-4 py-3 text-sm font-sans font-bold text-body hover:bg-line transition-colors cursor-pointer block">
+                                        Tahun <?php echo esc_html($tahun); ?>
+                                    </a>
+                            <?php 
+                                endwhile;
+                                wp_reset_postdata();
+                            else :
+                            ?>
+                                <p class="text-sm text-body-secondary font-sans italic">Belum ada data Propemperda.</p>
+                            <?php endif; ?>
                         </div>
                         <a href="<?php echo esc_url(home_url('/propemperda')); ?>" class="mt-auto text-primary text-xs font-bold flex items-center hover:underline self-end">
                             Lihat Semua
@@ -192,21 +204,28 @@ function dprd_get_indo_month($date_str) {
                         <h4 class="font-mono font-bold text-sm sm:text-[15px] mb-6">SAKIP</h4>
                         <div class="flex flex-col gap-3 mb-6">
                             <?php
-                            $sakip_items = [
-                                ['label' => 'Rencana Kerja', 'id' => 'renja'],
-                                ['label' => 'Rencana Strategis', 'id' => 'renstra'],
-                                ['label' => 'Anggaran', 'id' => 'anggaran'],
-                                ['label' => 'Rencana Aksi', 'id' => 'rencana-aksi']
-                            ];
-                            foreach ($sakip_items as $item) :
+                            // Ambil term dari kategori-sakip
+                            $sakip_terms = get_terms([
+                                'taxonomy'   => 'kategori-sakip',
+                                'hide_empty' => true, // hanya tampilkan yang ada isinya
+                                'number'     => 4     // batasi 4 untuk beranda
+                            ]);
+
+                            if (!empty($sakip_terms) && !is_wp_error($sakip_terms)) :
+                                foreach ($sakip_terms as $term) :
                             ?>
-                                <a href="<?php echo esc_url(home_url('/sakip?id=' . $item['id'])); ?>" class="bg-[#F4F4F4] rounded-[6px] px-4 py-3 text-sm font-sans font-bold text-body hover:bg-line transition-colors cursor-pointer flex justify-between items-center">
-                                    <?php echo esc_html($item['label']); ?>
-                                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                    </svg>
-                                </a>
-                            <?php endforeach; ?>
+                                    <a href="<?php echo esc_url(home_url('/sakip?id=' . $term->slug)); ?>" class="bg-[#F4F4F4] rounded-[6px] px-4 py-3 text-sm font-sans font-bold text-body hover:bg-line transition-colors cursor-pointer flex justify-between items-center">
+                                        <?php echo esc_html($term->name); ?>
+                                        <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </a>
+                            <?php 
+                                endforeach;
+                            else :
+                            ?>
+                                <p class="text-sm text-body-secondary font-sans italic">Belum ada data SAKIP.</p>
+                            <?php endif; ?>
                         </div>
                         <a href="<?php echo esc_url(home_url('/sakip')); ?>" class="mt-auto text-primary text-xs font-bold flex items-center hover:underline self-end">
                             Lihat Semua
