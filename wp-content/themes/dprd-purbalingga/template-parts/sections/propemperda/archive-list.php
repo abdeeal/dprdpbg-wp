@@ -32,7 +32,7 @@ if (!$query->have_posts()) {
         $post_title = get_the_title();
         $display_title = $post_title ? $post_title : 'Tahun ' . $tahun;
         ?>
-        <div class="border-b border-[#A32B2E]/40 last:border-b-0 py-6 md:py-8 dprd-accordion-item">
+        <div class="border-b border-[#A32B2E]/40 last:border-b-0 py-6 md:py-8 dprd-accordion-item" data-id="<?php echo esc_attr($tahun); ?>">
             <button class="w-full flex items-start justify-between text-left group cursor-pointer dprd-accordion-toggle">
                 <div class="flex flex-col gap-1.5">
                     <h3 class="font-display font-bold text-xl md:text-[22px] text-body group-hover:text-primary transition-colors">
@@ -83,18 +83,36 @@ if (!$query->have_posts()) {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const items = document.querySelectorAll('.dprd-accordion-item');
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeId = urlParams.get('id');
     
+    let isAnyOpened = false;
+
     items.forEach((item, index) => {
         const toggle = item.querySelector('.dprd-accordion-toggle');
         const content = item.querySelector('.dprd-accordion-content');
         const iconContainer = item.querySelector('.dprd-accordion-icon');
+        const itemId = item.getAttribute('data-id');
         
-        // Default buka item pertama (tahun terbaru)
-        if (index === 0) {
+        let shouldOpen = false;
+        if (activeId && activeId === itemId) {
+            shouldOpen = true;
+            isAnyOpened = true;
+        } else if (!activeId && index === 0) {
+            shouldOpen = true;
+        }
+
+        if (shouldOpen) {
             content.style.height = 'auto';
             content.style.opacity = '1';
             content.classList.add('is-open');
             iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true"><path d="M7 17 17 7"></path><path d="M7 7h10v10"></path></svg>`;
+            
+            if (activeId) {
+                setTimeout(() => {
+                    item.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
         }
 
         toggle.addEventListener('click', () => {
@@ -119,5 +137,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+    
+    // Fallback jika ID dari URL tidak ditemukan di item manapun
+    if (activeId && !isAnyOpened && items.length > 0) {
+        const firstContent = items[0].querySelector('.dprd-accordion-content');
+        const firstIconContainer = items[0].querySelector('.dprd-accordion-icon');
+        firstContent.style.height = 'auto';
+        firstContent.style.opacity = '1';
+        firstContent.classList.add('is-open');
+        firstIconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true"><path d="M7 17 17 7"></path><path d="M7 7h10v10"></path></svg>`;
+    }
 });
 </script>
