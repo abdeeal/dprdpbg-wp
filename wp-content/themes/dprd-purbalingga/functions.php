@@ -392,4 +392,57 @@ function dprd_get_auto_excerpt($post) {
     // 4. Last resort: potong konten mentah
     return wp_trim_words(wp_strip_all_tags($content), 30);
 }
+
+/**
+ * Intercept 404 requests and check if the path exists in navigation JSON.
+ * If it does, render the 503 "Segera Hadir" template instead.
+ */
+add_action('template_redirect', function() {
+    if (is_404()) {
+        $path = wp_parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $site_path = wp_parse_url(home_url(), PHP_URL_PATH) ?: '';
+        
+        if ($site_path && strpos($path, $site_path) === 0) {
+            $path = substr($path, strlen($site_path));
+        }
+        $path = '/' . ltrim($path, '/');
+
+        // Hapus trailing slash untuk exact matching kecuali untuk root '/'
+        if ($path !== '/' && substr($path, -1) === '/') {
+            $path = rtrim($path, '/');
+        }
+
+        $nav_json = get_option('dprd_navigation_json', '[]');
+        $nav = json_decode($nav_json, true);
+
+        if (!is_array($nav)) {
+            $nav = [];
+        }
+
+        // Helper function untuk cek path di dalam nested navigasi
+        $is_path_in_navigation = function($nav_array, $search_path) use (&$is_path_in_navigation) {
+            foreach ($nav_array as $item) {
+                if (isset($item['href']) && rtrim($item['href'], '/') === rtrim($search_path, '/')) return true;
+                if (!empty($item['children'])) {
+                    if ($is_path_in_navigation($item['children'], $search_path)) return true;
+                }
+            }
+            return false;
+        };
+
+        $is_planned = $is_path_in_navigation($nav, $path);
+
+        if ($is_planned) {
+            global $wp_query;
+            $wp_query->set_404(); // Reset to false internally? No, we need to make it non-404.
+            $wp_query->is_404 = false;
+            
+            status_header(503);
+            
+            // Render 503 template
+            include get_template_directory() . '/503.php';
+            exit;
+        }
+    }
+});
 
