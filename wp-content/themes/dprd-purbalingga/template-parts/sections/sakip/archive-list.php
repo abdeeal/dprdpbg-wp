@@ -59,10 +59,15 @@ if (empty($terms) || is_wp_error($terms)) {
             </button>
             <div class="dprd-accordion-content h-0 opacity-0 overflow-hidden transition-all duration-300">
                 <div class="pt-6 flex flex-col gap-3">
-                    <?php while ($query->have_posts()) : $query->the_post(); 
-                        $file_url = get_post_meta(get_the_ID(), 'file_url', true);
+                    <?php while ($query->have_posts()) : $query->the_post();
+                        $file_url   = get_post_meta(get_the_ID(), 'file_url', true);
+                        $doc_title  = get_the_title();
+                        $proxy_url  = dprd_proxy_url(get_the_ID(), $file_url, $doc_title);
                         ?>
-                        <a class="font-mono text-[13px] md:text-sm text-primary hover:text-primary/80 underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition-all w-fit" href="<?php echo esc_url($file_url ? $file_url : '#'); ?>" target="_blank" rel="noopener noreferrer">
+                        <a class="font-mono text-[13px] md:text-sm text-primary hover:text-primary/80 underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition-all w-fit"
+                           href="<?php echo esc_url($proxy_url); ?>"
+                           target="_blank"
+                           rel="noopener noreferrer">
                             <?php the_title(); ?>
                         </a>
                     <?php endwhile; wp_reset_postdata(); ?>

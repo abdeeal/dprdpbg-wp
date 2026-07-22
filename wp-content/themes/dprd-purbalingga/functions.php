@@ -199,3 +199,97 @@ add_action('init', function() {
     }
     update_option('dprd_menu_urls_cleaned_v4', true);
 });
+
+// =============================================================================
+// FILE PROXY — Sembunyikan path wp-content/uploads & perbaiki nama PDF
+// =============================================================================
+// URL publik: /dprd-purbalingga/?dprd_file=123&judul=nama-dokumen
+// → Membaca file dari upload dir, kirim sebagai inline PDF dengan nama judul
+// → Menggantikan URL langsung yang bocorkan path server
+// =============================================================================
+
+/**
+ * Helper: konversi URL upload langsung ke URL proxy yang aman.
+ *
+ * Digunakan di template SAKIP, Propemperda, PPID, dll.
+ *
+ * @param int    $post_id   ID post CPT (sakip / ppid / propemperda)
+ * @param string $file_url  URL asli file di wp-content/uploads
+ * @param string $title     Judul dokumen (untuk nama file yang tampil di browser)
+ * @return string URL proxy
+ */
+function dprd_proxy_url(int $post_id, string $file_url, string $title): string {
+    if (empty($file_url) || $file_url === '#') return '#';
+    $slug = sanitize_title($title) ?: 'dokumen';
+    return add_query_arg([
+        'dprd_file' => $post_id,
+        'judul'     => urlencode($slug),
+        'src'       => urlencode($file_url), // URL asli di-encode, tidak terbaca langsung
+    ], home_url('/'));
+}
+
+/**
+ * Tangani request proxy file: verifikasi, serve PDF dengan header yang benar.
+ */
+add_action('template_redirect', function () {
+    if (!isset($_GET['dprd_file'])) return;
+
+    $post_id  = absint($_GET['dprd_file']);
+    $judul    = sanitize_title($_GET['judul'] ?? 'dokumen');
+    $src      = isset($_GET['src']) ? esc_url_raw(urldecode($_GET['src'])) : '';
+
+    if (!$post_id || empty($src)) {
+        status_header(400);
+        wp_die('Parameter tidak valid.', 'Error', ['response' => 400]);
+    }
+
+    // Validasi: src harus berasal dari uploads WordPress kita sendiri
+    $upload_dir  = wp_upload_dir();
+    $uploads_url = trailingslashit($upload_dir['baseurl']);
+
+    if (strpos($src, $uploads_url) !== 0) {
+        status_header(403);
+        wp_die('Akses ditolak.', 'Forbidden', ['response' => 403]);
+    }
+
+    // Konversi URL → path file di server
+    $file_path = str_replace($upload_dir['baseurl'], $upload_dir['basedir'], $src);
+    $file_path = wp_normalize_path($file_path);
+
+    // Cegah path traversal
+    if (strpos(realpath(dirname($file_path)), wp_normalize_path($upload_dir['basedir'])) !== 0) {
+        status_header(403);
+        wp_die('Akses ditolak.', 'Forbidden', ['response' => 403]);
+    }
+
+    if (!file_exists($file_path)) {
+        status_header(404);
+        wp_die('File tidak ditemukan.', 'Not Found', ['response' => 404]);
+    }
+
+    // Hanya izinkan PDF
+    $finfo    = finfo_open(FILEINFO_MIME_TYPE);
+    $mime     = finfo_file($finfo, $file_path);
+    finfo_close($finfo);
+
+    if ($mime !== 'application/pdf') {
+        status_header(403);
+        wp_die('Tipe file tidak didukung.', 'Forbidden', ['response' => 403]);
+    }
+
+    $display_name = $judul . '.pdf';
+
+    // Kirim header + file
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: inline; filename="' . $display_name . '"');
+    header('Content-Length: ' . filesize($file_path));
+    header('Cache-Control: private, max-age=3600');
+    header('X-Content-Type-Options: nosniff');
+    header('X-Robots-Tag: noindex'); // Jangan di-index search engine
+
+    // Matikan buffer WordPress agar tidak corrupt
+    while (ob_get_level()) ob_end_clean();
+
+    readfile($file_path);
+    exit;
+});

@@ -50,13 +50,23 @@ if (!$query->have_posts()) {
             </button>
             <div class="dprd-accordion-content h-0 opacity-0 overflow-hidden transition-all duration-300">
                 <div class="pt-6 flex flex-col gap-3">
-                    <?php if ($propemperda_file) : ?>
-                        <a class="font-mono text-[13px] md:text-sm text-primary hover:text-primary/80 underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition-all w-fit" href="<?php echo esc_url($propemperda_file); ?>" target="_blank" rel="noopener noreferrer">
+                    <?php if ($propemperda_file) :
+                        $label_perda = 'Propemperda Kabupaten Purbalingga ' . $display_title;
+                        $proxy_perda = dprd_proxy_url(get_the_ID(), $propemperda_file, $label_perda);
+                    ?>
+                        <a class="font-mono text-[13px] md:text-sm text-primary hover:text-primary/80 underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition-all w-fit"
+                           href="<?php echo esc_url($proxy_perda); ?>"
+                           target="_blank" rel="noopener noreferrer">
                             Propemperda Kabupaten Purbalingga <?php echo esc_html($display_title); ?>
                         </a>
                     <?php endif; ?>
-                    <?php if ($sk_penetapan_file) : ?>
-                        <a class="font-mono text-[13px] md:text-sm text-primary hover:text-primary/80 underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition-all w-fit" href="<?php echo esc_url($sk_penetapan_file); ?>" target="_blank" rel="noopener noreferrer">
+                    <?php if ($sk_penetapan_file) :
+                        $label_sk   = 'SK Penetapan Propemperda ' . $display_title;
+                        $proxy_sk   = dprd_proxy_url(get_the_ID(), $sk_penetapan_file, $label_sk);
+                    ?>
+                        <a class="font-mono text-[13px] md:text-sm text-primary hover:text-primary/80 underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition-all w-fit"
+                           href="<?php echo esc_url($proxy_sk); ?>"
+                           target="_blank" rel="noopener noreferrer">
                             SK Penetapan Propemperda <?php echo esc_html($display_title); ?>
                         </a>
                     <?php endif; ?>

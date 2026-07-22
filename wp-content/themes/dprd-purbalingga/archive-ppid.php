@@ -82,13 +82,18 @@ $ppid_query = new WP_Query([
                         <div class="dprd-accordion-content overflow-hidden transition-all duration-300 ease-in-out <?php echo $is_open ? 'opacity-100 max-h-[1000px]' : 'opacity-0 max-h-0 hidden'; ?>">
                             <div class="pt-6 flex flex-col gap-3">
                                 <?php if (!empty($documents)) : ?>
-                                    <?php foreach ($documents as $doc) : ?>
-                                        <a 
-                                            href="<?php echo esc_url($doc['url'] ?? '#'); ?>" 
+                                    <?php foreach ($documents as $doc) :
+                                        $doc_url   = $doc['url'] ?? '#';
+                                        $doc_title = $doc['title'] ?? 'dokumen';
+                                        $href      = dprd_proxy_url($post_id, $doc_url, $doc_title);
+                                        ?>
+                                        <a
+                                            href="<?php echo esc_url($href); ?>"
                                             class="font-mono text-[13px] md:text-sm text-primary hover:text-primary/80 underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition-all w-fit"
-                                            <?php echo (isset($doc['url']) && $doc['url'] !== '#') ? 'target="_blank" rel="noopener noreferrer"' : ''; ?>
+                                            target="_blank"
+                                            rel="noopener noreferrer"
                                         >
-                                            <?php echo esc_html($doc['title']); ?>
+                                            <?php echo esc_html($doc_title); ?>
                                         </a>
                                     <?php endforeach; ?>
                                 <?php else : ?>
