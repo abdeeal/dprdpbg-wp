@@ -394,7 +394,7 @@ function dprd_get_auto_excerpt($post) {
 }
 
 /**
- * Intercept 404 requests and check if the path exists in navigation JSON.
+ * Intercept 404 requests and check if the path exists in navigation JSON or native WP menu.
  * If it does, render the 503 "Segera Hadir" template instead.
  */
 add_action('template_redirect', function() {
@@ -412,29 +412,54 @@ add_action('template_redirect', function() {
             $path = rtrim($path, '/');
         }
 
-        $nav_json = get_option('dprd_navigation_json', '[]');
-        $nav = json_decode($nav_json, true);
+        $is_planned = false;
 
-        if (!is_array($nav)) {
-            $nav = [];
-        }
+        // 1. Cek Native WordPress Menu (jika di-set di Appearance > Menus)
+        $locations = get_nav_menu_locations();
+        if (isset($locations['primary'])) {
+            $menu_items = wp_get_nav_menu_items($locations['primary']);
+            if ($menu_items && !is_wp_error($menu_items)) {
+                foreach ($menu_items as $mi) {
+                    $menu_url = $mi->url;
+                    $menu_path = wp_parse_url($menu_url, PHP_URL_PATH) ?: '';
+                    
+                    if ($site_path && strpos($menu_path, $site_path) === 0) {
+                        $menu_path = substr($menu_path, strlen($site_path));
+                    }
+                    $menu_path = '/' . ltrim($menu_path, '/');
+                    if ($menu_path !== '/' && substr($menu_path, -1) === '/') {
+                        $menu_path = rtrim($menu_path, '/');
+                    }
 
-        // Helper function untuk cek path di dalam nested navigasi
-        $is_path_in_navigation = function($nav_array, $search_path) use (&$is_path_in_navigation) {
-            foreach ($nav_array as $item) {
-                if (isset($item['href']) && rtrim($item['href'], '/') === rtrim($search_path, '/')) return true;
-                if (!empty($item['children'])) {
-                    if ($is_path_in_navigation($item['children'], $search_path)) return true;
+                    if ($menu_path === $path) {
+                        $is_planned = true;
+                        break;
+                    }
                 }
             }
-            return false;
-        };
+        }
 
-        $is_planned = $is_path_in_navigation($nav, $path);
+        // 2. Cek Custom Options Page JSON (fallback)
+        if (!$is_planned) {
+            $nav_json = get_option('dprd_navigation_json', '[]');
+            $nav = json_decode($nav_json, true);
+
+            if (is_array($nav)) {
+                $is_path_in_navigation = function($nav_array, $search_path) use (&$is_path_in_navigation) {
+                    foreach ($nav_array as $item) {
+                        if (isset($item['href']) && rtrim($item['href'], '/') === rtrim($search_path, '/')) return true;
+                        if (!empty($item['children'])) {
+                            if ($is_path_in_navigation($item['children'], $search_path)) return true;
+                        }
+                    }
+                    return false;
+                };
+                $is_planned = $is_path_in_navigation($nav, $path);
+            }
+        }
 
         if ($is_planned) {
             global $wp_query;
-            $wp_query->set_404(); // Reset to false internally? No, we need to make it non-404.
             $wp_query->is_404 = false;
             
             status_header(503);
