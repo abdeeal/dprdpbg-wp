@@ -63,7 +63,7 @@ $slug = get_post_field('post_name', $post_id);
 // Resolve Breadcrumbs
 $breadcrumbs = [
     ['label' => 'Beranda', 'href' => home_url('/')],
-    ['label' => 'Profil DPRD', 'href' => home_url('/profil-dprd/')],
+    ['label' => 'Profil DPRD', 'href' => '#'],
 ];
 
 // Flat members list resolved from dprd_ak_struktur_json
@@ -175,7 +175,7 @@ if ($slug === 'pimpinan-dprd') {
             <h2 class="font-display font-bold text-[22px] md:text-[28px] text-body mb-5">
                 Dasar Penetapan Pimpinan DPRD
             </h2>
-            <p class="font-sans text-[15px] md:text-base text-body leading-[1.8] mb-4">
+            <p class="font-sans text-[15px] md:text-base text-body leading-[1.8] md:leading-[1.8] mb-4">
                 <?php echo esc_html($dasar_penetapan); ?>
             </p>
             <?php if ($note) : ?>
@@ -250,7 +250,7 @@ if ($slug === 'pimpinan-dprd') {
         ob_start();
         ?>
         <div class="flex flex-col w-full">
-            <p class="font-sans text-[15px] md:text-base text-body leading-[1.8] mb-8">
+            <p class="font-sans text-[15px] md:text-base text-body leading-[1.8] md:leading-[1.8] mb-8">
                 <?php echo esc_html($dasar_penetapan); ?>
             </p>
             
@@ -513,14 +513,23 @@ if ($slug === 'pimpinan-dprd') {
 ?>
 
 <!-- Breadcrumbs -->
-<?php
-get_template_part('template-parts/ui/breadcrumbs', null, [
-    'items' => $breadcrumbs
-]);
-?>
+<div class="mb-6 md:mb-8">
+    <div class="flex items-center gap-1.5 flex-wrap font-sans text-xs md:text-sm text-body-secondary font-medium">
+        <?php foreach ($breadcrumbs as $i => $bc) : 
+            $is_last = ($i === count($breadcrumbs) - 1);
+            ?>
+            <?php if (!$is_last && isset($bc['href'])) : ?>
+                <a href="<?php echo esc_url($bc['href']); ?>" class="hover:text-primary transition-colors"><?php echo esc_html($bc['label']); ?></a>
+                <span class="text-body-secondary/60 text-xs mt-[1px] font-normal mx-0.5">›</span>
+            <?php else : ?>
+                <span class="text-body font-semibold"><?php echo esc_html($bc['label']); ?></span>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </div>
+</div>
 
 <!-- Page Header -->
-<div class="mb-10 w-full text-left">
+<div class="mb-10 max-w-4xl mx-auto w-full">
     <h1 class="font-display font-black text-3xl md:text-[36px] text-primary mb-2 leading-tight">
         <?php echo esc_html($title); ?>
     </h1>
@@ -557,7 +566,7 @@ get_template_part('template-parts/ui/breadcrumbs', null, [
                     <?php foreach ($lvl_members as $member) : ?>
                         <div class="w-full sm:w-[calc(50%-1.5rem)] md:w-[calc(33.333%-2.5rem)] max-w-[280px] flex justify-center">
                             <div class="flex flex-col items-center w-full">
-                                <h3 class="font-display text-lg md:text-[19px] font-normal text-body text-center mb-3 leading-snug h-[2.6em] min-h-[2.6em] flex items-center justify-center">
+                                <h3 class="font-display text-lg md:text-[19px] font-bold text-body text-center mb-3 leading-snug">
                                     <?php echo esc_html($member['name']); ?>
                                 </h3>
                                 
@@ -596,7 +605,7 @@ get_template_part('template-parts/ui/breadcrumbs', null, [
             <?php echo esc_html($dasar_title); ?>
         </h2>
         <?php if (is_string($dasar_content)) : ?>
-            <p class="font-sans text-[15px] md:text-base text-body leading-[1.8] mb-4">
+            <p class="font-sans text-[15px] md:text-base text-body leading-[1.8] md:leading-[1.8] mb-4">
                 <?php echo esc_html($dasar_content); ?>
             </p>
         <?php else : ?>
