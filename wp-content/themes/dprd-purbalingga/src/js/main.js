@@ -675,6 +675,7 @@ document.addEventListener('DOMContentLoaded', () => {
             el.innerText = '0';
             counterObserver.observe(el);
         });
+    }
 
     // ── Animated Counter (1:1 Vercel GSAP ScrollTrigger) ───────────────────
     const counters = document.querySelectorAll('.dprd-animated-counter');
