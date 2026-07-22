@@ -16,17 +16,17 @@ Pada fase ini, komponen-komponen React/Next.js telah berhasil dikonversi menjadi
 
 ---
 
-## ## Fase 5 — GSAP & Interaktivitas Client-Side (dan Aset)
+## Fase 5 — GSAP & Interaktivitas Client-Side (dan Aset)
 
 Interaksi interaktif dan kompilasi gaya agar sama persis dengan Next.js:
 
-- [x] **Interaktivitas Accordion**: Menambahkan skrip Vanilla JS interaktif di berkas list SAKIP dan Propemperda agar accordion meluncur buka-tutup dengan lancar saat diklik.
+- [x] **Interaktivitas Accordion Smooth (`max-height` + `scrollHeight`)**: Menulis ulang logika animasi di SAKIP, PPID, dan Propemperda menggunakan kalkulasi dinamik `scrollHeight + 'px'` dengan kurva deselerasi lembut `cubic-bezier(0.25, 1, 0.5, 1)` (Power2.out GSAP Vercel 1:1) tanpa lompatan kaku.
 - [x] **Sinkronisasi Font Global**: Mendefinisikan variabel font `:root` (Plus Jakarta Sans, Fraunces, JetBrains Mono, Montserrat) agar seluruh teks dan judul di website berubah mengikuti tipografi premium dari Vercel.
 - [x] **Kompilasi Aset Vite/Tailwind**: Menjalankan perintah `npm install` dan `npm run build` lokal sehingga seluruh kelas layout (kisi-kisi, timeline, panel, warna) terkompilasi sempurna ke berkas produksi `main.css`.
 
 ---
 
-## ## Optimasi Sistem Unggahan Gambar & Media (Tambahan Hari Ini)
+## Optimasi Sistem Unggahan Gambar & Media (Tambahan Hari Ini)
 
 Fungsi tambahan untuk mempermudah admin dalam mengelola konten tanpa kendala:
 
@@ -34,64 +34,48 @@ Fungsi tambahan untuk mempermudah admin dalam mengelola konten tanpa kendala:
 - [x] **Perbaikan Error Upload WebP**: Menambahkan filter prioritas GD Library dibanding Imagick untuk mengatasi error *"Server web tidak dapat menghasilkan ukuran gambar responsif"* pada server XAMPP lokal.
 - [x] **Aktifkan GD Library di php.ini**: Mengaktifkan `extension=gd` di berkas `D:\instalasi_aplikasi\xampp\php\php.ini` agar GD Library aktif saat diakses lewat browser (Apache), bukan hanya lewat CLI.
 - [x] **Sinkronisasi Hirarki URL Halaman**: Menata induk halaman sehingga halaman Sejarah memiliki URL terstruktur `/selayang-pandang/sejarah-kabupaten-purbalingga/` 1:1 sesuai rute Next.js.
+- [x] **Sistem Keamanan & Proxy PDF (`dprd_proxy_url`)**: Membangun handler proxy PDF di `functions.php` dan proteksi `.htaccess` di `wp-content/uploads/` untuk menyembunyikan direktori upload asli dan menampilkan nama dokumen di tab browser alih-alih "(anonymous)".
 
 ---
 
-## ## Perbaikan Layout (Bug Fix — Sesi Sore)
+## Perbaikan Layout & Backend Propemperda (Bug Fix & Handler Sesi Sore)
 
-Perbaikan dua masalah tata letak yang ditemukan setelah pengecekan visual di browser lokal:
-
-- [x] **Perbaikan H1 Sejarah** — Menyamakan kelas `h1` di [page-sejarah-kabupaten-purbalingga.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/page-sejarah-kabupaten-purbalingga.php) agar menggunakan `font-display font-black text-3xl md:text-[36px] tracking-tight text-primary` persis seperti di Vercel (sebelumnya `text-4xl font-bold` saja).
-- [x] **Perbaikan Banner CTA Full-Width** — Memindahkan banner *"Ingin Mengetahui Lebih Lanjut?"* dari dalam `content.php` (di mana ia terjebak di dalam container `max-w-7xl`) ke `page-sejarah-kabupaten-purbalingga.php` di luar container, sehingga banner merah bisa menjadi penuh selebar layar (full-width) seperti di Vercel.
-- [x] **Recompile Aset Tailwind** — Menjalankan ulang `npm run build` setelah perbaikan layout; ukuran CSS berhasil bertambah (23KB → 26KB) membuktikan kelas baru berhasil terkompilasi.
+- [x] **Upgrade Meta Box Propemperda PDF Upload**: Menulis ulang [inc/meta-boxes/propemperda.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/inc/meta-boxes/propemperda.php) menggunakan UI WordPress Media Uploader modern untuk berkas PDF Propemperda dan SK Penetapan, dilengkapi indikator nama berkas aktif dan tombol hapus file.
+- [x] **Pengurutan Tahun Terbaru (`meta_value_num DESC`)**: Mengubah query di [archive-list.php (Propemperda)](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/template-parts/sections/propemperda/archive-list.php) agar tahun paling baru (misal: 2026) secara otomatis selalu tampil di urutan teratas tanpa tergantung urutan penginputan.
+- [x] **Typo Handler Tahun**: Mengekstrak 4 digit angka tahun murni via regex (`preg_match('/\d{4}/')`) saat penyimpanan pos, membebaskan admin dari kesalahan ketik seperti `"Tahun 2026"` atau `" 2026a "`.
+- [x] **Strict Duplicate Year Handler & Lucide Warning Notice**: Mencegah overwrite dokumen lama jika terjadi duplikasi tahun. Pos baru yang duplikat otomatis dibatalkan (*Draft*) dan menampilkan kotak peringatan merah di dashboard admin dengan SVG Lucide `AlertTriangle` (`<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>`).
 
 ---
 
-## ## Fase 6 — Navigasi Global (Mega Menu Navbar)
+## Fase 6 — Navigasi Global (Mega Menu Navbar 1:1 Vercel)
 
 Membangun komponen navigasi utama website secara dinamis dari WordPress:
 
 - [x] **Header & Navbar Markup** — Membangun [header.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/header.php) dari awal dengan tiga bagian: tombol Menu/Tutup di kiri, Logo + nama di tengah, dan ikon search + tombol **Reservasi Kunjungan** di kanan.
-- [x] **Mega Menu 3-Level Kolom** — Membuat panel mega menu dinamis dengan 3 kolom horizontal:
-  - **Kolom 1** — Seluruh item level 1 dari WordPress menu (Selayang Pandang, Profil DPRD, Galeri, dll.)
-  - **Kolom 2** — Sub-menu level 2 yang ditampilkan sesuai item yang di-hover di kolom 1
-  - **Kolom 3** — Sub-sub-menu level 3 (contoh: Komisi I, II, III, IV) yang tampil sesuai hover kolom 2
-- [x] **Integrasi Menu WordPress** — Menu dibaca berdasarkan **lokasi** `primary` menggunakan `get_nav_menu_locations()` agar selalu sesuai dengan menu "Navbar" yang di-assign ke lokasi "Menu Utama" di WordPress Admin.
-- [x] **Logika Interaksi Vanilla JS** — Seluruh logika interaksi mega menu ditulis di [src/js/main.js](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/src/js/main.js): animasi buka/tutup, hover level 1→2→3, navigasi klik, tutup dengan `Escape`, dan shadow scroll.
-- [x] **Perbaikan Default Active State** — Item aktif default saat menu dibuka adalah item pertama yang memiliki anak (bukan index 0), sehingga kolom 2 & 3 tidak kosong.
-- [x] **Perbaikan Border Tombol** — Menghapus border default browser pada `<button>` dengan `border-0 bg-transparent outline-none`.
-- [x] **Perbaikan Breadcrumb Multi-Level** — Menulis ulang [breadcrumbs.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/template-parts/ui/breadcrumbs.php) dengan `wp_get_post_parent_id()` rekursif: **Beranda › Selayang Pandang › Sejarah Kabupaten Purbalingga**.
+- [x] **Mega Menu 3-Level Kolom** — Membuat panel mega menu dinamis dengan 3 kolom horizontal (Level 1 → Level 2 → Level 3).
+- [x] **Animasi GSAP 1:1 & Transisi Smooth (`700ms cubic-bezier`)**:
+  - Animasi menyusut (*shrink-on-scroll*) tinggi header `80px` → `64px` dan `scale(0.85)` logo saat scroll > 50px.
+  - Dropdown drawer meluncur dari `-15px` ke `0px` dengan pengereman lembut `0.7s cubic-bezier(0.25, 1, 0.5, 1)`.
+  - Pergantian kolom 2 dan 3 menggunakan animasi `.animate-fade-in` 0.5s.
+- [x] **Kompensasi Scrollbar Lock (`paddingRight`)**: Menghitung `window.innerWidth - document.documentElement.clientWidth` secara dinamis saat menu dibuka untuk diisikan ke `document.body.style.paddingRight` agar layout dan tombol header tidak meloncat/bergeser saat scrollbar browser hilang.
+- [x] **Mobile Accordion Smooth**: Menyesuaikan durasi transisi mobile menu menjadi `700ms` dengan rotasi panah 90 derajat secara perlahan.
 
 ---
 
-## ## Halaman PPID — Fase 2, 4 & 5 (22 Juli 2026)
+## Halaman PPID — Fase 2, 4 & 5 (22 Juli 2026)
 
 Mengerjakan halaman **PPID** (`/ppid`) agar 1:1 sesuai dengan Vercel `https://dprd-kab-purbalingga.vercel.app/ppid`, mencakup:
 
 ### Fase 2 — Content Model PPID (Custom Meta Box & Data Importer)
 
-- [x] **Upgrade Meta Box PPID** — Menulis ulang [inc/meta-boxes/ppid.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/inc/meta-boxes/ppid.php) agar mendukung field `description` (subtitle akordion) dan repeater `documents_json` (Judul Dokumen + URL Link File PDF) sesuai struktur data `ppid.data.js` Vercel. Admin sekarang bisa menambah/hapus dokumen langsung di WordPress tanpa sentuh kode.
-- [x] **Auto-Import 6 Data Default PPID** — Menambahkan blok importer di [inc/insert-default-data.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/inc/insert-default-data.php) yang secara otomatis membuat 6 pos CPT `ppid` saat pertama kali tema dimuat:
-  1. **SK PPID** — 5 dokumen SK Pembentukan Komisi, Badan Musyawarah, Badan Anggaran, Badan Kehormatan, dan Perubahan Fraksi
-  2. **Informasi Publik**
-  3. **Permohonan Informasi**
-  4. **Informasi Serta Merta**
-  5. **Informasi Setiap Saat**
-  6. **Informasi Berkala**
+- [x] **Upgrade Meta Box PPID** — Menulis ulang [inc/meta-boxes/ppid.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/inc/meta-boxes/ppid.php) agar mendukung field `description` (subtitle akordion) dan repeater `documents_json` (Judul Dokumen + Media Library PDF Uploader).
+- [x] **Auto-Import 6 Data Default PPID** — Menambahkan importer di `inc/insert-default-data.php` (SK PPID, Informasi Publik, Permohonan Informasi, Serta Merta, Setiap Saat, Berkala).
 
 ### Fase 4 — Konversi Template Halaman PPID
 
-- [x] **Template Arsip PPID** — Menulis ulang [archive-ppid.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/archive-ppid.php) dengan komponen lengkap:
-  - Breadcrumb dinamis (`Beranda › PPID`)
-  - Judul halaman `PPID` bergaya `font-display font-black text-3xl md:text-[36px] text-primary` persis Vercel
-  - Subtitle bergaya `font-mono text-sm tracking-wide text-body-secondary`
-  - Garis pembatas `border-t border-primary/40` di atas daftar akordion
-  - Setiap akordion menampilkan: judul pos, deskripsi singkat, daftar tautan dokumen dengan gaya `font-mono underline decoration-primary/40`
-  - Ikon berganti dinamis: **ArrowUpRight** (terbuka) dan **ArrowDownLeft** (tertutup) sesuai komponen `AccordionItem.jsx` Vercel
-  - Item pertama (SK PPID) terbuka secara default saat halaman dimuat
+- [x] **Template Arsip PPID** — Menulis ulang [archive-ppid.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/archive-ppid.php) lengkap dengan breadcrumb, gaya font Montserrat & Plus Jakarta Sans, serta ikon ArrowUpRight/ArrowDownLeft.
 
 ### Fase 5 — Interaktivitas Client-Side Accordion PPID
 
-- [x] **Vanilla JS Accordion** — Menambahkan logika interaksi buka/tutup smooth di [src/js/main.js](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/src/js/main.js) untuk seluruh `.dprd-accordion-item`: animasi transisi `max-height` + `opacity` 300ms, pergantian ikon ArrowUpRight ↔ ArrowDownLeft secara instan.
+- [x] **Vanilla JS Exclusive Accordion** — Logika eksklusif 1 terbuka di `src/js/main.js` dengan animasi `scrollHeight` 400ms `cubic-bezier(0.25, 1, 0.5, 1)`.
 - [x] **Kompilasi Aset Vite/Tailwind** — Menjalankan `npm run build` berhasil menghasilkan `main.css` (29.98 kB) dan `main.js` (6.81 kB).
-
