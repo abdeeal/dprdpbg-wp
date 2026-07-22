@@ -80,13 +80,7 @@ $recent_query = new WP_Query($recent_args);
             }
             $news_url = get_permalink($post_id);
             
-            $excerpt = get_post_meta($post_id, 'excerpt', true);
-            if (empty($excerpt)) {
-                $excerpt = $featured_post->post_excerpt;
-            }
-            if (empty($excerpt)) {
-                $excerpt = wp_trim_words(strip_shortcodes($featured_post->post_content), 25);
-            }
+            $excerpt = dprd_get_auto_excerpt($featured_post);
             ?>
             <a href="<?php echo esc_url($news_url); ?>" class="lg:col-span-7 group cursor-pointer block">
                 <div class="relative w-full aspect-[16/10] overflow-hidden mb-4 rounded-card">

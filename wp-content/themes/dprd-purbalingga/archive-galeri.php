@@ -16,10 +16,10 @@ get_header();
         get_template_part('template-parts/ui/breadcrumbs');
         ?>
         
-        <header class="mb-12 mt-6">
-            <h1 class="font-display text-4xl text-primary font-bold mb-4">Galeri & Dokumentasi</h1>
-            <p class="font-sans text-body-secondary text-[15px] max-w-2xl">
-                Dokumentasi foto dan video kegiatan rapat, kunjungan kerja, dan acara resmi DPRD Kabupaten Purbalingga.
+        <header class="mb-2 mt-6">
+            <h1 class="font-display font-black text-3xl md:text-[36px] text-primary mb-2">Galeri</h1>
+            <p class="font-mono text-xs md:text-[13px] text-body-secondary tracking-widest">
+                Dokumentasi Kegiatan DPRD Kabupaten Purbalingga
             </p>
         </header>
 

@@ -62,12 +62,12 @@ if (!empty($additional_images) || (!empty($quote_text) && $quote_paragraph > 0))
         $caption = isset($img['caption']) ? $img['caption'] : '';
 
         if ($img_id && $paragraph_idx > 0) {
-            $img_url = wp_get_attachment_image_url($img_id, 'large');
-            if ($img_url) {
+            $add_img_url = wp_get_attachment_image_url($img_id, 'large');
+            if ($add_img_url) {
                 $image_html = '
                 <figure class="my-10 w-full">
                     <div class="relative w-full aspect-[16/9] overflow-hidden rounded-card mb-3">
-                        <img src="' . esc_url($img_url) . '" class="object-cover w-full h-full" alt="Foto Tambahan" />
+                        <img src="' . esc_url($add_img_url) . '" class="object-cover w-full h-full" alt="Foto Tambahan" />
                     </div>';
                 if (!empty($caption)) {
                     $image_html .= '<figcaption class="text-center font-sans text-xs md:text-[13px] text-body-secondary">' . esc_html($caption) . '</figcaption>';

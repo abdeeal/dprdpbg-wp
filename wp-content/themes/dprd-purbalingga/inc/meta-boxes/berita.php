@@ -80,7 +80,6 @@ function dprd_render_berita_additional_meta_box($post) {
     $day = get_post_meta($post->ID, 'day', true);
     $time = get_post_meta($post->ID, 'time', true);
     $author = get_post_meta($post->ID, 'author', true);
-    $excerpt = get_post_meta($post->ID, 'excerpt', true);
     $image_caption = get_post_meta($post->ID, 'imageCaption', true);
     $quote_text = get_post_meta($post->ID, 'dprd_quote_text', true);
     $quote_paragraph = get_post_meta($post->ID, 'dprd_quote_paragraph', true);
@@ -110,10 +109,10 @@ function dprd_render_berita_additional_meta_box($post) {
             </td>
         </tr>
         <tr>
-            <th><label for="dprd_excerpt">Ringkasan Berita (Tampil di Halaman Depan)</label></th>
-            <td>
-                <textarea name="excerpt" id="dprd_excerpt" rows="3" class="large-text" placeholder="Tulis 1-2 kalimat ringkasan singkat berita untuk ditampilkan di halaman utama..."><?php echo esc_textarea($excerpt); ?></textarea>
-                <p class="description">Teks ringkasan ini akan tampil di bawah judul berita pada halaman depan website. <em>*Catatan: Huruf pertama pada isi berita Anda otomatis akan diubah menjadi besar dan tebal (Gaya Dropcap) saat dibaca pengunjung, Anda tidak perlu menambahkan format apa pun.*</em></p>
+            <td colspan="2">
+                <p class="description" style="padding: 8px; background: #f0f7ff; border-left: 4px solid #2271b1; margin: 0;">
+                    <strong>💡 Ringkasan Berita</strong> diisi melalui kolom <strong>"Kutipan"</strong> di sidebar kanan editor (gulir ke bawah di panel Berita). Teks tersebut otomatis tampil di halaman depan website sebagai ringkasan berita.
+                </p>
             </td>
         </tr>
         <tr>
@@ -178,9 +177,8 @@ add_action('save_post', function ($post_id) {
                 if (isset($_POST['author'])) {
                     update_post_meta($post_id, 'author', sanitize_text_field($_POST['author']));
                 }
-                if (isset($_POST['excerpt'])) {
-                    update_post_meta($post_id, 'excerpt', sanitize_textarea_field($_POST['excerpt']));
-                }
+                // Catatan: excerpt sekarang menggunakan field native WordPress (post_excerpt)
+                // yang tersimpan otomatis oleh WP core via field "Kutipan" di editor.
                 if (isset($_POST['imageCaption'])) {
                     update_post_meta($post_id, 'imageCaption', sanitize_textarea_field($_POST['imageCaption']));
                 }

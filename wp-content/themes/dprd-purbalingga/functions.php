@@ -339,4 +339,57 @@ add_action('template_redirect', function () {
 </html>';
     exit;
 });
+
+/**
+ * Ambil paragraf pertama dari konten post (Gutenberg-safe).
+ * Digunakan sebagai auto-excerpt di halaman beranda & archive berita.
+ *
+ * Prioritas:
+ *   1. post_excerpt (field "Kutipan" WP) — jika diisi manual
+ *   2. Paragraf pertama dari post_content (parse Gutenberg block)
+ *   3. Fallback: 30 kata pertama dari konten
+ *
+ * @param WP_Post|int $post   Object post atau ID post
+ * @return string             Teks ringkasan bersih (tanpa HTML)
+ */
+function dprd_get_auto_excerpt($post) {
+    if (is_int($post)) {
+        $post = get_post($post);
+    }
+    if (!$post) return '';
+
+    // 1. Jika ada kutipan manual, pakai itu
+    if (!empty(trim($post->post_excerpt))) {
+        return wp_strip_all_tags($post->post_excerpt);
+    }
+
+    // 2. Parse blok Gutenberg → ambil paragraf pertama yang bermakna
+    $content = $post->post_content;
+
+    if (function_exists('parse_blocks')) {
+        $blocks = parse_blocks($content);
+        foreach ($blocks as $block) {
+            if ($block['blockName'] === 'core/paragraph' && !empty(trim($block['innerHTML'] ?? ''))) {
+                $text = wp_strip_all_tags($block['innerHTML']);
+                $text = html_entity_decode(trim($text), ENT_QUOTES, 'UTF-8');
+                if (mb_strlen($text) > 20) { // Abaikan paragraf terlalu pendek
+                    return $text;
+                }
+            }
+        }
+    }
+
+    // 3. Fallback: render HTML lalu ambil <p> pertama
+    $rendered = apply_filters('the_content', $content);
+    if (preg_match('/<p[^>]*>(.*?)<\/p>/si', $rendered, $matches)) {
+        $text = wp_strip_all_tags($matches[1]);
+        $text = html_entity_decode(trim($text), ENT_QUOTES, 'UTF-8');
+        if (!empty($text)) {
+            return $text;
+        }
+    }
+
+    // 4. Last resort: potong konten mentah
+    return wp_trim_words(wp_strip_all_tags($content), 30);
+}
 
