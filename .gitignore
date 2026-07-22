@@ -5,6 +5,10 @@
 !wp-config-sample.php
 xmlrpc.php
 
+# .htaccess dikecualikan — RewriteBase berbeda di setiap mesin lokal
+.htaccess
+
+
 # Konfigurasi sensitif — WAJIB diabaikan
 wp-config.php
 wp-content/aiven-ca.pem
