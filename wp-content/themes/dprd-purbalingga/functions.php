@@ -256,8 +256,11 @@ add_action('template_redirect', function () {
     $file_path = str_replace($upload_dir['baseurl'], $upload_dir['basedir'], $src);
     $file_path = wp_normalize_path($file_path);
 
-    // Cegah path traversal
-    if (strpos(realpath(dirname($file_path)), wp_normalize_path($upload_dir['basedir'])) !== 0) {
+    // Cegah path traversal — normalize kedua path ke forward-slash (Windows compat)
+    $real_dir   = realpath(dirname($file_path));
+    $upload_base = wp_normalize_path($upload_dir['basedir']);
+
+    if (!$real_dir || strpos(wp_normalize_path($real_dir), $upload_base) !== 0) {
         status_header(403);
         wp_die('Akses ditolak.', 'Forbidden', ['response' => 403]);
     }
