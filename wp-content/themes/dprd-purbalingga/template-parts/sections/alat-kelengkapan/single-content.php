@@ -520,7 +520,7 @@ get_template_part('template-parts/ui/breadcrumbs', null, [
 ?>
 
 <!-- Page Header -->
-<div class="mb-10 max-w-4xl mx-auto w-full">
+<div class="mb-10 w-full text-left">
     <h1 class="font-display font-black text-3xl md:text-[36px] text-primary mb-2 leading-tight">
         <?php echo esc_html($title); ?>
     </h1>
@@ -557,7 +557,7 @@ get_template_part('template-parts/ui/breadcrumbs', null, [
                     <?php foreach ($lvl_members as $member) : ?>
                         <div class="w-full sm:w-[calc(50%-1.5rem)] md:w-[calc(33.333%-2.5rem)] max-w-[280px] flex justify-center">
                             <div class="flex flex-col items-center w-full">
-                                <h3 class="font-display text-lg md:text-[19px] font-bold text-body text-center mb-3 leading-snug">
+                                <h3 class="font-display text-lg md:text-[19px] font-normal text-body text-center mb-3 leading-snug h-[2.6em] min-h-[2.6em] flex items-center justify-center">
                                     <?php echo esc_html($member['name']); ?>
                                 </h3>
                                 
