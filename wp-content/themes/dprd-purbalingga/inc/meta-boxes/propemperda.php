@@ -122,7 +122,7 @@ function dprd_render_propemperda_meta_box($post) {
     <?php
 }
 
-add_action('save_post', function ($post_id) {
+function dprd_save_propemperda_meta($post_id) {
     if (!isset($_POST['dprd_propemperda_meta_nonce']) || !wp_verify_nonce($_POST['dprd_propemperda_meta_nonce'], 'dprd_save_propemperda_meta')) {
         return;
     }
@@ -134,7 +134,38 @@ add_action('save_post', function ($post_id) {
     }
 
     if (isset($_POST['tahun'])) {
-        update_post_meta($post_id, 'tahun', sanitize_text_field($_POST['tahun']));
+        $raw_tahun = sanitize_text_field($_POST['tahun']);
+        if (preg_match('/\d{4}/', $raw_tahun, $matches)) {
+            $clean_tahun = intval($matches[0]);
+        } else {
+            $clean_tahun = intval(preg_replace('/[^0-9]/', '', $raw_tahun)) ?: date('Y');
+        }
+
+        // ── Strict Duplicate Year Handler (Gagal & Notifikasi saat Typo) ──
+        $existing_posts = get_posts([
+            'post_type'      => 'propemperda',
+            'meta_key'       => 'tahun',
+            'meta_value'     => $clean_tahun,
+            'post__not_in'   => [$post_id],
+            'posts_per_page' => 1,
+            'post_status'    => 'publish'
+        ]);
+
+        if (!empty($existing_posts)) {
+            // Unhook agar tidak infinite loop, lalu kembalikan status post ke draft (GAGAL PUBLISH)
+            remove_action('save_post', 'dprd_save_propemperda_meta');
+            wp_update_post([
+                'ID'          => $post_id,
+                'post_status' => 'draft'
+            ]);
+            add_action('save_post', 'dprd_save_propemperda_meta');
+
+            // Set notifikasi error untuk admin
+            set_transient('dprd_propemperda_duplicate_error_' . get_current_user_id(), $clean_tahun, 45);
+            return;
+        }
+
+        update_post_meta($post_id, 'tahun', $clean_tahun);
     }
     if (isset($_POST['deskripsi'])) {
         update_post_meta($post_id, 'deskripsi', sanitize_textarea_field($_POST['deskripsi']));
@@ -144,6 +175,21 @@ add_action('save_post', function ($post_id) {
     }
     if (isset($_POST['sk_penetapan_file'])) {
         update_post_meta($post_id, 'sk_penetapan_file', esc_url_raw($_POST['sk_penetapan_file']));
+    }
+}
+add_action('save_post', 'dprd_save_propemperda_meta');
+
+// Admin Notice jika Terjadi Duplikasi Tahun (Penolakan Publikasi)
+add_action('admin_notices', function () {
+    $user_id = get_current_user_id();
+    $error_tahun = get_transient('dprd_propemperda_duplicate_error_' . $user_id);
+    if ($error_tahun) {
+        delete_transient('dprd_propemperda_duplicate_error_' . $user_id);
+        ?>
+        <div class="notice notice-error is-dismissible">
+            <p><strong>⚠️ GAGAL MEMPUBLIKASIKAN DOKUMEN:</strong> Dokumen Propemperda untuk <strong>Tahun <?php echo esc_html($error_tahun); ?></strong> sudah terdaftar di database! Dokumen baru ini disimpan sebagai <em>Draft</em> agar tidak menimpa file lama. Silakan periksa kembali tahun atau edit pos tahun <?php echo esc_html($error_tahun); ?> yang sudah ada.</p>
+        </div>
+        <?php
     }
 });
 

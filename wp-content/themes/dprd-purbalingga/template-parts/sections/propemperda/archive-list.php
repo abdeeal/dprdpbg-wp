@@ -10,9 +10,20 @@ if (!defined('ABSPATH')) exit;
 $query = new WP_Query([
     'post_type'      => 'propemperda',
     'posts_per_page' => -1,
-    'orderby'        => 'date',
+    'meta_key'       => 'tahun',
+    'orderby'        => 'meta_value_num',
     'order'          => 'DESC'
 ]);
+
+if (!$query->have_posts()) {
+    // Fallback jika belum ada meta_key tahun terisi
+    $query = new WP_Query([
+        'post_type'      => 'propemperda',
+        'posts_per_page' => -1,
+        'orderby'        => 'date',
+        'order'          => 'DESC'
+    ]);
+}
 
 if (!$query->have_posts()) {
     echo '<p class="text-body-secondary font-sans">Belum ada dokumen Propemperda yang terdaftar.</p>';
