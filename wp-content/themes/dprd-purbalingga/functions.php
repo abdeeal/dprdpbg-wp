@@ -230,13 +230,21 @@ function dprd_proxy_url(int $post_id, string $file_url, string $title): string {
 
 /**
  * Tangani request proxy file: verifikasi, serve PDF dengan header yang benar.
+ *
+ * Mode:
+ *  - default      → halaman HTML wrapper dengan <title> judul dokumen (fix tab "(anonymous)")
+ *  - ?raw=1       → bytes PDF mentah (dipakai oleh <embed> di dalam wrapper)
  */
 add_action('template_redirect', function () {
     if (!isset($_GET['dprd_file'])) return;
 
     $post_id  = absint($_GET['dprd_file']);
     $judul    = sanitize_title($_GET['judul'] ?? 'dokumen');
+    $judul_label = isset($_GET['judul']) ? urldecode($_GET['judul']) : 'dokumen'; // untuk display
+    $judul_label = str_replace('-', ' ', $judul_label);
+    $judul_label = ucwords($judul_label);
     $src      = isset($_GET['src']) ? esc_url_raw(urldecode($_GET['src'])) : '';
+    $is_raw   = isset($_GET['raw']) && $_GET['raw'] === '1';
 
     if (!$post_id || empty($src)) {
         status_header(400);
@@ -257,7 +265,7 @@ add_action('template_redirect', function () {
     $file_path = wp_normalize_path($file_path);
 
     // Cegah path traversal — normalize kedua path ke forward-slash (Windows compat)
-    $real_dir   = realpath(dirname($file_path));
+    $real_dir    = realpath(dirname($file_path));
     $upload_base = wp_normalize_path($upload_dir['basedir']);
 
     if (!$real_dir || strpos(wp_normalize_path($real_dir), $upload_base) !== 0) {
@@ -271,8 +279,8 @@ add_action('template_redirect', function () {
     }
 
     // Hanya izinkan PDF
-    $finfo    = finfo_open(FILEINFO_MIME_TYPE);
-    $mime     = finfo_file($finfo, $file_path);
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime  = finfo_file($finfo, $file_path);
     finfo_close($finfo);
 
     if ($mime !== 'application/pdf') {
@@ -280,19 +288,55 @@ add_action('template_redirect', function () {
         wp_die('Tipe file tidak didukung.', 'Forbidden', ['response' => 403]);
     }
 
-    $display_name = $judul . '.pdf';
+    // ── Mode RAW: kirim bytes PDF (dipanggil oleh <embed> di dalam wrapper) ──
+    if ($is_raw) {
+        $display_name = $judul . '.pdf';
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: inline; filename="' . $display_name . '"');
+        header('Content-Length: ' . filesize($file_path));
+        header('Cache-Control: private, max-age=3600');
+        header('X-Content-Type-Options: nosniff');
+        header('X-Robots-Tag: noindex');
 
-    // Kirim header + file
-    header('Content-Type: application/pdf');
-    header('Content-Disposition: inline; filename="' . $display_name . '"');
-    header('Content-Length: ' . filesize($file_path));
-    header('Cache-Control: private, max-age=3600');
-    header('X-Content-Type-Options: nosniff');
-    header('X-Robots-Tag: noindex'); // Jangan di-index search engine
+        while (ob_get_level()) ob_end_clean();
+        readfile($file_path);
+        exit;
+    }
 
-    // Matikan buffer WordPress agar tidak corrupt
+    // ── Mode WRAPPER: tampilkan halaman HTML yang embed PDF ──
+    // Tab browser akan menampilkan <title> ini, bukan metadata PDF
+    $raw_url = add_query_arg([
+        'dprd_file' => $post_id,
+        'judul'     => urlencode($judul),
+        'src'       => urlencode($src),
+        'raw'       => '1',
+    ], home_url('/'));
+
+    $site_name   = get_bloginfo('name');
+    $page_title  = esc_html($judul_label) . ' — ' . esc_html($site_name);
+    $raw_url_esc = esc_url($raw_url);
+
+    header('Content-Type: text/html; charset=UTF-8');
+    header('X-Robots-Tag: noindex');
     while (ob_get_level()) ob_end_clean();
 
-    readfile($file_path);
+    echo '<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>' . $page_title . '</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; background: #525659; }
+        embed { display: block; width: 100%; height: 100vh; border: none; }
+    </style>
+</head>
+<body>
+    <embed src="' . $raw_url_esc . '" type="application/pdf" width="100%" height="100%">
+</body>
+</html>';
     exit;
-});
+});
+
