@@ -5,6 +5,31 @@
 
 if (!defined('ABSPATH')) exit;
 
+/**
+ * Singleton untuk instance repeater Foto Tambahan Berita
+ */
+function dprd_get_berita_images_repeater() {
+    static $instance = null;
+    if ($instance === null) {
+        $instance = new DPRD_Repeater_Field(
+            'dprd_berita_images_json',
+            'Foto-Foto Tambahan Berita (Multiple Images)',
+            null,
+            [
+                'image_id'  => ['label' => 'Foto', 'type' => 'image'],
+                'caption'   => ['label' => 'Keterangan Foto', 'type' => 'textarea'],
+                'paragraph' => ['label' => 'Disisipkan Setelah Paragraf Ke-', 'type' => 'text'],
+            ]
+        );
+    }
+    return $instance;
+}
+
+// Inisialisasi early agar asset di-enqueue
+add_action('admin_init', function() {
+    dprd_get_berita_images_repeater();
+});
+
 add_action('add_meta_boxes', function () {
     // Meta box di sidebar untuk status featured
     add_meta_box(
@@ -21,6 +46,16 @@ add_action('add_meta_boxes', function () {
         'dprd_berita_additional_meta',
         'Informasi Tambahan Berita',
         'dprd_render_berita_additional_meta_box',
+        'berita',
+        'normal',
+        'default'
+    );
+
+    // Meta box untuk galeri foto tambahan di berita (repeater)
+    add_meta_box(
+        'dprd_berita_images_meta',
+        'Foto-Foto Tambahan Berita',
+        'dprd_render_berita_images_meta_box',
         'berita',
         'normal',
         'default'
@@ -47,14 +82,9 @@ function dprd_render_berita_additional_meta_box($post) {
     $author = get_post_meta($post->ID, 'author', true);
     $excerpt = get_post_meta($post->ID, 'excerpt', true);
     $image_caption = get_post_meta($post->ID, 'imageCaption', true);
+    $quote_text = get_post_meta($post->ID, 'dprd_quote_text', true);
+    $quote_paragraph = get_post_meta($post->ID, 'dprd_quote_paragraph', true);
     
-    // Fields untuk Foto Tambahan di Tengah Paragraf
-    $additional_image_id = get_post_meta($post->ID, 'additional_image_id', true);
-    $additional_image_caption = get_post_meta($post->ID, 'additional_image_caption', true);
-    $additional_image_paragraph = get_post_meta($post->ID, 'additional_image_paragraph', true);
-    
-    $additional_image_url = $additional_image_id ? wp_get_attachment_image_url($additional_image_id, 'medium') : '';
-
     wp_enqueue_media();
     ?>
     <table class="form-table">
@@ -94,77 +124,34 @@ function dprd_render_berita_additional_meta_box($post) {
             </td>
         </tr>
 
-        <!-- Pembatas Sisi Foto Tambahan -->
+        <!-- Pembatas Sisi Kutipan -->
         <tr>
             <td colspan="2"><hr style="border:0; border-top:1px solid #ccc; margin: 10px 0;"></td>
         </tr>
 
         <tr>
-            <th><label>Foto Tambahan (Di Tengah Paragraf)</label></th>
+            <th><label for="dprd_quote_text">Kutipan / Blockquote (Di Tengah Paragraf)</label></th>
             <td>
-                <div class="dprd-meta-image-uploader">
-                    <input type="hidden" name="additional_image_id" id="dprd_additional_image_id" value="<?php echo esc_attr($additional_image_id); ?>">
-                    <div id="dprd_additional_image_preview" style="margin-bottom: 10px;">
-                        <?php if ($additional_image_url): ?>
-                            <img src="<?php echo esc_url($additional_image_url); ?>" style="max-width: 200px; max-height: 200px; display: block; border: 1px solid #ccc; padding: 4px; border-radius: 4px;">
-                        <?php endif; ?>
-                    </div>
-                    <button type="button" class="button button-secondary" id="dprd_additional_upload_button">Pilih / Unggah Foto Tambahan</button>
-                    <button type="button" class="button-link" id="dprd_additional_remove_button" style="<?php echo $additional_image_id ? '' : 'display:none;'; ?> margin-left: 10px; color: #b32d2e; text-decoration: none;">Hapus Foto</button>
-                </div>
-                <p class="description" style="margin-top: 5px;">Pilih atau unggah foto pendukung tambahan untuk disisipkan di sela-sela paragraf isi berita.</p>
-
-                <script>
-                jQuery(document).ready(function($){
-                    var file_frame;
-                    $('#dprd_additional_upload_button').on('click', function(e){
-                        e.preventDefault();
-                        if (file_frame) {
-                            file_frame.open();
-                            return;
-                        }
-                        file_frame = wp.media.frames.file_frame = wp.media({
-                            title: 'Pilih atau Unggah Foto Tambahan',
-                            button: {
-                                text: 'Gunakan Foto Ini'
-                            },
-                            multiple: false
-                        });
-                        file_frame.on('select', function() {
-                            var attachment = file_frame.state().get('selection').first().toJSON();
-                            $('#dprd_additional_image_id').val(attachment.id);
-                            $('#dprd_additional_image_preview').html('<img src="'+attachment.url+'" style="max-width: 200px; max-height: 200px; display: block; border: 1px solid #ccc; padding: 4px; border-radius: 4px;">');
-                            $('#dprd_additional_remove_button').show();
-                        });
-                        file_frame.open();
-                    });
-
-                    $('#dprd_additional_remove_button').on('click', function(e){
-                        e.preventDefault();
-                        $('#dprd_additional_image_id').val('');
-                        $('#dprd_additional_image_preview').html('');
-                        $(this).hide();
-                    });
-                });
-                </script>
+                <textarea name="dprd_quote_text" id="dprd_quote_text" rows="3" class="large-text" placeholder="Tulis kalimat kutipan penting dari narasumber atau sidang di sini..."><?php echo esc_textarea($quote_text); ?></textarea>
+                <p class="description">Teks kutipan ini akan otomatis diformat dengan garis vertikal merah di sebelah kiri dan gaya huruf miring.</p>
             </td>
         </tr>
         <tr>
-            <th><label for="dprd_additional_image_caption">Keterangan Foto Tambahan</label></th>
+            <th><label for="dprd_quote_paragraph">Disisipkan Setelah Paragraf Ke-</label></th>
             <td>
-                <textarea name="additional_image_caption" id="dprd_additional_image_caption" rows="2" class="large-text" placeholder="Tulis keterangan foto tambahan di sini..."><?php echo esc_textarea($additional_image_caption); ?></textarea>
-                <p class="description">Tulis keterangan singkat/caption untuk foto tambahan di atas.</p>
-            </td>
-        </tr>
-        <tr>
-            <th><label for="dprd_additional_image_paragraph">Disisipkan pada Paragraf Ke-</label></th>
-            <td>
-                <input type="number" name="additional_image_paragraph" id="dprd_additional_image_paragraph" value="<?php echo esc_attr($additional_image_paragraph); ?>" min="1" step="1" style="width: 80px;">
-                <p class="description">Tentukan setelah paragraf ke berapa foto tambahan ini akan diletakkan (Contoh: tulis 2 agar foto otomatis muncul tepat setelah paragraf kedua).</p>
+                <input type="number" name="dprd_quote_paragraph" id="dprd_quote_paragraph" value="<?php echo esc_attr($quote_paragraph); ?>" min="1" step="1" style="width: 80px;">
+                <p class="description">Tentukan setelah paragraf ke berapa kutipan ini akan diletakkan (Contoh: tulis 2 agar kutipan muncul tepat setelah paragraf kedua).</p>
             </td>
         </tr>
     </table>
     <?php
+}
+
+function dprd_render_berita_images_meta_box($post) {
+    wp_nonce_field('dprd_save_berita_images', 'dprd_berita_images_nonce');
+    $raw = get_post_meta($post->ID, 'dprd_berita_images_json', true);
+    $rows = $raw ? json_decode($raw, true) : [];
+    dprd_get_berita_images_repeater()->render_field_only($rows);
 }
 
 add_action('save_post', function ($post_id) {
@@ -197,14 +184,24 @@ add_action('save_post', function ($post_id) {
                 if (isset($_POST['imageCaption'])) {
                     update_post_meta($post_id, 'imageCaption', sanitize_textarea_field($_POST['imageCaption']));
                 }
-                if (isset($_POST['additional_image_id'])) {
-                    update_post_meta($post_id, 'additional_image_id', absint($_POST['additional_image_id']));
+                if (isset($_POST['dprd_quote_text'])) {
+                    update_post_meta($post_id, 'dprd_quote_text', sanitize_textarea_field($_POST['dprd_quote_text']));
                 }
-                if (isset($_POST['additional_image_caption'])) {
-                    update_post_meta($post_id, 'additional_image_caption', sanitize_textarea_field($_POST['additional_image_caption']));
+                if (isset($_POST['dprd_quote_paragraph'])) {
+                    update_post_meta($post_id, 'dprd_quote_paragraph', absint($_POST['dprd_quote_paragraph']));
                 }
-                if (isset($_POST['additional_image_paragraph'])) {
-                    update_post_meta($post_id, 'additional_image_paragraph', absint($_POST['additional_image_paragraph']));
+            }
+        }
+    }
+
+    // 3. Simpan Repeater Foto Tambahan Berita
+    if (isset($_POST['dprd_berita_images_nonce']) && wp_verify_nonce($_POST['dprd_berita_images_nonce'], 'dprd_save_berita_images')) {
+        if (!defined('DOING_AUTOSAVE') || !DOING_AUTOSAVE) {
+            if (current_user_can('edit_post', $post_id)) {
+                if (isset($_POST['dprd_berita_images_json'])) {
+                    $repeater = dprd_get_berita_images_repeater();
+                    $clean_json = $repeater->sanitize_from_post($_POST['dprd_berita_images_json']);
+                    update_post_meta($post_id, 'dprd_berita_images_json', $clean_json);
                 }
             }
         }

@@ -17,9 +17,9 @@ get_header();
         ?>
         
         <header class="mb-12 mt-6">
-            <h1 class="font-display text-4xl text-primary font-bold mb-4">Berita Terkini</h1>
-            <p class="font-sans text-body-secondary text-[15px] max-w-2xl">
-                Ikuti perkembangan informasi kegiatan, keputusan, dan agenda terbaru dari DPRD Kabupaten Purbalingga.
+            <h1 class="font-display text-primary text-4xl md:text-5xl lg:text-[56px] font-bold mb-4 tracking-tight leading-none">Berita</h1>
+            <p class="font-mono text-sm text-body-secondary tracking-wide">
+                Arsip Berita Dari DPRD Kabupaten Purbalingga
             </p>
         </header>
 

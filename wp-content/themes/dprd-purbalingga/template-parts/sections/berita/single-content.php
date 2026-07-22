@@ -26,40 +26,80 @@ if (empty($img_url)) {
 $content = get_the_content();
 $content = apply_filters('the_content', $content);
 $content = trim($content);
-if (preg_match('/^<p[^>]*>([A-Za-z])/u', $content, $matches)) {
-    $first_letter = $matches[1];
-    $content = preg_replace('/^<p([^>]*)>[A-Za-z]/u', '<p$1><span class="dropcap">' . $first_letter . '</span>', $content);
+$content = preg_replace('/<p([^>]*)>\s*([A-Za-z])/u', '<p$1><span class="dropcap">$2</span>', $content, 1);
+
+// Sisipkan Foto-Foto Tambahan & Kutipan di Tengah Paragraf (Kustom)
+$additional_images = get_dprd_repeater($post_id, 'dprd_berita_images_json');
+$quote_text = get_post_meta($post_id, 'dprd_quote_text', true);
+$quote_paragraph = get_post_meta($post_id, 'dprd_quote_paragraph', true);
+
+// Fallback jika repeater kosong tapi field lama berisi data
+if (empty($additional_images)) {
+    $old_img_id = get_post_meta($post_id, 'additional_image_id', true);
+    $old_caption = get_post_meta($post_id, 'additional_image_caption', true);
+    $old_para = get_post_meta($post_id, 'additional_image_paragraph', true);
+    if ($old_img_id && $old_para > 0) {
+        $additional_images[] = [
+            'image_id'  => $old_img_id,
+            'caption'   => $old_caption,
+            'paragraph' => $old_para
+        ];
+    }
 }
 
-// Sisipkan Foto Tambahan di Tengah Paragraf (Fase 4 - Kustom)
-$additional_image_id = get_post_meta($post_id, 'additional_image_id', true);
-$additional_image_caption = get_post_meta($post_id, 'additional_image_caption', true);
-$additional_image_paragraph = get_post_meta($post_id, 'additional_image_paragraph', true);
+if (!empty($additional_images) || (!empty($quote_text) && $quote_paragraph > 0)) {
+    // Pisahkan konten berdasarkan tag penutup paragraf </p>
+    $paragraphs = explode('</p>', $content);
+    $num_paragraphs = count($paragraphs) - 1;
 
-if ($additional_image_id && $additional_image_paragraph > 0) {
-    $additional_image_url = wp_get_attachment_image_url($additional_image_id, 'large');
-    if ($additional_image_url) {
-        $image_html = '
-        <figure class="my-10 w-full">
-            <div class="relative w-full aspect-[16/9] overflow-hidden rounded-card mb-3">
-                <img src="' . esc_url($additional_image_url) . '" class="object-cover w-full h-full" alt="Foto Tambahan" />
-            </div>';
-        if (!empty($additional_image_caption)) {
-            $image_html .= '<figcaption class="text-center font-sans text-xs md:text-[13px] text-body-secondary">' . esc_html($additional_image_caption) . '</figcaption>';
-        }
-        $image_html .= '</figure>';
+    // Kelompokkan HTML sisipan berdasarkan paragraph target
+    $inserts = [];
 
-        // Pisahkan konten berdasarkan tag penutup paragraf </p>
-        $paragraphs = explode('</p>', $content);
-        $insert_index = intval($additional_image_paragraph) - 1; // 1-indexed ke 0-indexed
-        
-        if ($insert_index >= 0 && $insert_index < count($paragraphs)) {
-            $paragraphs[$insert_index] .= '</p>' . $image_html;
-            $content = implode('</p>', $paragraphs);
-        } else {
-            $content .= $image_html;
+    // 1. Gambar Tambahan
+    foreach ($additional_images as $img) {
+        $img_id = isset($img['image_id']) ? intval($img['image_id']) : 0;
+        $paragraph_idx = isset($img['paragraph']) ? intval($img['paragraph']) : 0;
+        $caption = isset($img['caption']) ? $img['caption'] : '';
+
+        if ($img_id && $paragraph_idx > 0) {
+            $img_url = wp_get_attachment_image_url($img_id, 'large');
+            if ($img_url) {
+                $image_html = '
+                <figure class="my-10 w-full">
+                    <div class="relative w-full aspect-[16/9] overflow-hidden rounded-card mb-3">
+                        <img src="' . esc_url($img_url) . '" class="object-cover w-full h-full" alt="Foto Tambahan" />
+                    </div>';
+                if (!empty($caption)) {
+                    $image_html .= '<figcaption class="text-center font-sans text-xs md:text-[13px] text-body-secondary">' . esc_html($caption) . '</figcaption>';
+                }
+                $image_html .= '</figure>';
+
+                $inserts[$paragraph_idx][] = $image_html;
+            }
         }
     }
+
+    // 2. Kutipan / Blockquote
+    if (!empty($quote_text) && $quote_paragraph > 0) {
+        $quote_html = '
+        <blockquote class="wp-block-quote">
+            <p>"' . esc_html($quote_text) . '"</p>
+        </blockquote>';
+        $inserts[$quote_paragraph][] = $quote_html;
+    }
+
+    // Sisipkan ke array paragraphs
+    foreach ($inserts as $p_idx => $html_list) {
+        $combined_html = implode('', $html_list);
+        if ($p_idx > 0 && $p_idx <= $num_paragraphs) {
+            $paragraphs[$p_idx] = $combined_html . $paragraphs[$p_idx];
+        } else {
+            $last_idx = count($paragraphs) - 1;
+            $paragraphs[$last_idx] .= $combined_html;
+        }
+    }
+
+    $content = implode('</p>', $paragraphs);
 }
 
 // Ambil Berita Terbaru untuk Sidebar (mengabaikan berita yang sedang aktif)
@@ -150,6 +190,14 @@ $recent_news_posts = get_posts([
                     font-style: italic;
                     color: #251818;
                     line-height: 1.6;
+                }
+                .artikel-content blockquote p {
+                    margin-bottom: 0 !important;
+                    font-family: inherit !important;
+                    font-size: inherit !important;
+                    font-style: inherit !important;
+                    color: inherit !important;
+                    line-height: inherit !important;
                 }
             </style>
 

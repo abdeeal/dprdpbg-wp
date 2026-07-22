@@ -1,15 +1,15 @@
 # BEGIN WordPress
-# Arahan (baris) antara "BEGIN WordPress" dan "END WordPress"
-# dihasilkan secara dinamis, dan hanya dapat dimodifikasi melalui filter WordPress.
-# Setiap perubahan pada arahan di antara penanda berikut akan ditimpa.
+# The directives (lines) between "BEGIN WordPress" and "END WordPress" are
+# dynamically generated, and should only be modified via WordPress filters.
+# Any changes to the directives between these markers will be overwritten.
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-RewriteBase /dprd-purbalingga/
+RewriteBase /dprdpbg-wp/
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /dprd-purbalingga/index.php [L]
+RewriteRule . /dprdpbg-wp/index.php [L]
 </IfModule>
 
 # END WordPress
