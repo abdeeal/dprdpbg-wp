@@ -359,6 +359,86 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ── Interaksi Banner Carousel ──────────────────────────────────────────
+    const carouselContainer = document.querySelector('.dprd-banner-carousel');
+    if (carouselContainer) {
+        const track = carouselContainer.querySelector('.dprd-carousel-track');
+        const prevBtn = carouselContainer.querySelector('.dprd-carousel-prev');
+        const nextBtn = carouselContainer.querySelector('.dprd-carousel-next');
+        const dots = carouselContainer.querySelectorAll('.dprd-carousel-dot');
+        const slidesCount = dots.length;
+        
+        if (slidesCount > 1) {
+            let currentIndex = 0;
+            let timer;
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            const updateCarousel = () => {
+                if (track) {
+                    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                }
+                dots.forEach((dot, index) => {
+                    if (index === currentIndex) {
+                        dot.classList.add('bg-white', 'w-4');
+                        dot.classList.remove('bg-white/50', 'hover:bg-white/75');
+                    } else {
+                        dot.classList.remove('bg-white', 'w-4');
+                        dot.classList.add('bg-white/50', 'hover:bg-white/75');
+                    }
+                });
+            };
+
+            const nextSlide = () => {
+                currentIndex = (currentIndex === slidesCount - 1) ? 0 : currentIndex + 1;
+                updateCarousel();
+            };
+
+            const prevSlide = () => {
+                currentIndex = (currentIndex === 0) ? slidesCount - 1 : currentIndex - 1;
+                updateCarousel();
+            };
+
+            const startTimer = () => {
+                timer = setInterval(nextSlide, 3000);
+            };
+
+            const stopTimer = () => {
+                clearInterval(timer);
+            };
+
+            if (prevBtn) prevBtn.addEventListener('click', () => { stopTimer(); prevSlide(); startTimer(); });
+            if (nextBtn) nextBtn.addEventListener('click', () => { stopTimer(); nextSlide(); startTimer(); });
+            
+            dots.forEach(dot => {
+                dot.addEventListener('click', (e) => {
+                    stopTimer();
+                    currentIndex = parseInt(e.target.dataset.index);
+                    updateCarousel();
+                    startTimer();
+                });
+            });
+
+            carouselContainer.addEventListener('mouseenter', stopTimer);
+            carouselContainer.addEventListener('mouseleave', startTimer);
+
+            carouselContainer.addEventListener('touchstart', e => {
+                stopTimer();
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+
+            carouselContainer.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                if (touchStartX - touchEndX > 50) nextSlide();
+                if (touchStartX - touchEndX < -50) prevSlide();
+                startTimer();
+            }, {passive: true});
+
+            updateCarousel();
+            startTimer();
+        }
+    }
+
 });
 
 

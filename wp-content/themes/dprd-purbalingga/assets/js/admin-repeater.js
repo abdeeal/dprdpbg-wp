@@ -257,7 +257,7 @@
           }).toBlob(function(blob) {
               var formData = new FormData();
               formData.append('action', 'dprd_upload_cropped_image');
-              formData.append('image', blob, 'cropped-' + attachment.id + '.jpg');
+              formData.append('image', blob, 'cropped-' + attachment.id + '.webp');
               formData.append('_ajax_nonce', dprd_repeater_vars.nonce);
 
               fetch(dprd_repeater_vars.ajax_url, {
@@ -286,7 +286,7 @@
                   cropBtn.textContent = 'Crop & Gunakan';
                   cropBtn.disabled = false;
               });
-          }, 'image/jpeg', 0.9);
+          }, 'image/webp', 0.75);
       });
   }
 
