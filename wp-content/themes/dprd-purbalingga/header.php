@@ -87,7 +87,7 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
          class="absolute top-full left-0 w-screen bg-white border-t border-b border-line/50 shadow-xl z-40 invisible opacity-0 transition-all duration-300 ease-out"
          aria-hidden="true">
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 py-8 flex gap-0 min-h-[280px]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 py-6 flex gap-0 min-h-[220px]">
 
         <!-- ── Kolom 1: Menu Level 1 ────────────────────────────────────── -->
         <?php
@@ -98,21 +98,21 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
         }
         ?>
         <nav class="w-1/3 border-r border-line/40 pr-8 overflow-y-auto" aria-label="Menu utama">
-            <ul class="flex flex-col gap-0.5 font-mono text-[14px] text-body">
+            <ul class="flex flex-col gap-1 font-mono text-[14px] text-body">
                 <?php foreach ($menu_tree as $i => $item) :
                     $has_children = !empty($item->children);
                     $is_default   = ($i === $default_l1_index);
                     ?>
                     <li>
                         <button
-                            class="dprd-l1-item w-full flex items-center justify-between py-2.5 px-3 rounded-sm text-left transition-colors hover:bg-line/30 border-0 bg-transparent outline-none focus:outline-none p-0 <?php echo $is_default ? 'dprd-active text-primary font-bold' : ''; ?>"
+                            class="dprd-l1-item w-full flex items-center justify-between py-1.5 px-2 rounded-none text-left transition-colors hover:text-primary border-0 bg-transparent outline-none focus:outline-none cursor-pointer <?php echo $is_default ? 'dprd-active text-primary font-bold' : ''; ?>"
                             data-index="<?php echo esc_attr($i); ?>"
                             data-url="<?php echo esc_url($item->url); ?>"
                             data-has-children="<?php echo $has_children ? 'true' : 'false'; ?>"
                         >
-                            <span class="py-2.5 px-3"><?php echo esc_html($item->title); ?></span>
+                            <span><?php echo esc_html($item->title); ?></span>
                             <?php if ($has_children) : ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="shrink-0 opacity-60 mr-3" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="shrink-0 opacity-60" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                             <?php endif; ?>
                         </button>
                     </li>
@@ -125,26 +125,25 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
             <?php foreach ($menu_tree as $i => $item) :
                 if (empty($item->children)) continue;
                 $is_default_panel = ($i === $default_l1_index);
-                // Default L2 item: index 0 dalam panel ini
                 ?>
                 <nav id="dprd-l2-<?php echo esc_attr($i); ?>"
                      class="dprd-l2-panel <?php echo $is_default_panel ? '' : 'hidden'; ?>"
                      aria-label="Sub-menu <?php echo esc_attr($item->title); ?>">
-                    <ul class="flex flex-col gap-0.5 font-mono text-[14px] text-body">
+                    <ul class="flex flex-col gap-1 font-mono text-[14px] text-body">
                         <?php foreach ($item->children as $j => $sub) :
                             $has_sub = !empty($sub->children);
                             ?>
                             <li>
                                 <button
-                                    class="dprd-l2-item w-full flex items-center justify-between py-2.5 px-3 rounded-sm text-left transition-colors hover:bg-line/30 border-0 bg-transparent outline-none focus:outline-none p-0 <?php echo ($is_default_panel && $j === 0) ? 'dprd-active text-primary font-bold' : ''; ?>"
+                                    class="dprd-l2-item w-full flex items-center justify-between py-1.5 px-2 rounded-none text-left transition-colors hover:text-primary border-0 bg-transparent outline-none focus:outline-none cursor-pointer <?php echo ($is_default_panel && $j === 0) ? 'dprd-active text-primary font-bold' : ''; ?>"
                                     data-parent="<?php echo esc_attr($i); ?>"
                                     data-index="<?php echo esc_attr($i . '-' . $j); ?>"
                                     data-url="<?php echo esc_url($sub->url); ?>"
                                     data-has-children="<?php echo $has_sub ? 'true' : 'false'; ?>"
                                 >
-                                    <span class="py-2.5 px-3"><?php echo esc_html($sub->title); ?></span>
+                                    <span><?php echo esc_html($sub->title); ?></span>
                                     <?php if ($has_sub) : ?>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="shrink-0 opacity-60 mr-3" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="shrink-0 opacity-60" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                                     <?php endif; ?>
                                 </button>
                             </li>
@@ -164,11 +163,11 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
                     <nav id="dprd-l3-<?php echo esc_attr($key); ?>"
                          class="dprd-l3-panel hidden"
                          aria-label="Sub-menu <?php echo esc_attr($sub->title); ?>">
-                        <ul class="flex flex-col gap-0.5 font-mono text-[14px] text-body">
+                        <ul class="flex flex-col gap-1 font-mono text-[14px] text-body">
                             <?php foreach ($sub->children as $child) : ?>
                                 <li>
                                     <a href="<?php echo esc_url($child->url); ?>"
-                                       class="w-full flex items-center py-2.5 px-3 rounded-sm transition-colors hover:text-primary hover:bg-line/30">
+                                       class="w-full flex items-center py-1.5 px-2 rounded-none transition-colors hover:text-primary">
                                         <?php echo esc_html($child->title); ?>
                                     </a>
                                 </li>

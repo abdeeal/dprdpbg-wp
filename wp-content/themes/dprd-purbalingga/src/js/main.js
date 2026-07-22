@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Helper: set active state ────────────────────────────────────────────
     function setActive(items, btn) {
         items.forEach(el => {
-            el.classList.remove('dprd-active', 'text-primary', 'font-bold', 'bg-line/30');
+            el.classList.remove('dprd-active', 'text-primary', 'font-bold');
         });
         if (btn) {
             btn.classList.add('dprd-active', 'text-primary', 'font-bold');
@@ -152,4 +152,69 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
     }
 
+    // ── Interaksi Halaman Reservasi ────────────────────────────────────────
+    const btnMinus = document.getElementById('dprd-jumlah-minus');
+    const btnPlus  = document.getElementById('dprd-jumlah-plus');
+    const inputJumlah = document.getElementById('res_jumlah_peserta');
+
+    if (btnMinus && btnPlus && inputJumlah) {
+        btnMinus.addEventListener('click', () => {
+            let val = parseInt(inputJumlah.value) || 1;
+            if (val > 1) {
+                inputJumlah.value = val - 1;
+            }
+        });
+        btnPlus.addEventListener('click', () => {
+            let val = parseInt(inputJumlah.value) || 1;
+            inputJumlah.value = val + 1;
+        });
+    }
+
+    const uploadBox = document.getElementById('dprd-upload-box');
+    const fileInput = document.getElementById('res_file_surat');
+    const uploadText = document.getElementById('dprd-upload-text');
+    const uploadSubtext = document.getElementById('dprd-upload-subtext');
+
+    if (uploadBox && fileInput) {
+        uploadBox.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                uploadText.textContent = file.name;
+                uploadText.classList.add('font-bold', 'text-primary');
+                uploadSubtext.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+            }
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadBox.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadBox.classList.add('bg-primary-light');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadBox.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadBox.classList.remove('bg-primary-light');
+            }, false);
+        });
+
+        uploadBox.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files && files[0]) {
+                fileInput.files = files;
+                const file = files[0];
+                uploadText.textContent = file.name;
+                uploadText.classList.add('font-bold', 'text-primary');
+                uploadSubtext.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+            }
+        });
+    }
+
 });
+
