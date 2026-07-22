@@ -707,3 +707,103 @@ add_action('init', function() {
         update_option('dprd_default_ak_group_imported_v9', true);
     }
 });
+
+// --- IMPORT DEFAULT POSTS PPID ---
+add_action('init', function() {
+    if (!get_option('dprd_default_ppid_imported_v1')) {
+        $ppid_list = [
+            [
+                'slug'        => 'sk-ppid',
+                'title'       => 'SK PPID',
+                'description' => 'SK PPID DPRD Kabupaten Purbalingga',
+                'documents'   => [
+                    ['title' => 'SK 170 Perubahan Fraksi', 'url' => '#'],
+                    ['title' => 'SK NO 170-04 TH 2022 PEMBENTUKAN KOMISI', 'url' => '#'],
+                    ['title' => 'SK NO 170-03 TH 2022 PEMBENTUKAN BADAN MUSYAWARAH', 'url' => '#'],
+                    ['title' => 'SK NO 170-06 TH 2022 PEMBENTUKAN BADAN ANGGARAN', 'url' => '#'],
+                    ['title' => 'SK NO 170-07 TH 2022 PEMBENTUKAN BADAN KEHORMATAN', 'url' => '#']
+                ],
+                'date'        => '2026-07-21 10:00:00'
+            ],
+            [
+                'slug'        => 'informasi-publik',
+                'title'       => 'Informasi Publik',
+                'description' => 'Rencana Kerja Periode 2024-2029',
+                'documents'   => [
+                    ['title' => 'Dokumen Informasi Publik 2024', 'url' => '#']
+                ],
+                'date'        => '2026-07-21 10:00:01'
+            ],
+            [
+                'slug'        => 'permohonan-informasi',
+                'title'       => 'Permohonan Informasi',
+                'description' => 'Rencana Kerja Periode 2024-2029',
+                'documents'   => [
+                    ['title' => 'Formulir Permohonan Informasi', 'url' => '#']
+                ],
+                'date'        => '2026-07-21 10:00:02'
+            ],
+            [
+                'slug'        => 'informasi-serta-merta',
+                'title'       => 'Informasi Serta Merta',
+                'description' => 'Rencana Kerja Periode 2024-2029',
+                'documents'   => [
+                    ['title' => 'Dokumen Informasi Serta Merta', 'url' => '#']
+                ],
+                'date'        => '2026-07-21 10:00:03'
+            ],
+            [
+                'slug'        => 'informasi-setiap-saat',
+                'title'       => 'Informasi Setiap Saat',
+                'description' => 'Rencana Kerja Periode 2024-2029',
+                'documents'   => [
+                    ['title' => 'Dokumen Informasi Setiap Saat', 'url' => '#']
+                ],
+                'date'        => '2026-07-21 10:00:04'
+            ],
+            [
+                'slug'        => 'informasi-berkala',
+                'title'       => 'Informasi Berkala',
+                'description' => 'Rencana Kerja Periode 2024-2029',
+                'documents'   => [
+                    ['title' => 'Dokumen Informasi Berkala', 'url' => '#']
+                ],
+                'date'        => '2026-07-21 10:00:05'
+            ],
+        ];
+
+        foreach ($ppid_list as $item) {
+            $posts = get_posts([
+                'post_type'   => 'ppid',
+                'name'        => $item['slug'],
+                'post_status' => 'any',
+                'numberposts' => 1
+            ]);
+
+            $post_data = [
+                'post_title'  => $item['title'],
+                'post_name'   => $item['slug'],
+                'post_status' => 'publish',
+                'post_type'   => 'ppid',
+                'post_date'   => $item['date'],
+                'post_date_gmt' => get_gmt_from_date($item['date']),
+            ];
+
+            if (empty($posts)) {
+                $post_id = wp_insert_post($post_data);
+            } else {
+                $post_id = $posts[0]->ID;
+                $post_data['ID'] = $post_id;
+                wp_update_post($post_data);
+            }
+
+            if ($post_id && !is_wp_error($post_id)) {
+                update_post_meta($post_id, 'description', $item['description']);
+                update_post_meta($post_id, 'documents_json', wp_json_encode($item['documents']));
+            }
+        }
+
+        update_option('dprd_default_ppid_imported_v1', true);
+    }
+});
+

@@ -62,4 +62,36 @@ Membangun komponen navigasi utama website secara dinamis dari WordPress:
 - [x] **Perbaikan Border Tombol** — Menghapus border default browser pada `<button>` dengan `border-0 bg-transparent outline-none`.
 - [x] **Perbaikan Breadcrumb Multi-Level** — Menulis ulang [breadcrumbs.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/template-parts/ui/breadcrumbs.php) dengan `wp_get_post_parent_id()` rekursif: **Beranda › Selayang Pandang › Sejarah Kabupaten Purbalingga**.
 
+---
+
+## ## Halaman PPID — Fase 2, 4 & 5 (22 Juli 2026)
+
+Mengerjakan halaman **PPID** (`/ppid`) agar 1:1 sesuai dengan Vercel `https://dprd-kab-purbalingga.vercel.app/ppid`, mencakup:
+
+### Fase 2 — Content Model PPID (Custom Meta Box & Data Importer)
+
+- [x] **Upgrade Meta Box PPID** — Menulis ulang [inc/meta-boxes/ppid.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/inc/meta-boxes/ppid.php) agar mendukung field `description` (subtitle akordion) dan repeater `documents_json` (Judul Dokumen + URL Link File PDF) sesuai struktur data `ppid.data.js` Vercel. Admin sekarang bisa menambah/hapus dokumen langsung di WordPress tanpa sentuh kode.
+- [x] **Auto-Import 6 Data Default PPID** — Menambahkan blok importer di [inc/insert-default-data.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/inc/insert-default-data.php) yang secara otomatis membuat 6 pos CPT `ppid` saat pertama kali tema dimuat:
+  1. **SK PPID** — 5 dokumen SK Pembentukan Komisi, Badan Musyawarah, Badan Anggaran, Badan Kehormatan, dan Perubahan Fraksi
+  2. **Informasi Publik**
+  3. **Permohonan Informasi**
+  4. **Informasi Serta Merta**
+  5. **Informasi Setiap Saat**
+  6. **Informasi Berkala**
+
+### Fase 4 — Konversi Template Halaman PPID
+
+- [x] **Template Arsip PPID** — Menulis ulang [archive-ppid.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/archive-ppid.php) dengan komponen lengkap:
+  - Breadcrumb dinamis (`Beranda › PPID`)
+  - Judul halaman `PPID` bergaya `font-display font-black text-3xl md:text-[36px] text-primary` persis Vercel
+  - Subtitle bergaya `font-mono text-sm tracking-wide text-body-secondary`
+  - Garis pembatas `border-t border-primary/40` di atas daftar akordion
+  - Setiap akordion menampilkan: judul pos, deskripsi singkat, daftar tautan dokumen dengan gaya `font-mono underline decoration-primary/40`
+  - Ikon berganti dinamis: **ArrowUpRight** (terbuka) dan **ArrowDownLeft** (tertutup) sesuai komponen `AccordionItem.jsx` Vercel
+  - Item pertama (SK PPID) terbuka secara default saat halaman dimuat
+
+### Fase 5 — Interaktivitas Client-Side Accordion PPID
+
+- [x] **Vanilla JS Accordion** — Menambahkan logika interaksi buka/tutup smooth di [src/js/main.js](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/src/js/main.js) untuk seluruh `.dprd-accordion-item`: animasi transisi `max-height` + `opacity` 300ms, pergantian ikon ArrowUpRight ↔ ArrowDownLeft secara instan.
+- [x] **Kompilasi Aset Vite/Tailwind** — Menjalankan `npm run build` berhasil menghasilkan `main.css` (29.98 kB) dan `main.js` (6.81 kB).
 

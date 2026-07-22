@@ -314,7 +314,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // ── Interaksi Accordion PPID ──────────────────────────────────────────
+    const ppidItems = document.querySelectorAll('.dprd-accordion-item');
+
+    ppidItems.forEach(item => {
+        const btn = item.querySelector('.dprd-accordion-btn');
+        const content = item.querySelector('.dprd-accordion-content');
+        const iconOpen = item.querySelector('.dprd-icon-open');
+        const iconClosed = item.querySelector('.dprd-icon-closed');
+
+        if (btn && content) {
+            btn.addEventListener('click', () => {
+                const isHidden = content.classList.contains('hidden');
+
+                if (isHidden) {
+                    content.classList.remove('hidden');
+                    requestAnimationFrame(() => {
+                        content.classList.remove('max-h-0', 'opacity-0');
+                        content.classList.add('max-h-[1000px]', 'opacity-100');
+                    });
+                    if (iconOpen) iconOpen.classList.remove('hidden');
+                    if (iconClosed) iconClosed.classList.add('hidden');
+                } else {
+                    content.classList.add('max-h-0', 'opacity-0');
+                    content.classList.remove('max-h-[1000px]', 'opacity-100');
+                    setTimeout(() => {
+                        content.classList.add('hidden');
+                    }, 300);
+                    if (iconOpen) iconOpen.classList.add('hidden');
+                    if (iconClosed) iconClosed.classList.remove('hidden');
+                }
+            });
+        }
+    });
+
 });
+
 
 
 
