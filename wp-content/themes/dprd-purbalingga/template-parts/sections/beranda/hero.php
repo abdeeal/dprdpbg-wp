@@ -59,26 +59,20 @@ $stats_periode_akhir = get_option('dprd_hero_stats_periode_akhir', '2029');
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 py-8">
                 <div class="flex flex-col justify-center border-l-2 border-primary pl-4">
                     <span class="font-mono text-[10px] sm:text-xs text-body-secondary uppercase tracking-[0.2em] font-semibold mb-2">Anggota Dewan</span>
-                    <span class="font-mono text-3xl sm:text-4xl font-bold text-primary leading-none dprd-animated-counter" data-value="<?php echo esc_attr($stats_anggota); ?>">
-                        <?php echo esc_html($stats_anggota); ?>
-                    </span>
+                    <span class="font-mono text-3xl sm:text-4xl font-bold text-primary leading-none dprd-animated-counter" data-value="<?php echo esc_attr($stats_anggota); ?>">1</span>
                 </div>
                 <div class="flex flex-col justify-center border-l-2 border-primary pl-4">
                     <span class="font-mono text-[10px] sm:text-xs text-body-secondary uppercase tracking-[0.2em] font-semibold mb-2">Fraksi</span>
-                    <span class="font-mono text-3xl sm:text-4xl font-bold text-primary leading-none dprd-animated-counter" data-value="<?php echo esc_attr($stats_fraksi); ?>">
-                        <?php echo esc_html($stats_fraksi); ?>
-                    </span>
+                    <span class="font-mono text-3xl sm:text-4xl font-bold text-primary leading-none dprd-animated-counter" data-value="<?php echo esc_attr($stats_fraksi); ?>">1</span>
                 </div>
                 <div class="flex flex-col justify-center border-l-2 border-primary pl-4">
                     <span class="font-mono text-[10px] sm:text-xs text-body-secondary uppercase tracking-[0.2em] font-semibold mb-2">Komisi</span>
-                    <span class="font-mono text-3xl sm:text-4xl font-bold text-primary leading-none dprd-animated-counter" data-value="<?php echo esc_attr($stats_komisi); ?>">
-                        <?php echo esc_html($stats_komisi); ?>
-                    </span>
+                    <span class="font-mono text-3xl sm:text-4xl font-bold text-primary leading-none dprd-animated-counter" data-value="<?php echo esc_attr($stats_komisi); ?>">1</span>
                 </div>
                 <div class="flex flex-col justify-center border-l-2 border-primary pl-4">
                     <span class="font-mono text-[10px] sm:text-xs text-body-secondary uppercase tracking-[0.2em] font-semibold mb-2">Periode Jabatan</span>
-                    <span class="font-mono text-3xl sm:text-4xl font-bold text-primary leading-none">
-                        <?php echo esc_html($stats_periode_mulai); ?>-<?php echo esc_html($stats_periode_akhir); ?>
+                    <span class="font-mono text-3xl sm:text-4xl font-bold text-primary leading-none dprd-animated-counter" data-value="<?php echo esc_attr($stats_periode_mulai . '-' . $stats_periode_akhir); ?>">
+                        1945-<?php echo esc_html(1945 + ((int)$stats_periode_akhir - (int)$stats_periode_mulai)); ?>
                     </span>
                 </div>
             </div>

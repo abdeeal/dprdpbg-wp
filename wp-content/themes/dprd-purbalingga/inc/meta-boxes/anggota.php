@@ -113,6 +113,7 @@ function dprd_render_anggota_meta_box($post) {
                         formData.append('action', 'dprd_upload_cropped_image');
                         formData.append('image', blob, 'foto-diri-' + attachment.id + '.jpg');
                         formData.append('_ajax_nonce', dprd_repeater_vars.nonce);
+                        formData.append('original_id', attachment.id);
 
                         fetch(dprd_repeater_vars.ajax_url, {
                             method: 'POST',

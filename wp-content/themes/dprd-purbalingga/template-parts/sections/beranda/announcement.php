@@ -15,10 +15,8 @@ if (empty($pengumuman_text)) {
         <div class="flex items-center dprd-marquee-container animate-marquee">
             <?php for ($i = 0; $i < 4; $i++) : ?>
             <div class="flex items-center gap-3 pr-16 md:pr-32">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0 text-white">
-                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg width="18" height="18" viewBox="0 0 15 12" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0 text-white">
+                    <path d="M12 6.75V5.25H15V6.75H12ZM12.9 12L10.5 10.2L11.4 9L13.8 10.8L12.9 12ZM11.4 3L10.5 1.8L12.9 0L13.8 1.2L11.4 3ZM2.25 11.25V8.25H1.5C1.0875 8.25 0.734375 8.10312 0.440625 7.80937C0.146875 7.51562 0 7.1625 0 6.75V5.25C0 4.8375 0.146875 4.48438 0.440625 4.19063C0.734375 3.89688 1.0875 3.75 1.5 3.75H4.5L8.25 1.5V10.5L4.5 8.25H3.75V11.25H2.25ZM6.75 7.8375V4.1625L4.9125 5.25H1.5V6.75H4.9125L6.75 7.8375ZM9 8.5125V3.4875C9.3375 3.7875 9.60938 4.15312 9.81563 4.58437C10.0219 5.01562 10.125 5.4875 10.125 6C10.125 6.5125 10.0219 6.98438 9.81563 7.41563C9.60938 7.84688 9.3375 8.2125 9 8.5125Z" fill="currentColor"/>
                 </svg>
                 <p class="font-mono text-xs sm:text-sm tracking-wide">
                     <?php echo esc_html($pengumuman_text); ?>

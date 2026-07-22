@@ -13,8 +13,102 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let isOpen = false;
 
+    // ── Elemen Pencarian ────────────────────────────────────────────────────
+    const searchToggle    = document.getElementById('dprd-search-toggle');
+    const searchClose     = document.getElementById('dprd-search-close');
+    const searchContainer = document.getElementById('dprd-search-container');
+    const searchInput     = document.getElementById('dprd-search-input');
+    const normalActions   = document.getElementById('dprd-normal-actions');
+    const logoWrapper     = document.getElementById('dprd-logo-wrapper');
+    const searchBackdrop  = document.getElementById('dprd-search-backdrop');
+    
+    let isSearchOpen = false;
+
+    function openSearch() {
+        if (isOpen) closeMenu(); // Tutup menu jika terbuka
+        isSearchOpen = true;
+        
+        // Disable scroll
+        const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+        document.body.style.overflow = 'hidden';
+        document.body.style.paddingRight = `${scrollBarWidth}px`;
+
+        // Tampilkan backdrop
+        if (searchBackdrop) {
+            searchBackdrop.classList.remove('invisible', 'opacity-0');
+            searchBackdrop.classList.add('visible', 'opacity-100');
+        }
+
+        // Tampilkan search container
+        if (searchContainer) {
+            searchContainer.classList.remove('w-0', 'opacity-0', 'pointer-events-none', 'scale-x-0');
+            searchContainer.classList.add('w-[calc(100vw-6rem)]', 'sm:w-[calc(100vw-12rem)]', 'lg:w-[400px]', 'opacity-100', 'pointer-events-auto', 'scale-x-100');
+        }
+
+        // Sembunyikan normal actions
+        if (normalActions) {
+            normalActions.classList.remove('opacity-100', 'visible', 'scale-100', 'translate-x-0');
+            normalActions.classList.add('opacity-0', 'invisible', 'scale-90', 'translate-x-4');
+        }
+
+        // Sembunyikan logo di mobile
+        if (logoWrapper) {
+            logoWrapper.classList.remove('opacity-100');
+            logoWrapper.classList.add('opacity-0', 'pointer-events-none', 'lg:opacity-100', 'lg:pointer-events-auto');
+        }
+
+        // Auto focus input
+        if (searchInput) {
+            setTimeout(() => {
+                searchInput.focus();
+            }, 100);
+        }
+    }
+
+    function closeSearch() {
+        isSearchOpen = false;
+        
+        // Restore scroll
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+
+        // Sembunyikan backdrop
+        if (searchBackdrop) {
+            searchBackdrop.classList.add('invisible', 'opacity-0');
+            searchBackdrop.classList.remove('visible', 'opacity-100');
+        }
+
+        // Sembunyikan search container
+        if (searchContainer) {
+            searchContainer.classList.add('w-0', 'opacity-0', 'pointer-events-none', 'scale-x-0');
+            searchContainer.classList.remove('w-[calc(100vw-6rem)]', 'sm:w-[calc(100vw-12rem)]', 'lg:w-[400px]', 'opacity-100', 'pointer-events-auto', 'scale-x-100');
+        }
+
+        // Tampilkan normal actions
+        if (normalActions) {
+            normalActions.classList.add('opacity-100', 'visible', 'scale-100', 'translate-x-0');
+            normalActions.classList.remove('opacity-0', 'invisible', 'scale-90', 'translate-x-4');
+        }
+
+        // Tampilkan logo kembali
+        if (logoWrapper) {
+            logoWrapper.classList.add('opacity-100');
+            logoWrapper.classList.remove('opacity-0', 'pointer-events-none', 'lg:opacity-100', 'lg:pointer-events-auto');
+        }
+
+        // Reset input
+        if (searchInput) {
+            searchInput.value = '';
+        }
+    }
+
+    if (searchToggle) searchToggle.addEventListener('click', openSearch);
+    if (searchClose) searchClose.addEventListener('click', closeSearch);
+    if (searchBackdrop) searchBackdrop.addEventListener('click', closeSearch);
+
     // ── Buka / Tutup Menu (1:1 GSAP di NavbarDropdown.jsx) ───────────────────
     function openMenu() {
+        if (isSearchOpen) closeSearch(); // Tutup search jika terbuka
         isOpen = true;
         toggle.setAttribute('aria-expanded', 'true');
         megamenu.setAttribute('aria-hidden', 'false');
@@ -45,8 +139,10 @@ document.addEventListener('DOMContentLoaded', () => {
         megamenu.setAttribute('aria-hidden', 'true');
 
         // Restore scrollbar & padding (Persis Vercel Navbar.jsx line 45-46)
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
+        if (!isSearchOpen) { // Jangan kembalikan scroll jika search sedang terbuka
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        }
 
         megamenu.classList.add('opacity-0', '-translate-y-[15px]');
         megamenu.classList.remove('opacity-100', 'translate-y-0');
@@ -67,7 +163,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Tutup dengan Escape
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && isOpen) closeMenu();
+        if (e.key === 'Escape') {
+            if (isOpen) closeMenu();
+            if (isSearchOpen) closeSearch();
+        }
     });
 
     // ── Helper: set active state ────────────────────────────────────────────
@@ -152,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Sticky header shrink on scroll (Persis Vercel Navbar.jsx) ──────────
     const header       = document.getElementById('dprd-header');
     const navContainer = document.getElementById('dprd-nav-container');
-    const logoWrapper  = document.getElementById('dprd-logo-wrapper');
+    // logoWrapper sudah di-declare di bagian Search Toggle
 
     if (header && navContainer && logoWrapper) {
         window.addEventListener('scroll', () => {
@@ -457,6 +556,80 @@ document.addEventListener('DOMContentLoaded', () => {
             updateCarousel();
             startTimer();
         }
+    }
+
+    // ── Animated Counter (1:1 Vercel GSAP ScrollTrigger) ───────────────────
+    const counters = document.querySelectorAll('.dprd-animated-counter');
+    if (counters.length > 0) {
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    obs.unobserve(el); // Hanya jalankan sekali
+
+                    const value = el.getAttribute('data-value');
+                    const duration = 2000; // 2 seconds
+                    const startTime = performance.now();
+                    
+                    // Equivalent to GSAP "power2.out"
+                    const easePower2Out = (t) => 1 - Math.pow(1 - t, 2);
+
+                    const isPeriod = value.includes('-');
+                    if (!isPeriod) {
+                        const target = parseInt(value, 10);
+                        if (!isNaN(target)) {
+                            const animate = (currentTime) => {
+                                const elapsed = currentTime - startTime;
+                                const progress = Math.min(elapsed / duration, 1);
+                                const easedProgress = easePower2Out(progress);
+                                
+                                const currentVal = Math.floor(1 + (target - 1) * easedProgress);
+                                el.textContent = currentVal;
+                                
+                                if (progress < 1) {
+                                    requestAnimationFrame(animate);
+                                } else {
+                                    el.textContent = target;
+                                }
+                            };
+                            requestAnimationFrame(animate);
+                        }
+                    } else {
+                        const parts = value.split('-');
+                        const targetStart = parseInt(parts[0], 10);
+                        const targetEnd = parseInt(parts[1], 10);
+                        if (!isNaN(targetStart) && !isNaN(targetEnd)) {
+                            const gap = targetEnd - targetStart;
+                            const start1 = 1945;
+                            const start2 = 1945 + gap;
+                            
+                            const animate = (currentTime) => {
+                                const elapsed = currentTime - startTime;
+                                const progress = Math.min(elapsed / duration, 1);
+                                const easedProgress = easePower2Out(progress);
+                                
+                                const currentVal1 = Math.floor(start1 + (targetStart - start1) * easedProgress);
+                                const currentVal2 = Math.floor(start2 + (targetEnd - start2) * easedProgress);
+                                
+                                el.textContent = currentVal1 + '-' + currentVal2;
+                                
+                                if (progress < 1) {
+                                    requestAnimationFrame(animate);
+                                } else {
+                                    el.textContent = targetStart + '-' + targetEnd;
+                                }
+                            };
+                            requestAnimationFrame(animate);
+                        }
+                    }
+                }
+            });
+        }, {
+            threshold: 0,
+            rootMargin: '0px 0px -10% 0px' // Memicu saat elemen berada 10% dari bawah viewport (mirip GSAP top 90%)
+        });
+
+        counters.forEach(counter => observer.observe(counter));
     }
 
 });

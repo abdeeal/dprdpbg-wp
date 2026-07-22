@@ -35,6 +35,9 @@ if ($menu_items) {
 $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga.png';
 ?>
 
+<!-- ── Overlay Backdrop Pencarian ── -->
+<div id="dprd-search-backdrop" class="fixed inset-0 backdrop-blur-sm z-40 transition-all duration-500 ease-out opacity-0 invisible"></div>
+
 <header id="dprd-header" class="bg-white border-b border-line/50 sticky top-0 z-50 transition-all duration-300">
     <div id="dprd-nav-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 h-20 flex items-center justify-between transition-all duration-300">
 
@@ -67,15 +70,43 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
         </a>
 
         <!-- Kanan: Search + Reservasi -->
-        <div class="flex items-center justify-end flex-1 gap-4 sm:gap-6">
-            <button id="dprd-search-toggle" class="text-body hover:text-primary transition-colors border-0 bg-transparent outline-none focus:outline-none p-0" aria-label="Cari">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/>
-                </svg>
-            </button>
-            <a class="hidden sm:block bg-primary text-white font-sans text-[13px] font-medium py-2.5 px-5 hover:bg-primary/90 transition-colors" href="<?php echo esc_url(home_url('/reservasi')); ?>">
-                Reservasi Kunjungan
-            </a>
+        <div class="flex items-center justify-end flex-1 relative h-full">
+            
+            <!-- Search Input (Hidden by default, expands when search is open) -->
+            <div 
+                id="dprd-search-container"
+                class="absolute right-0 flex items-center h-10 transition-all duration-500 ease-out origin-right z-10 w-0 opacity-0 pointer-events-none scale-x-0"
+            >
+                <form action="<?php echo esc_url(home_url('/pencarian')); ?>" method="get" class="relative w-full h-full flex items-center border-b border-line overflow-hidden m-0">
+                    <input 
+                        id="dprd-search-input"
+                        name="q"
+                        type="text" 
+                        placeholder="Ketik lalu Enter..." 
+                        class="w-full h-full bg-transparent pr-10 text-sm text-body outline-none"
+                    />
+                    <button 
+                        type="button"
+                        id="dprd-search-close"
+                        class="absolute right-3 text-body-secondary hover:text-primary transition-colors border-0 bg-transparent outline-none cursor-pointer p-0"
+                        aria-label="Tutup Pencarian"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Normal Actions (Hidden when search is open) -->
+            <div id="dprd-normal-actions" class="flex items-center gap-4 sm:gap-6 transition-all duration-300 ease-in-out origin-right opacity-100 visible scale-100 translate-x-0">
+                <button id="dprd-search-toggle" class="text-body hover:text-primary transition-colors border-0 bg-transparent outline-none focus:outline-none p-0 cursor-pointer" aria-label="Cari">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/>
+                    </svg>
+                </button>
+                <a class="hidden sm:block bg-primary text-white font-sans text-[13px] font-medium py-2.5 px-5 hover:bg-primary/90 transition-colors" href="<?php echo esc_url(home_url('/reservasi')); ?>">
+                    Reservasi Kunjungan
+                </a>
+            </div>
         </div>
     </div>
 

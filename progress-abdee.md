@@ -45,3 +45,10 @@ Hari ini: Rabu, 22 Juli 2026
 - [x] Pengenalan flag `$dasar_is_html` pada `single-content.php` sehingga Dasar Pembentukan Badan Kehormatan (Red Banner Stats) dirender utuh sebagai HTML tanpa terbungkus `esc_html()`.
 - [x] Penerapan `md:leading-[1.8]` pada deskripsi dasar pembentukan agar jarak antar baris desktop konsisten 1.8.
 - [x] Kompilasi ulang aset produksi Vite/Tailwind (`npm run build`).
+
+## 5. Implementasi & Penyesuaian Halaman Beranda & Navbar
+- [x] Optimasi penyimpanan server dengan penghapusan otomatis (_auto-delete_) gambar original saat operasi _crop_ & _upload_ gambar di dashboard admin.
+- [x] Penambahan animasi native JavaScript (`IntersectionObserver`) pada _Infostrip Counter_ halaman beranda yang perilakunya (ease-out, jeda waktu, kalkulasi tahun) persis dengan ekstensi GSAP ScrollTrigger di Next.js.
+- [x] Pembuatan *section* **Berita Video** di `front-page.php` yang secara dinamis mengambil 6 video YouTube terbaru milik DPRD Purbalingga via `fetch_feed()` RSS bawaan WordPress, lengkap dengan formating layout 1:1 Next.js.
+- [x] Migrasi form interaktif **Search Navbar** yang menggunakan _Vanilla JavaScript_ untuk mengelola *state toggle* (expand/shrink, auto-focus input) beserta penyesuaian susunan *z-index* *backdrop* sehingga navbar tidak ikut memudar.
+- [x] Kompilasi ulang aset produksi Vite/Tailwind (`npm run build`) untuk menerapkan utilitas *class Tailwind* yang disalin dari komponen video dan search UI Next.js.

@@ -417,6 +417,14 @@ add_action('wp_ajax_dprd_upload_cropped_image', function() {
         wp_send_json_error($attachment_id->get_error_message());
     }
 
+    // Hapus gambar lama (yang belum dicrop) dari storage agar tidak memenuhi penyimpanan
+    if (!empty($_POST['original_id'])) {
+        $original_id = absint($_POST['original_id']);
+        if ($original_id > 0 && current_user_can('delete_post', $original_id)) {
+            wp_delete_attachment($original_id, true);
+        }
+    }
+
     $url = wp_get_attachment_image_url($attachment_id, 'thumbnail');
     
     wp_send_json_success([
