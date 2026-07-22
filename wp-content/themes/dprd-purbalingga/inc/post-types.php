@@ -132,6 +132,9 @@ add_filter('query_vars', function($vars) {
  * Ubah teks placeholder "Tambahkan judul" agar sesuai dengan konteks masing-masing tipe konten.
  */
 function dprd_change_title_placeholder($title, $post) {
+    if (!is_object($post) || empty($post->post_type)) {
+        return $title;
+    }
     switch ($post->post_type) {
         case 'anggota':
             return 'Nama Anggota';
@@ -143,6 +146,8 @@ function dprd_change_title_placeholder($title, $post) {
             return 'Masukkan Tahun (Contoh: Tahun 2026)';
         case 'sakip':
             return 'Masukkan Nama Dokumen Laporan (Contoh: Renja Sekretariat DPRD 2024)';
+        case 'agenda':
+            return 'Tambahkan judul agenda';
     }
     return $title;
 }

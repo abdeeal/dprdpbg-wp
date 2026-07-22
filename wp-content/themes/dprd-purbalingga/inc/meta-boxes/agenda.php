@@ -59,10 +59,3 @@ add_action('save_post', function ($post_id) {
     }
 });
 
-// Ubah placeholder "Tambahkan judul" (Add Title) khusus untuk CPT Agenda
-add_filter('enter_title_here', function ($title, $post) {
-    if (is_object($post) && isset($post->post_type) && $post->post_type === 'agenda') {
-        return 'Tambahkan judul agenda';
-    }
-    return $title;
-}, 10, 2);
