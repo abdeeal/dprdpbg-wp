@@ -266,6 +266,7 @@ function dprd_render_site_settings_page() {
                     formData.append('action', 'dprd_upload_cropped_image');
                     formData.append('image', blob, 'cropped-hero-' + attachment.id + '.webp');
                     formData.append('_ajax_nonce', dprd_repeater_vars.nonce);
+                    formData.append('original_id', attachment.id);
 
                     fetch(dprd_repeater_vars.ajax_url, {
                         method: 'POST',

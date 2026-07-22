@@ -22,6 +22,7 @@ get_header();
         get_template_part('template-parts/sections/beranda/announcement');
         get_template_part('template-parts/sections/beranda/berita');
         get_template_part('template-parts/sections/beranda/agenda');
+        get_template_part('template-parts/sections/beranda/video');
         get_template_part('template-parts/sections/beranda/kelembagaan');
         get_template_part('template-parts/sections/beranda/layanan');
         get_template_part('template-parts/sections/beranda/galeri');
