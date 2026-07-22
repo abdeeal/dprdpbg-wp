@@ -35,8 +35,8 @@ if ($menu_items) {
 $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga.png';
 ?>
 
-<header id="dprd-header" class="bg-white border-b border-line/50 sticky top-0 z-50 relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 h-20 flex items-center justify-between">
+<header id="dprd-header" class="bg-white border-b border-line/50 sticky top-0 z-50 transition-all duration-300">
+    <div id="dprd-nav-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 h-20 flex items-center justify-between transition-all duration-300">
 
         <!-- Kiri: Tombol Menu / Tutup -->
         <div class="flex items-center gap-3 flex-1">
@@ -59,9 +59,9 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
         </div>
 
         <!-- Tengah: Logo + Nama -->
-        <a class="flex items-center gap-3 justify-center flex-1 transition-all duration-300" href="<?php echo esc_url(home_url('/')); ?>" aria-label="Kembali ke Beranda DPRD Purbalingga">
-            <div class="relative w-9 h-11 shrink-0 overflow-hidden" style="width:36px;height:44px;flex-shrink:0">
-                <img src="<?php echo esc_url($logo_url); ?>" alt="Logo DPRD Purbalingga" style="width:36px;height:44px;object-fit:contain;display:block">
+        <a id="dprd-logo-wrapper" class="flex items-center gap-3 justify-center flex-1 origin-center transition-all duration-300" href="<?php echo esc_url(home_url('/')); ?>" aria-label="Kembali ke Beranda DPRD Purbalingga">
+            <div class="relative w-9 h-11 shrink-0 flex items-center justify-center">
+                <img src="<?php echo esc_url($logo_url); ?>" alt="Logo DPRD Purbalingga" class="w-full h-full object-contain">
             </div>
             <span class="font-sans text-[17px] font-medium text-body tracking-wide pt-0.5 whitespace-nowrap">DPRD Purbalingga</span>
         </a>
@@ -79,12 +79,12 @@ $logo_url = get_template_directory_uri() . '/assets/images/logo-dprd-purbalingga
         </div>
     </div>
 
-    <!-- ── Overlay gelap saat menu terbuka ── -->
-    <div id="dprd-overlay" class="absolute top-full left-0 w-screen h-screen bg-ink/20 backdrop-blur-sm z-30 hidden opacity-0 transition-opacity duration-500 ease-out"></div>
+    <!-- ── Overlay gelap saat menu terbuka (Hanya menutupi area DI BAWAH header) ── -->
+    <div id="dprd-overlay" class="absolute top-full left-0 w-full h-screen bg-ink/20 backdrop-blur-sm z-30 hidden opacity-0 transition-opacity duration-500 ease-out"></div>
 
     <!-- ── Mega Menu Panel (Desktop + Mobile Layout) ────── -->
     <div id="dprd-megamenu"
-         class="absolute top-full left-0 w-screen bg-white border-t border-b border-line/50 shadow-xl z-40 invisible opacity-0 transition-all duration-300 ease-out"
+         class="absolute top-full left-0 w-full bg-white border-t border-b border-line/50 shadow-xl z-40 invisible opacity-0 transition-all duration-300 ease-out"
          aria-hidden="true">
 
         <?php

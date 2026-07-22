@@ -13,18 +13,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let isOpen = false;
 
-    // ── Buka / Tutup Menu ───────────────────────────────────────────────────
+    // ── Buka / Tutup Menu (1:1 GSAP di NavbarDropdown.jsx) ───────────────────
     function openMenu() {
         isOpen = true;
         toggle.setAttribute('aria-expanded', 'true');
         megamenu.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden'; // lock scroll
+
+        // Kompensasi hilangnya scrollbar (Persis Vercel Navbar.jsx line 41-43)
+        const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+        document.body.style.overflow = 'hidden';
+        document.body.style.paddingRight = `${scrollBarWidth}px`;
 
         // Tampilkan overlay
         overlay.classList.remove('hidden');
-        // Tampilkan mega menu: hapus invisible, tambah visible + opacity
-        megamenu.classList.remove('invisible', 'opacity-0');
-        megamenu.classList.add('opacity-100');
+        megamenu.classList.remove('invisible', 'opacity-0', '-translate-y-[15px]');
+        megamenu.classList.add('opacity-100', 'translate-y-0');
+
         requestAnimationFrame(() => {
             overlay.classList.remove('opacity-0');
             overlay.classList.add('opacity-100');
@@ -39,15 +43,18 @@ document.addEventListener('DOMContentLoaded', () => {
         isOpen = false;
         toggle.setAttribute('aria-expanded', 'false');
         megamenu.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = ''; // restore scroll
 
-        // Sembunyikan mega menu
-        megamenu.classList.add('invisible', 'opacity-0');
-        megamenu.classList.remove('opacity-100');
+        // Restore scrollbar & padding (Persis Vercel Navbar.jsx line 45-46)
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+
+        megamenu.classList.add('opacity-0', '-translate-y-[15px]');
+        megamenu.classList.remove('opacity-100', 'translate-y-0');
         overlay.classList.add('opacity-0');
         overlay.classList.remove('opacity-100');
 
         setTimeout(() => {
+            megamenu.classList.add('invisible');
             overlay.classList.add('hidden');
         }, 300);
 
@@ -94,15 +101,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const idx = btn.dataset.index;
         setActive(l1Items, btn);
 
-        // Sembunyikan semua L2
+        // Sembunyikan semua L2 & L3
         l2Panels.forEach(p => p.classList.add('hidden'));
-        // Sembunyikan semua L3
         l3Panels.forEach(p => p.classList.add('hidden'));
 
-        // Tampilkan L2 yang sesuai
+        // Tampilkan L2 yang sesuai dengan efek fade-in (0.5s ease-out Vercel GSAP)
         const l2 = document.getElementById('dprd-l2-' + idx);
         if (l2) {
             l2.classList.remove('hidden');
+            l2.classList.add('animate-fade-in');
             // Auto-activate item pertama di L2
             const firstL2 = l2.querySelector('.dprd-l2-item');
             if (firstL2) activateL2(firstL2);
@@ -125,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function activateL2(btn) {
-        // Ambil semua L2 items dalam panel yang sama
         const parentId = btn.dataset.parent;
         const siblingPanel = document.getElementById('dprd-l2-' + parentId);
         const siblings = siblingPanel ? siblingPanel.querySelectorAll('.dprd-l2-item') : [];
@@ -134,20 +140,34 @@ document.addEventListener('DOMContentLoaded', () => {
         // Sembunyikan semua L3
         l3Panels.forEach(p => p.classList.add('hidden'));
 
-        // Tampilkan L3 yang sesuai
+        // Tampilkan L3 yang sesuai dengan efek fade-in (0.5s ease-out Vercel GSAP)
         const key = btn.dataset.index;
         const l3 = document.getElementById('dprd-l3-' + key);
-        if (l3) l3.classList.remove('hidden');
+        if (l3) {
+            l3.classList.remove('hidden');
+            l3.classList.add('animate-fade-in');
+        }
     }
 
-    // ── Sticky header shrink on scroll (opsional) ──────────────────────────
-    const header = document.getElementById('dprd-header');
-    if (header) {
+    // ── Sticky header shrink on scroll (Persis Vercel Navbar.jsx) ──────────
+    const header       = document.getElementById('dprd-header');
+    const navContainer = document.getElementById('dprd-nav-container');
+    const logoWrapper  = document.getElementById('dprd-logo-wrapper');
+
+    if (header && navContainer && logoWrapper) {
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 40) {
-                header.classList.add('shadow-md');
+            if (window.scrollY > 50) {
+                navContainer.classList.remove('h-20');
+                navContainer.classList.add('h-16');
+                logoWrapper.classList.add('scale-85', 'scale-[0.85]');
+                header.classList.add('shadow-[0_4px_20px_rgba(0,0,0,0.05)]', 'border-transparent');
+                header.classList.remove('border-line/50');
             } else {
-                header.classList.remove('shadow-md');
+                navContainer.classList.remove('h-16');
+                navContainer.classList.add('h-20');
+                logoWrapper.classList.remove('scale-85', 'scale-[0.85]');
+                header.classList.remove('shadow-[0_4px_20px_rgba(0,0,0,0.05)]', 'border-transparent');
+                header.classList.add('border-line/50');
             }
         }, { passive: true });
     }
