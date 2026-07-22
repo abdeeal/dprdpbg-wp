@@ -314,20 +314,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ── Interaksi Accordion PPID ──────────────────────────────────────────
+    // ── Interaksi Accordion PPID (Exclusive Accordion / Hanya 1 terbuka) ──
     const ppidItems = document.querySelectorAll('.dprd-accordion-item');
 
     ppidItems.forEach(item => {
         const btn = item.querySelector('.dprd-accordion-btn');
         const content = item.querySelector('.dprd-accordion-content');
-        const iconOpen = item.querySelector('.dprd-icon-open');
-        const iconClosed = item.querySelector('.dprd-icon-closed');
 
         if (btn && content) {
             btn.addEventListener('click', () => {
                 const isHidden = content.classList.contains('hidden');
 
+                // Tutup semua item PPID terlebih dahulu
+                ppidItems.forEach(otherItem => {
+                    const otherContent = otherItem.querySelector('.dprd-accordion-content');
+                    const otherOpen = otherItem.querySelector('.dprd-icon-open');
+                    const otherClosed = otherItem.querySelector('.dprd-icon-closed');
+
+                    if (otherContent && !otherContent.classList.contains('hidden')) {
+                        otherContent.classList.add('max-h-0', 'opacity-0');
+                        otherContent.classList.remove('max-h-[1000px]', 'opacity-100');
+                        setTimeout(() => {
+                            otherContent.classList.add('hidden');
+                        }, 300);
+                    }
+                    if (otherOpen) otherOpen.classList.add('hidden');
+                    if (otherClosed) otherClosed.classList.remove('hidden');
+                });
+
+                // Jika sebelumnya tertutup, buka item yang diklik
                 if (isHidden) {
+                    const iconOpen = item.querySelector('.dprd-icon-open');
+                    const iconClosed = item.querySelector('.dprd-icon-closed');
+
                     content.classList.remove('hidden');
                     requestAnimationFrame(() => {
                         content.classList.remove('max-h-0', 'opacity-0');
@@ -335,14 +354,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     if (iconOpen) iconOpen.classList.remove('hidden');
                     if (iconClosed) iconClosed.classList.add('hidden');
-                } else {
-                    content.classList.add('max-h-0', 'opacity-0');
-                    content.classList.remove('max-h-[1000px]', 'opacity-100');
-                    setTimeout(() => {
-                        content.classList.add('hidden');
-                    }, 300);
-                    if (iconOpen) iconOpen.classList.add('hidden');
-                    if (iconClosed) iconClosed.classList.remove('hidden');
                 }
             });
         }
