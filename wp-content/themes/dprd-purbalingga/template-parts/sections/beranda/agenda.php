@@ -204,28 +204,21 @@ function dprd_get_indo_month($date_str) {
                         <h4 class="font-mono font-bold text-sm sm:text-[15px] mb-6">SAKIP</h4>
                         <div class="flex flex-col gap-3 mb-6">
                             <?php
-                            // Ambil term dari kategori-sakip
-                            $sakip_terms = get_terms([
-                                'taxonomy'   => 'kategori-sakip',
-                                'hide_empty' => true, // hanya tampilkan yang ada isinya
-                                'number'     => 4     // batasi 4 untuk beranda
-                            ]);
-
-                            if (!empty($sakip_terms) && !is_wp_error($sakip_terms)) :
-                                foreach ($sakip_terms as $term) :
+                            $sakip_items = [
+                                ['label' => 'Rencana Kerja',     'id' => 'renja'],
+                                ['label' => 'Rencana Strategis', 'id' => 'renstra'],
+                                ['label' => 'Anggaran',          'id' => 'anggaran'],
+                                ['label' => 'Rencana Aksi',      'id' => 'rencana-aksi'],
+                            ];
+                            foreach ($sakip_items as $item) :
                             ?>
-                                    <a href="<?php echo esc_url(home_url('/sakip?id=' . $term->slug)); ?>" class="bg-[#F4F4F4] rounded-[6px] px-4 py-3 text-sm font-sans font-bold text-body hover:bg-line transition-colors cursor-pointer flex justify-between items-center">
-                                        <?php echo esc_html($term->name); ?>
+                                    <a href="<?php echo esc_url(home_url('/sakip?id=' . $item['id'])); ?>" class="bg-[#F4F4F4] rounded-[6px] px-4 py-3 text-sm font-sans font-bold text-body hover:bg-line transition-colors cursor-pointer flex justify-between items-center">
+                                        <?php echo esc_html($item['label']); ?>
                                         <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                         </svg>
                                     </a>
-                            <?php 
-                                endforeach;
-                            else :
-                            ?>
-                                <p class="text-sm text-body-secondary font-sans italic">Belum ada data SAKIP.</p>
-                            <?php endif; ?>
+                            <?php endforeach; ?>
                         </div>
                         <a href="<?php echo esc_url(home_url('/sakip')); ?>" class="mt-auto text-primary text-xs font-bold flex items-center hover:underline self-end">
                             Lihat Semua
