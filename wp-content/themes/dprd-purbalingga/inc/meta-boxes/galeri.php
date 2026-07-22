@@ -21,11 +21,7 @@ function dprd_render_galeri_meta_box($post) {
     $image_id = get_post_meta($post->ID, 'image_id', true);
     $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'medium') : '';
 
-    // Ambil term kategori yang saat ini terpilih
-    $terms = wp_get_object_terms($post->ID, 'kategori-galeri');
-    $current_term_id = !empty($terms) && !is_wp_error($terms) ? $terms[0]->term_id : 0;
-
-    // Daftar Kategori Galeri yang ada di website live
+    // Daftar Kategori Galeri yang ada di website live (pastikan selalu terdaftar di database)
     $categories = [
         'Rapat Paripurna',
         'Rapat Komisi',
@@ -34,17 +30,10 @@ function dprd_render_galeri_meta_box($post) {
         'Audiensi & Kunjungan Tamu'
     ];
 
-    // Pastikan kategori-kategori ini terdaftar di database
-    $options = [];
     foreach ($categories as $cat_name) {
         $term = get_term_by('name', $cat_name, 'kategori-galeri');
         if (!$term) {
-            $inserted = wp_insert_term($cat_name, 'kategori-galeri');
-            if (!is_wp_error($inserted)) {
-                $options[$inserted['term_id']] = $cat_name;
-            }
-        } else {
-            $options[$term->term_id] = $cat_name;
+            wp_insert_term($cat_name, 'kategori-galeri');
         }
     }
 
@@ -101,18 +90,6 @@ function dprd_render_galeri_meta_box($post) {
                 </script>
             </td>
         </tr>
-        <tr>
-            <th><label for="dprd_kategori">Kategori Kegiatan</label></th>
-            <td>
-                <select name="kategori_galeri" id="dprd_kategori" class="postform">
-                    <option value="">-- Pilih Kategori --</option>
-                    <?php foreach ($options as $id => $name): ?>
-                        <option value="<?php echo esc_attr($id); ?>" <?php selected($current_term_id, $id); ?>><?php echo esc_html($name); ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <p class="description">Pilih kategori untuk memfilter foto ini di halaman website Galeri.</p>
-            </td>
-        </tr>
     </table>
     <?php
 }
@@ -130,15 +107,6 @@ add_action('save_post', function ($post_id) {
 
     if (isset($_POST['image_id'])) {
         update_post_meta($post_id, 'image_id', absint($_POST['image_id']));
-    }
-    
-    if (isset($_POST['kategori_galeri'])) {
-        $term_id = absint($_POST['kategori_galeri']);
-        if ($term_id > 0) {
-            wp_set_object_terms($post_id, $term_id, 'kategori-galeri');
-        } else {
-            wp_set_object_terms($post_id, [], 'kategori-galeri');
-        }
     }
 });
 

@@ -26,14 +26,13 @@ if (empty($img_url)) {
 $content = get_the_content();
 $content = apply_filters('the_content', $content);
 $content = trim($content);
-$content = preg_replace('/<p([^>]*)>\s*([A-Za-z])/u', '<p$1><span class="dropcap">$2</span>', $content, 1);
+$content = preg_replace('/(<p[^>]*>\s*(?:<[a-zA-Z0-9]+[^>]*>\s*|[“"\'‘\(\[])*)([A-Za-z\p{L}])/u', '$1<span class="dropcap">$2</span>', $content, 1);
 
 // Sisipkan Foto-Foto Tambahan & Kutipan di Tengah Paragraf (Kustom)
 $additional_images = get_dprd_repeater($post_id, 'dprd_berita_images_json');
-$quote_text = get_post_meta($post_id, 'dprd_quote_text', true);
-$quote_paragraph = get_post_meta($post_id, 'dprd_quote_paragraph', true);
+$additional_quotes = get_dprd_repeater($post_id, 'dprd_berita_quotes_json');
 
-// Fallback jika repeater kosong tapi field lama berisi data
+// Fallback jika repeater foto kosong tapi field lama berisi data
 if (empty($additional_images)) {
     $old_img_id = get_post_meta($post_id, 'additional_image_id', true);
     $old_caption = get_post_meta($post_id, 'additional_image_caption', true);
@@ -47,7 +46,19 @@ if (empty($additional_images)) {
     }
 }
 
-if (!empty($additional_images) || (!empty($quote_text) && $quote_paragraph > 0)) {
+// Fallback jika repeater kutipan kosong tapi field lama berisi data
+if (empty($additional_quotes)) {
+    $quote_text = get_post_meta($post_id, 'dprd_quote_text', true);
+    $quote_paragraph = get_post_meta($post_id, 'dprd_quote_paragraph', true);
+    if (!empty($quote_text) && $quote_paragraph > 0) {
+        $additional_quotes[] = [
+            'quote_text' => $quote_text,
+            'paragraph'  => $quote_paragraph
+        ];
+    }
+}
+
+if (!empty($additional_images) || !empty($additional_quotes)) {
     // Pisahkan konten berdasarkan tag penutup paragraf </p>
     $paragraphs = explode('</p>', $content);
     $num_paragraphs = count($paragraphs) - 1;
@@ -79,13 +90,17 @@ if (!empty($additional_images) || (!empty($quote_text) && $quote_paragraph > 0))
         }
     }
 
-    // 2. Kutipan / Blockquote
-    if (!empty($quote_text) && $quote_paragraph > 0) {
-        $quote_html = '
-        <blockquote class="wp-block-quote">
-            <p>"' . esc_html($quote_text) . '"</p>
-        </blockquote>';
-        $inserts[$quote_paragraph][] = $quote_html;
+    // 2. Kutipan / Blockquote (Repeater)
+    foreach ($additional_quotes as $qt) {
+        $q_text = isset($qt['quote_text']) ? trim($qt['quote_text']) : '';
+        $q_para = isset($qt['paragraph']) ? intval($qt['paragraph']) : 0;
+        if (!empty($q_text) && $q_para > 0) {
+            $quote_html = '
+            <blockquote class="wp-block-quote">
+                <p>"' . esc_html($q_text) . '"</p>
+            </blockquote>';
+            $inserts[$q_para][] = $quote_html;
+        }
     }
 
     // Sisipkan ke array paragraphs

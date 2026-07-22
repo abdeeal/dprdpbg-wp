@@ -25,13 +25,20 @@ foreach ($galeri_posts as $gp) {
     }
 
     $terms = wp_get_object_terms($gp->ID, 'kategori-galeri');
-    $category = (!empty($terms) && !is_wp_error($terms)) ? strtoupper($terms[0]->name) : 'LAINNYA';
+    $category_names = [];
+    if (!empty($terms) && !is_wp_error($terms)) {
+        foreach ($terms as $t) {
+            $category_names[] = strtoupper($t->name);
+        }
+    }
+    $category = !empty($category_names) ? $category_names[0] : 'LAINNYA';
 
     $galeri_data[] = [
-        'id'       => $gp->ID,
-        'title'    => $gp->post_title,
-        'category' => $category,
-        'image'    => $image_url
+        'id'         => $gp->ID,
+        'title'      => $gp->post_title,
+        'category'   => $category,
+        'categories' => $category_names,
+        'image'      => $image_url
     ];
 }
 
@@ -67,7 +74,7 @@ $categories = [
         <?php foreach ($categories as $cat) : ?>
             <button 
                 data-category="<?php echo esc_attr($cat); ?>"
-                class="dprd-filter-btn px-6 py-2 text-xs md:text-[13px] tracking-wider uppercase whitespace-nowrap transition-colors border <?php echo $cat === 'Semua' ? 'bg-[#82111A] text-white border-[#82111A]' : 'text-body-secondary border-transparent hover:text-black bg-transparent'; ?>"
+                class="dprd-filter-btn px-6 py-2 text-xs md:text-[13px] tracking-wider uppercase whitespace-nowrap transition-colors border <?php echo $cat === 'Semua' ? 'bg-[#82111A] text-white border-[#82111A] hover:text-white' : 'text-body-secondary border-transparent hover:text-primary bg-transparent'; ?>"
             >
                 <?php echo esc_html($cat); ?>
             </button>
@@ -107,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function render() {
         // Filter items
         var filtered = allItems.filter(function(item) {
-            var matchesCategory = activeCategory === 'Semua' || item.category === activeCategory;
+            var matchesCategory = activeCategory === 'Semua' || (Array.isArray(item.categories) && item.categories.indexOf(activeCategory) !== -1) || item.category === activeCategory;
             var matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
             return matchesCategory && matchesSearch;
         });
@@ -166,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
                     pagHtml += `
                         <button 
-                            class="w-8 h-8 flex items-center justify-center text-sm font-sans transition-colors ${i === currentPage ? 'bg-[#82111A] text-white font-medium' : 'text-body-secondary hover:text-primary'}"
+                            class="w-8 h-8 flex items-center justify-center text-sm font-sans transition-colors ${i === currentPage ? 'bg-[#82111A] text-white font-medium hover:text-white' : 'text-body-secondary hover:text-primary'}"
                             onclick="window.setGaleriPage(${i})"
                         >
                             ${i}
@@ -205,11 +212,11 @@ document.addEventListener('DOMContentLoaded', function() {
     filterBtns.forEach(function(btn) {
         btn.addEventListener('click', function() {
             filterBtns.forEach(function(b) {
-                b.classList.remove('bg-[#82111A]', 'text-white', 'border-[#82111A]');
-                b.classList.add('text-body-secondary', 'border-transparent', 'bg-transparent');
+                b.classList.remove('bg-[#82111A]', 'text-white', 'border-[#82111A]', 'hover:text-white');
+                b.classList.add('text-body-secondary', 'border-transparent', 'bg-transparent', 'hover:text-primary');
             });
-            this.classList.add('bg-[#82111A]', 'text-white', 'border-[#82111A]');
-            this.classList.remove('text-body-secondary', 'border-transparent', 'bg-transparent');
+            this.classList.add('bg-[#82111A]', 'text-white', 'border-[#82111A]', 'hover:text-white');
+            this.classList.remove('text-body-secondary', 'border-transparent', 'bg-transparent', 'hover:text-primary');
             
             activeCategory = this.getAttribute('data-category');
             currentPage = 1;

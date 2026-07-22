@@ -136,10 +136,18 @@ function dprd_convert_upload_to_webp($upload) {
             }
             
             // Simpan gambar sebagai WebP dengan kualitas 75%
-            if (function_exists('imagewebp') && imagewebp($image, $webp_path, 75)) {
-                // Hapus file JPG/PNG asli (jika ekstensinya bukan .webp sejak awal)
-                if ($webp_path !== $file_path) {
-                    unlink($file_path);
+            $saved = false;
+            if (function_exists('imagewebp')) {
+                $saved = imagewebp($image, $webp_path, 75);
+            }
+            
+            // PENTING DI WINDOWS: Harus panggil imagedestroy() sebelum unlink() agar file tidak terkunci oleh GD
+            imagedestroy($image);
+
+            if ($saved) {
+                // Hapus file JPG/JPEG/PNG asli (jika ekstensinya bukan .webp sejak awal)
+                if ($webp_path !== $file_path && file_exists($file_path)) {
+                    @unlink($file_path);
                 }
                 
                 // Perbarui informasi file upload di WordPress
@@ -147,11 +155,53 @@ function dprd_convert_upload_to_webp($upload) {
                 $upload['url'] = preg_replace('/\\.(jpg|jpeg|png)$/i', '.webp', $upload['url']);
                 $upload['type'] = 'image/webp';
             }
-            imagedestroy($image);
         }
     }
     return $upload;
 }
+
+// Pastikan semua ukuran thumbnail yang digenerate oleh WordPress otomatis dalam format WebP
+add_filter('image_editor_output_format', function ($formats) {
+    $formats['image/jpeg'] = 'image/webp';
+    $formats['image/png']  = 'image/webp';
+    return $formats;
+});
+
+// Bersihkan file uncompressed (JPG/PNG lama) secara otomatis saat attachment metadata di-generate/update
+add_filter('wp_generate_attachment_metadata', function ($metadata, $attachment_id) {
+    if (!empty($metadata['file'])) {
+        $upload_dir = wp_upload_dir();
+        $base_dir = $upload_dir['basedir'] . '/' . dirname($metadata['file']);
+        
+        // Jika file utamanya .webp, cari apakah ada sisa file .jpg/.png dengan nama sama yang belum terhapus
+        $file_name = basename($metadata['file']);
+        if (preg_match('/\\.webp$/i', $file_name)) {
+            $base_name = preg_replace('/\\.webp$/i', '', $file_name);
+            foreach (['.jpg', '.jpeg', '.png'] as $ext) {
+                $old_file = $base_dir . '/' . $base_name . $ext;
+                if (file_exists($old_file)) {
+                    @unlink($old_file);
+                }
+            }
+        }
+
+        // Hapus juga file sisa di sub-ukuran (sizes) jika masih ada versi JPG/PNG
+        if (!empty($metadata['sizes']) && is_array($metadata['sizes'])) {
+            foreach ($metadata['sizes'] as $size => $info) {
+                if (isset($info['file']) && preg_match('/\\.webp$/i', $info['file'])) {
+                    $base_name_size = preg_replace('/\\.webp$/i', '', $info['file']);
+                    foreach (['.jpg', '.jpeg', '.png'] as $ext) {
+                        $old_size_file = $base_dir . '/' . $base_name_size . $ext;
+                        if (file_exists($old_size_file)) {
+                            @unlink($old_size_file);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return $metadata;
+}, 10, 2);
 
 // Set kualitas kompresi WebP bawaan WordPress menjadi 80%
 add_filter('wp_editor_set_quality', function($quality, $mime_type) {
