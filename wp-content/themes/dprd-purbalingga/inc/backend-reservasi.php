@@ -240,7 +240,7 @@ function dprd_handle_reservasi_submit() {
             'nama_pimpinan'    => $nama_pimpinan,
             'jabatan_pimpinan' => $jabatan_pimpinan,
             'jumlah_peserta'   => $jumlah_peserta,
-            'wa'               => $formatted_wa,
+            'wa'               => "'" . $formatted_wa, // Apostrof memaksa Google Sheets membaca sebagai teks, bukan formula
             'file_url'         => $file_url,
             'status'           => 'Pending'
         ];

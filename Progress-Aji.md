@@ -89,12 +89,13 @@ Membangun sistem pengajuan permohonan reservasi kunjungan dinas/studi banding le
 - [x] **Custom Post Type `reservasi`** — Meregistrasikan CPT `reservasi` di [inc/post-types.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/inc/post-types.php) untuk menyimpan permohonan masuk secara terstruktur di Database WordPress.
 - [x] **Handler Form Submission & PDF Uploader (`inc/backend-reservasi.php`)** — Mengolah data permohonan via AJAX (`dprd_submit_reservasi`), validasi file PDF Surat Permohonan (max 5MB), dan penyimpanan ke database `wp_posts` & `wp_postmeta`.
 - [x] **Sinkronisasi Real-time ke Google Sheets Webhook** — Integrasi otomatis via `wp_remote_post()` ke Google Apps Script Webhook sehingga data permohonan baru langsung muncul sebagai baris baru di Google Sheets secara live.
-- [x] **Form UI & Prefix WhatsApp (`+62`)** — Memperbarui [page-reservasi.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/page-reservasi.php) dengan input nomor WhatsApp ber-prefix `🇮🇩 +62`, filter angka murni, serta tanggal minimal hari ini.
-- [x] **Strict Validation Rules**:
+- [x] **Form UI & Prefix WhatsApp (`+62`)** — Memperbarui [page-reservasi.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/page-reservasi.php) dengan input nomor WhatsApp ber-prefix `+62` (tanpa emoji bendera agar lebih clean), filter angka murni, dan tanggal minimal hari ini. Menambahkan apostrof (`'`) pada data payload WA ke Google Sheets agar simbol `+` tidak dibaca sebagai formula dan hilang.
+- [x] **Strict Validation Rules & Frontend Inline Error**:
+  - **Inline Frontend Error PDF**: Menambahkan notifikasi teks merah inline dan fungsi *auto-scroll* ketika user mencoba *submit* tanpa file PDF (mengatasi konflik native browser validation pada input hidden). Mencegah form dikirim ke backend.
   - Validasi Email wajib berformat valid (`is_email` & ada `@`).
   - Validasi WhatsApp 9–13 digit angka murni setelah prefix `+62`.
   - Validasi Tanggal kunjungan tidak boleh masa lalu & khusus hari kerja (Senin–Jumat).
   - Validasi Jumlah Peserta minimal 1 orang.
   - Validasi Berkas Surat Permohonan wajib `.pdf` & max 5MB.
-- [x] **Custom Modal Popup Alert (Design System 1:1 Vercel)** — Mengganti alert browser standar dengan Modal Dialog Popup UI lengkap dengan backdrop blur, animasi scale 95%→100%, serta ikon Lucide SVG (`CheckCircle2` hijau untuk sukses, `AlertTriangle` merah untuk gagal).
+- [x] **Custom Modal Popup Alert (Premium UI)** — Mengganti alert browser standar dengan Modal khusus berdesain *clean* (font *regular*, deskripsi tidak *overflow*, dan tombol tutup transparan teks merah). Dilengkapi keyframe CSS *custom SVG animation* (*circle draw* + memunculkan centang *smooth* untuk sukses, dan animasi *shake* untuk error).
 - [x] **Detail Meta Box Dashboard Admin** — Menampilkan seluruh detail instansi, email, tanggal permohonan, tombol langsung ke WhatsApp, status permohonan (*Pending / Disetujui / Ditolak*), dan tombol unduh PDF di WordPress Admin.

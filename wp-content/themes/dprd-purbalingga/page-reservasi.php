@@ -130,8 +130,8 @@ get_header();
                                     Narahubung (WhatsApp) <span class="text-primary">*</span>
                                 </label>
                                 <div class="flex items-center border border-line rounded-button overflow-hidden focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 h-[42px] bg-white">
-                                    <span class="bg-surface px-3 h-full flex items-center justify-center font-mono text-[13px] text-ink font-bold border-r border-line shrink-0 select-none">
-                                        🇮🇩 +62
+                                    <span class="bg-white px-3 h-full flex items-center justify-center font-mono text-[13px] text-ink font-medium border-r border-line shrink-0 select-none">
+                                        +62
                                     </span>
                                     <input type="tel" id="res_wa" name="res_wa" required placeholder="81234567890" maxlength="13" class="w-full px-3 h-full font-sans text-[14px] text-ink placeholder:text-body-secondary/60 outline-none bg-transparent"/>
                                 </div>
@@ -143,10 +143,15 @@ get_header();
                                 Upload Surat Permohonan <span class="text-primary">*</span>
                             </label>
                             <div id="dprd-upload-box" class="bg-primary-light/50 border border-dashed border-primary/30 rounded-button p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-primary-light transition-colors group relative">
-                                <input type="file" id="res_file_surat" name="res_file_surat" accept=".pdf" class="hidden" required/>
+                                <input type="file" id="res_file_surat" name="res_file_surat" accept=".pdf" class="hidden"/>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-up text-primary mb-3 group-hover:-translate-y-1 transition-transform" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M12 12v6"></path><path d="m15 15-3-3-3 3"></path></svg>
                                 <span id="dprd-upload-text" class="font-sans text-[13px] text-ink mb-1.5 text-center px-4">Klik atau seret file PDF ke sini</span>
                                 <span id="dprd-upload-subtext" class="font-mono text-[10px] text-body-secondary uppercase tracking-widest text-center">Maksimal 5MB (PDF)</span>
+                            </div>
+                            <!-- Pesan error PDF inline -->
+                            <div id="dprd-pdf-error" style="display:none;" class="font-sans text-[12px] text-rose-600 mt-2 flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                Berkas surat permohonan belum diunggah.
                             </div>
                         </div>
                     </div>
@@ -162,19 +167,48 @@ get_header();
 </div>
 
 <!-- Modal Popup Alert Custom (Premium Design System 1:1 Vercel) -->
+<style>
+@keyframes dprd-pop-in {
+    0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
+    60%  { transform: scale(1.15) rotate(5deg); opacity: 1; }
+    80%  { transform: scale(0.95) rotate(-2deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes dprd-circle-draw {
+    0%   { stroke-dashoffset: 80; opacity: 0; }
+    40%  { opacity: 1; }
+    100% { stroke-dashoffset: 0; }
+}
+@keyframes dprd-check-draw {
+    0%   { stroke-dashoffset: 30; }
+    100% { stroke-dashoffset: 0; }
+}
+@keyframes dprd-shake {
+    0%,100% { transform: translateX(0); }
+    15%  { transform: translateX(-6px) rotate(-4deg); }
+    30%  { transform: translateX(6px) rotate(4deg); }
+    45%  { transform: translateX(-4px) rotate(-2deg); }
+    60%  { transform: translateX(4px) rotate(2deg); }
+    75%  { transform: translateX(-2px); }
+}
+.dprd-icon-animate  { animation: dprd-pop-in 0.5s cubic-bezier(0.25, 1, 0.5, 1) both; }
+.dprd-icon-shake    { animation: dprd-shake 0.55s cubic-bezier(0.25, 1, 0.5, 1) both; }
+.dprd-circle-path   { stroke-dasharray: 80; stroke-dashoffset: 80; animation: dprd-circle-draw 0.5s 0.1s ease-out forwards; }
+.dprd-check-path    { stroke-dasharray: 30; stroke-dashoffset: 30; animation: dprd-check-draw 0.4s 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+</style>
 <div id="dprd-modal-overlay" class="fixed inset-0 bg-ink/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-    <div id="dprd-modal-card" class="bg-white border border-line rounded-card max-w-md w-full p-6 md:p-8 shadow-2xl transform scale-95 opacity-0 transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col items-center text-center">
+    <div id="dprd-modal-card" class="bg-white border border-line rounded-card max-w-md w-full p-7 md:p-9 shadow-2xl transform scale-95 opacity-0 transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col items-center text-center">
         <!-- Icon Container -->
-        <div id="dprd-modal-icon-bg" class="w-16 h-16 rounded-full flex items-center justify-center mb-5 transition-transform duration-500 scale-0">
+        <div id="dprd-modal-icon-bg" class="w-[72px] h-[72px] rounded-full flex items-center justify-center mb-5">
             <div id="dprd-modal-icon"></div>
         </div>
 
         <!-- Title & Message -->
-        <h3 id="dprd-modal-title" class="font-display font-bold text-xl md:text-2xl text-ink mb-2"></h3>
-        <p id="dprd-modal-message" class="font-sans text-[14px] text-body-secondary leading-relaxed mb-6"></p>
+        <h3 id="dprd-modal-title" class="font-display font-normal text-[20px] text-ink mb-2 leading-snug"></h3>
+        <p id="dprd-modal-message" class="font-sans text-[16px] text-body-secondary leading-[1.65] mb-5 max-w-[280px] mx-auto break-words"></p>
 
-        <!-- Action Button -->
-        <button id="dprd-modal-close-btn" type="button" class="w-full bg-primary hover:bg-primary/90 text-white font-sans font-medium text-[14px] py-3 rounded-button transition-colors cursor-pointer border-0 outline-none">
+        <!-- Action Button (teks merah, transparan) -->
+        <button id="dprd-modal-close-btn" type="button" class="text-primary font-sans font-medium text-[16px] py-2 cursor-pointer border-0 outline-none bg-transparent">
             Tutup
         </button>
     </div>
@@ -205,13 +239,22 @@ document.addEventListener('DOMContentLoaded', function() {
         modalMessage.textContent = message;
 
         if (isSuccess) {
-            modalIconBg.className = 'w-16 h-16 rounded-full flex items-center justify-center mb-5 bg-emerald-50 text-emerald-600 transition-transform duration-500 scale-100';
-            modalIcon.innerHTML   = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle-2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`;
-            modalCloseBtn.className = 'w-full bg-emerald-600 hover:bg-emerald-700 text-white font-sans font-medium text-[14px] py-3 rounded-button transition-colors cursor-pointer border-0 outline-none';
+            modalIconBg.className = 'w-[72px] h-[72px] rounded-full flex items-center justify-center mb-5 bg-emerald-50 text-emerald-600';
+            // SVG animasi: lingkaran ter-draw dulu, lalu centang muncul smooth
+            modalIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle class="dprd-circle-path" cx="12" cy="12" r="10"/>
+                <path class="dprd-check-path" d="m9 12 2 2 4-4"/>
+            </svg>`;
+            modalCloseBtn.className = 'text-primary font-sans font-medium text-[14px] py-2 cursor-pointer border-0 outline-none bg-transparent';
         } else {
-            modalIconBg.className = 'w-16 h-16 rounded-full flex items-center justify-center mb-5 bg-rose-50 text-rose-600 transition-transform duration-500 scale-100';
-            modalIcon.innerHTML   = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-triangle"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
-            modalCloseBtn.className = 'w-full bg-primary hover:bg-primary/90 text-white font-sans font-medium text-[14px] py-3 rounded-button transition-colors cursor-pointer border-0 outline-none';
+            modalIconBg.className = 'w-[72px] h-[72px] rounded-full flex items-center justify-center mb-5 bg-rose-50 text-rose-600';
+            // SVG error: segitiga peringatan + animasi shake
+            modalIcon.innerHTML = `<svg class="dprd-icon-shake" xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <circle cx="12" cy="17" r="0.5" fill="currentColor"/>
+            </svg>`;
+            modalCloseBtn.className = 'text-primary font-sans font-medium text-[14px] py-2 cursor-pointer border-0 outline-none bg-transparent';
         }
 
         modalOverlay.classList.remove('opacity-0', 'pointer-events-none');
@@ -270,8 +313,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (uploadBox && fileInput) {
         uploadBox.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', () => {
+            const pdfError = document.getElementById('dprd-pdf-error');
             if (fileInput.files.length > 0) {
                 uploadText.innerHTML = '<strong class="text-primary">📄 File Terpilih: ' + fileInput.files[0].name + '</strong>';
+                // Sembunyikan pesan error jika file sudah dipilih
+                if (pdfError) pdfError.style.display = 'none';
             }
         });
     }
@@ -280,6 +326,33 @@ document.addEventListener('DOMContentLoaded', function() {
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
+
+            const pdfError = document.getElementById('dprd-pdf-error');
+
+            // Validasi frontend: cek PDF wajib dipilih sebelum kirim
+            if (!fileInput || fileInput.files.length === 0) {
+                if (pdfError) {
+                    pdfError.style.display = 'flex';
+                    pdfError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            // Sembunyikan error jika ada file
+            if (pdfError) pdfError.style.display = 'none';
+
+            // Validasi ekstensi PDF di frontend
+            const fileName = fileInput.files[0].name;
+            if (!fileName.toLowerCase().endsWith('.pdf')) {
+                openModal(false, 'Format File Tidak Valid', 'Berkas surat permohonan harus berformat PDF (.pdf).');
+                return;
+            }
+
+            // Validasi ukuran file (maks 5MB)
+            if (fileInput.files[0].size > 5 * 1024 * 1024) {
+                openModal(false, 'Ukuran File Terlalu Besar', 'Berkas PDF surat permohonan maksimal 5MB. Silakan kompres file Anda terlebih dahulu.');
+                return;
+            }
 
             const formData = new FormData(form);
             const nonceVal = document.getElementById('dprd_reservasi_security')?.value || '';
