@@ -605,6 +605,185 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.scrollTo({ top: y, behavior: 'smooth' });
                 }
             });
+        });
+    }
+
+    // ── FadeIn Animasi Scroll-Trigger ([data-fade]) ──
+    const fadeElements = document.querySelectorAll('[data-fade]');
+    if (fadeElements.length > 0) {
+        fadeElements.forEach(el => {
+            el.classList.add('opacity-0', 'translate-y-8', 'transition-all', 'duration-700', 'ease-out');
+        });
+
+        const fadeObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.remove('opacity-0', 'translate-y-8');
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { rootMargin: '0px 0px -50px 0px', threshold: 0.1 });
+
+        fadeElements.forEach(el => fadeObserver.observe(el));
+    }
+
+    // ── Animated Counter ([data-counter]) ──
+    const counterElements = document.querySelectorAll('[data-counter]');
+    if (counterElements.length > 0) {
+        const animateCounter = (el) => {
+            const targetText = el.dataset.original || el.innerText.trim();
+            const targetNumber = parseInt(targetText.replace(/[^0-9]/g, ''));
+            if (isNaN(targetNumber)) {
+                el.innerText = targetText;
+                return;
+            }
+            
+            let startTime = null;
+            const duration = 2000;
+            
+            const step = (currentTime) => {
+                if (!startTime) startTime = currentTime;
+                const progress = Math.min((currentTime - startTime) / duration, 1);
+                
+                const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+                const currentNumber = Math.floor(easeProgress * targetNumber);
+                
+                el.innerText = currentNumber.toLocaleString('id-ID');
+                
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    el.innerText = targetText;
+                }
+            };
+            
+            window.requestAnimationFrame(step);
+        };
+
+        const counterObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { rootMargin: '0px 0px -50px 0px', threshold: 0.1 });
+
+        counterElements.forEach(el => {
+            el.dataset.original = el.innerText.trim();
+            el.innerText = '0';
+            counterObserver.observe(el);
+        });
+    }
+
+    // ── Animated Counter (1:1 Vercel GSAP ScrollTrigger) ───────────────────
+    const counters = document.querySelectorAll('.dprd-animated-counter');
+    if (counters.length > 0) {
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    obs.unobserve(el); // Hanya jalankan sekali
+
+                    const value = el.getAttribute('data-value');
+                    const duration = 2000; // 2 seconds
+                    const startTime = performance.now();
+                    
+                    // Equivalent to GSAP "power2.out"
+                    const easePower2Out = (t) => 1 - Math.pow(1 - t, 2);
+
+                    const isPeriod = value.includes('-');
+                    if (!isPeriod) {
+                        const target = parseInt(value, 10);
+                        if (!isNaN(target)) {
+                            const animate = (currentTime) => {
+                                const elapsed = currentTime - startTime;
+                                const progress = Math.min(elapsed / duration, 1);
+                                const easedProgress = easePower2Out(progress);
+                                
+                                const currentVal = Math.floor(1 + (target - 1) * easedProgress);
+                                el.textContent = currentVal;
+                                
+                                if (progress < 1) {
+                                    requestAnimationFrame(animate);
+                                } else {
+                                    el.textContent = target;
+                                }
+                            };
+                            requestAnimationFrame(animate);
+                        }
+                    } else {
+                        const parts = value.split('-');
+                        const targetStart = parseInt(parts[0], 10);
+                        const targetEnd = parseInt(parts[1], 10);
+                        if (!isNaN(targetStart) && !isNaN(targetEnd)) {
+                            const gap = targetEnd - targetStart;
+                            const start1 = 1945;
+                            const start2 = 1945 + gap;
+                            
+                            const animate = (currentTime) => {
+                                const elapsed = currentTime - startTime;
+                                const progress = Math.min(elapsed / duration, 1);
+                                const easedProgress = easePower2Out(progress);
+                                
+                                const currentVal1 = Math.floor(start1 + (targetStart - start1) * easedProgress);
+                                const currentVal2 = Math.floor(start2 + (targetEnd - start2) * easedProgress);
+                                
+                                el.textContent = currentVal1 + '-' + currentVal2;
+                                
+                                if (progress < 1) {
+                                    requestAnimationFrame(animate);
+                                } else {
+                                    el.textContent = targetStart + '-' + targetEnd;
+                                }
+                            };
+                            requestAnimationFrame(animate);
+                        }
+                    }
+                }
+            });
+        }, {
+            threshold: 0,
+            rootMargin: '0px 0px -10% 0px' // Memicu saat elemen berada 10% dari bawah viewport (mirip GSAP top 90%)
+        });
+
+        counters.forEach(counter => observer.observe(counter));
+
+    }
+
+    // ── FadeIn Animation (1:1 Vercel GSAP) ───────────────────
+    const dprdFadeElements = document.querySelectorAll('.dprd-fade-in');
+    if (dprdFadeElements.length > 0) {
+        const dprdFadeObserver = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    obs.unobserve(el);
+
+                    const delay = el.getAttribute('data-delay') || '0';
+                    const duration = el.getAttribute('data-duration') || '0.8';
+                    
+                    el.style.transition = `opacity ${duration}s cubic-bezier(0.25, 1, 0.5, 1) ${delay}s, transform ${duration}s cubic-bezier(0.25, 1, 0.5, 1) ${delay}s`;
+                    
+                    requestAnimationFrame(() => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translate(0, 0)';
+                    });
+                }
+            });
+        }, {
+            threshold: 0,
+            rootMargin: '0px 0px -15% 0px' // Mirip GSAP start: 'top 85%'
+        });
+
+        dprdFadeElements.forEach(el => {
+            const direction = el.getAttribute('data-direction') || 'up';
+            const distance = el.getAttribute('data-distance') || '40';
+            
+            let x = 0, y = 0;
+            if (direction === 'up') y = distance;
+            else if (direction === 'down') y = -distance;
             else if (direction === 'left') x = distance;
             else if (direction === 'right') x = -distance;
 
@@ -612,7 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
             el.style.opacity = '0';
             el.style.transform = `translate(${x}px, ${y}px)`;
             
-            fadeObserver.observe(el);
+            dprdFadeObserver.observe(el);
         });
     }
 
