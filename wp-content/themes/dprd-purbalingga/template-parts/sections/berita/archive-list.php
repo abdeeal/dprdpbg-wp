@@ -71,6 +71,7 @@ $query = new WP_Query($args);
                             src="<?php echo esc_url($img_url); ?>" 
                             alt="<?php echo esc_attr($title); ?>"
                             class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
                         />
                     </div>
                     <div class="font-mono font-bold text-[13px] text-body-secondary mb-2">

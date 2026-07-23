@@ -14,7 +14,7 @@ get_header();
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 pb-16">
         <?php get_template_part('template-parts/ui/breadcrumbs'); ?>
 
-        <div class="mb-0">
+        <div class="mb-0 dprd-fade-in" data-direction="up" data-duration="0.6">
             <h1 class="font-display text-3xl md:text-[36px] font-black tracking-tight text-primary mt-8 mb-6">Sejarah Kabupaten Purbalingga</h1>
         </div>
 
@@ -22,7 +22,7 @@ get_header();
     </div>
 
     <!-- Banner CTA: full-width, di luar container -->
-    <div class="w-full bg-[#A32B2E] py-12">
+    <div class="w-full bg-[#A32B2E] py-12 dprd-fade-in" data-direction="up">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="text-white text-left">
                 <h3 class="font-sans font-bold text-[22px] md:text-2xl mb-1.5">Ingin Mengetahui Lebih Lanjut?</h3>

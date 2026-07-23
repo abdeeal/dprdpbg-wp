@@ -151,7 +151,7 @@ if ($slug === 'pimpinan-dprd') {
             <div class="flex flex-col md:flex-row gap-8 md:gap-10 items-start mb-12 last:mb-0">
                 <div class="relative w-full md:w-[220px] shrink-0 aspect-[3/4] rounded-md overflow-hidden bg-surface border border-line/10">
                     <?php if ($p['image']) : ?>
-                        <img src="<?php echo esc_url($p['image']); ?>" alt="<?php echo esc_attr($p['name']); ?>" class="object-cover w-full h-full">
+                        <img src="<?php echo esc_url($p['image']); ?>" alt="<?php echo esc_attr($p['name']); ?>" class="object-cover w-full h-full" loading="lazy">
                     <?php endif; ?>
                 </div>
                 <div class="flex flex-col flex-grow pt-2">
@@ -565,13 +565,13 @@ get_template_part('template-parts/ui/breadcrumbs', null, [
                                 <!-- Divider line -->
                                 <div class="w-full h-px bg-body/30 mb-3"></div>
                                 
-                                <span class="font-sans text-sm md:text-[15px] font-semibold text-primary mb-4 text-center">
+                                <span class="font-display text-sm md:text-[15px]  mb-4 text-center">
                                     <?php echo esc_html($member['position']); ?>
                                 </span>
                                 
                                 <div class="relative w-full aspect-[3/4] rounded-sm overflow-hidden bg-surface shadow-sm border border-line/40">
                                     <?php if ($member['image']) : ?>
-                                        <img src="<?php echo esc_url($member['image']); ?>" alt="<?php echo esc_attr($member['name']); ?>" class="object-cover w-full h-full">
+                                        <img src="<?php echo esc_url($member['image']); ?>" alt="<?php echo esc_attr($member['name']); ?>" class="object-cover w-full h-full" loading="lazy">
                                     <?php endif; ?>
                                 </div>
                             </div>

@@ -752,6 +752,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
+    // ── FadeIn Animation (1:1 Vercel GSAP) ───────────────────
+    const dprdFadeElements = document.querySelectorAll('.dprd-fade-in');
+    if (dprdFadeElements.length > 0) {
+        const dprdFadeObserver = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    obs.unobserve(el);
+
+                    const delay = el.getAttribute('data-delay') || '0';
+                    const duration = el.getAttribute('data-duration') || '0.8';
+                    
+                    el.style.transition = `opacity ${duration}s cubic-bezier(0.25, 1, 0.5, 1) ${delay}s, transform ${duration}s cubic-bezier(0.25, 1, 0.5, 1) ${delay}s`;
+                    
+                    requestAnimationFrame(() => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translate(0, 0)';
+                    });
+                }
+            });
+        }, {
+            threshold: 0,
+            rootMargin: '0px 0px -15% 0px' // Mirip GSAP start: 'top 85%'
+        });
+
+        dprdFadeElements.forEach(el => {
+            const direction = el.getAttribute('data-direction') || 'up';
+            const distance = el.getAttribute('data-distance') || '40';
+            
+            let x = 0, y = 0;
+            if (direction === 'up') y = distance;
+            else if (direction === 'down') y = -distance;
+            else if (direction === 'left') x = distance;
+            else if (direction === 'right') x = -distance;
+
+            // Initial state
+            el.style.opacity = '0';
+            el.style.transform = `translate(${x}px, ${y}px)`;
+            
+            dprdFadeObserver.observe(el);
+        });
+    }
+
 });
-
-

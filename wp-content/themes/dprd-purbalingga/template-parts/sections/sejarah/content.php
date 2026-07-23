@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) exit;
 ?>
 
 <!-- 1. Kotak Hari Jadi Kabupaten -->
-<div class="mb-12">
+<div class="mb-12 dprd-fade-in" data-direction="up" data-delay="0.1">
     <div class="bg-[#82111A] text-white py-6 px-6 md:py-7 md:px-8">
         <h3 class="font-sans font-bold text-lg md:text-xl mb-3 underline underline-offset-4">Hari Jadi Kabupaten Purbalingga</h3>
         <p class="font-mono max-w-2/3 text-[15px] md:text-base leading-snug text-white/95">
@@ -22,16 +22,16 @@ if (!defined('ABSPATH')) exit;
 <div class="flex flex-col lg:flex-row gap-12 mb-16">
     <!-- Kolom Kiri: Narasi Sejarah -->
     <div class="lg:w-1/2">
-        <h2 class="font-display text-2xl text-body mb-6 font-bold">Asal-usul & Narasi Sejarah</h2>
+        <h2 class="font-display text-2xl text-body mb-6 font-bold dprd-fade-in" data-direction="up" data-delay="0.15">Asal-usul & Narasi Sejarah</h2>
         <div class="font-sans text-[15px] md:text-base text-body-secondary leading-[1.8] space-y-6">
-            <p>Purbalingga berawal dari kademangan kecil yang kemudian berkembang menjadi pusat pemerintahan yang strategis di wilayah Jawa Tengah. Akar sejarahnya tidak lepas dari peran Kyai Arsantaka yang merupakan sosok pionir dalam menata fondasi kemasyarakatan di wilayah ini.</p>
-            <p>Nama "Purbalingga" sendiri mengandung makna filosofis yang dalam, mencerminkan kejayaan masa lalu yang tetap relevan sebagai fondasi pembangunan masa depan. Proses transisi dari kademangan menjadi kabupaten merupakan perjalanan panjang yang melibatkan dinamika politik kolonial dan kearifan lokal yang kuat.</p>
-            <p>Melalui penelusuran sejarah yang intensif oleh para ahli dan budayawan, jati diri Purbalingga semakin kokoh dengan ditetapkannya hari jadi yang menjadi simbol persatuan dan kebanggaan seluruh masyarakat Purbalingga.</p>
+            <p class="dprd-fade-in" data-direction="up" data-delay="0.30">Purbalingga berawal dari kademangan kecil yang kemudian berkembang menjadi pusat pemerintahan yang strategis di wilayah Jawa Tengah. Akar sejarahnya tidak lepas dari peran Kyai Arsantaka yang merupakan sosok pionir dalam menata fondasi kemasyarakatan di wilayah ini.</p>
+            <p class="dprd-fade-in" data-direction="up" data-delay="0.45">Nama "Purbalingga" sendiri mengandung makna filosofis yang dalam, mencerminkan kejayaan masa lalu yang tetap relevan sebagai fondasi pembangunan masa depan. Proses transisi dari kademangan menjadi kabupaten merupakan perjalanan panjang yang melibatkan dinamika politik kolonial dan kearifan lokal yang kuat.</p>
+            <p class="dprd-fade-in" data-direction="up" data-delay="0.60">Melalui penelusuran sejarah yang intensif oleh para ahli dan budayawan, jati diri Purbalingga semakin kokoh dengan ditetapkannya hari jadi yang menjadi simbol persatuan dan kebanggaan seluruh masyarakat Purbalingga.</p>
         </div>
     </div>
 
     <!-- Kolom Kanan: Garis Waktu (Timeline) -->
-    <div class="lg:w-1/2">
+    <div class="lg:w-1/2 dprd-fade-in" data-direction="up" data-delay="0.2">
         <div class="relative border-l border-line ml-3 md:ml-4 py-2">
             <!-- Item 1 -->
             <div class="mb-10 last:mb-0 relative pl-8 md:pl-10">
@@ -66,7 +66,7 @@ if (!defined('ABSPATH')) exit;
 </div>
 
 <!-- 3. Kotak Sumber & Referensi -->
-<div class="mb-16">
+<div class="mb-16 dprd-fade-in" data-direction="up">
     <div class="bg-[#82111A] text-white p-8 md:p-10 border border-[#82111A]">
         <h3 class="font-display font-black text-[26px] md:text-[32px] mb-8 tracking-tight">Sumber & Referensi</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
@@ -111,7 +111,7 @@ if (!defined('ABSPATH')) exit;
 </div>
 
 <!-- 4. Daftar Kisi Tokoh Purbalingga (Dinamis dari CPT tokoh-sejarah) -->
-<div class="mb-16">
+<div class="mb-16 dprd-fade-in" data-direction="up">
     <?php
     get_template_part('template-parts/sections/tokoh-sejarah/archive-list');
     ?>
