@@ -17,10 +17,10 @@ if (!defined('ABSPATH')) exit;
                     Jl. Oneng Saputra No.1, Purbalingga,<br/>Jawa Tengah 53311.
                 </p>
                 <div class="flex gap-3">
-                    <a href="<?php echo esc_url(home_url('/ppid/')); ?>" class="w-10 h-10 rounded-full bg-surface hover:bg-line transition-colors flex items-center justify-center text-body" aria-label="PPID">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11a9 9 0 0 1 18 0"/><path d="M21 11v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z"/><path d="M3 11v5a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3Z"/><path d="M21 16a2 2 0 0 1-2 2h-5"/></svg>
+                    <a href="https://jdih.purbalinggakab.go.id/" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-surface hover:bg-line transition-colors flex items-center justify-center text-body" aria-label="JDIH Purbalingga">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
                     </a>
-                    <a href="<?php echo esc_url(home_url('/galeri/')); ?>" class="w-10 h-10 rounded-full bg-surface hover:bg-line transition-colors flex items-center justify-center text-body" aria-label="Galeri Video">
+                    <a href="https://www.youtube.com/@DPRDPurbalingga" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-surface hover:bg-line transition-colors flex items-center justify-center text-body" aria-label="YouTube DPRD Purbalingga">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
                     </a>
                     <a href="<?php echo esc_url(home_url('/berita/')); ?>" class="w-10 h-10 rounded-full bg-surface hover:bg-line transition-colors flex items-center justify-center text-body" aria-label="Umpan Berita RSS">
@@ -76,8 +76,6 @@ if (!defined('ABSPATH')) exit;
             <div class="pt-8 border-t border-line flex flex-col md:flex-row justify-between items-center text-[12px] text-body font-mono">
                 <p>© <?php echo date('Y'); ?> DPRD Kabupaten Purbalingga. Hak Cipta Dilindungi Undang-Undang.</p>
                 <div class="flex gap-6 mt-4 md:mt-0">
-                    <a href="#" class="hover:text-primary transition-colors">Kebijakan Privasi</a>
-                    <a href="#" class="hover:text-primary transition-colors">Syarat & Ketentuan</a>
                 </div>
             </div>
         </div>

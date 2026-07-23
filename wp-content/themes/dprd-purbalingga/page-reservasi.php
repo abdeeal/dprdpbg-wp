@@ -20,9 +20,22 @@ get_header();
             </p>
         </div>
 
+        <!-- Notifikasi -->
+        <?php if (isset($_GET['status']) && $_GET['status'] === 'sukses') : ?>
+            <div class="mb-8 p-4 bg-green-50 border border-green-200 rounded-button flex items-start gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle text-green-600 shrink-0 mt-0.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <div>
+                    <h3 class="font-sans font-bold text-green-800 text-[14px] mb-1">Reservasi Berhasil Dikirim</h3>
+                    <p class="font-sans text-[13px] text-green-700 leading-relaxed">Permohonan kunjungan Anda telah kami terima dan akan segera diproses. Kami akan menghubungi Anda melalui WhatsApp atau Email untuk konfirmasi lebih lanjut.</p>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <!-- Form Card Container -->
         <div class="bg-white border border-line rounded-card p-6 md:p-10 shadow-sm">
-            <form id="dprd-reservasi-form" method="post" enctype="multipart/form-data" class="space-y-12">
+            <form id="dprd-reservasi-form" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" enctype="multipart/form-data" class="space-y-12">
+                <input type="hidden" name="action" value="submit_reservasi">
+                <?php wp_nonce_field('dprd_submit_reservasi_action', 'dprd_reservasi_nonce'); ?>
                 
                 <!-- Section 1: Informasi Instansi -->
                 <div>

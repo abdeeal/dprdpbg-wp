@@ -52,3 +52,18 @@ Hari ini: Rabu, 22 Juli 2026
 - [x] Pembuatan *section* **Berita Video** di `front-page.php` yang secara dinamis mengambil 6 video YouTube terbaru milik DPRD Purbalingga via `fetch_feed()` RSS bawaan WordPress, lengkap dengan formating layout 1:1 Next.js.
 - [x] Migrasi form interaktif **Search Navbar** yang menggunakan _Vanilla JavaScript_ untuk mengelola *state toggle* (expand/shrink, auto-focus input) beserta penyesuaian susunan *z-index* *backdrop* sehingga navbar tidak ikut memudar.
 - [x] Kompilasi ulang aset produksi Vite/Tailwind (`npm run build`) untuk menerapkan utilitas *class Tailwind* yang disalin dari komponen video dan search UI Next.js.
+
+## 6. Optimasi Performa, Keamanan & Finalisasi Footer (Hari ini: 23 Juli 2026)
+- [x] **Optimasi Web Vitals & Performa LCP**: Mengonfigurasi _browser caching_, mengaktifkan _GZIP compression_, _eager-loading_ (`fetchpriority="high"`) untuk gambar utama, dan _lazy-loading_ untuk gambar sekunder di Beranda, Berita, dan Galeri.
+- [x] **Sinkronisasi Git Aset Tim**: Memperbarui berkas `.gitignore` untuk mengizinkan sinkronisasi sementara *folder* `wp-content/uploads/` sehingga aset (gambar/PDF) yang ditambahkan *developer* lain (Ghilbran/Aji) dapat diakses tim tanpa menyebabkan _broken link_ / _missing file_.
+- [x] **Audit & Penambalan Celah Keamanan**:
+  - Menutup celah *User Enumeration* melalui REST API untuk *user* yang tidak _login_.
+  - Menonaktifkan fitur rentan `xmlrpc.php` dari *brute-force* dan DDoS.
+- [x] **Implementasi Handler Form Reservasi (Fase 7)**:
+  - Pembuatan *handler* form aman di `admin-post.php` yang melindungi data dengan Nonce CSRF.
+  - Implementasi validasi ketat *upload* surat permohonan menggunakan `wp_handle_upload` (Wajib PDF, Maksimal 5MB, Deteksi ekstensi & _MIME type_).
+  - Menyimpan data reservasi pengunjung secara utuh ke sistem sebagai Custom Post Type (CPT) `reservasi`.
+- [x] **Penyesuaian Tampilan Footer**:
+  - Penghapusan tautan fiktif _Kebijakan Privasi_ & _Syarat Ketentuan_.
+  - Penambahan tombol ikon dokumen dan integrasi tautan yang mengarah ke _website_ Jaringan Dokumentasi dan Informasi Hukum (JDIH) Purbalingga.
+  - Penyesuaian tautan sosial media ke *channel* YouTube resmi DPRD Purbalingga (@DPRDPurbalingga).
