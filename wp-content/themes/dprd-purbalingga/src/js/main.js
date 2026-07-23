@@ -605,51 +605,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.scrollTo({ top: y, behavior: 'smooth' });
                 }
             });
-        });
-    }
-
-    // ── FadeIn Animasi Scroll-Trigger ([data-fade]) ──
-    const fadeElements = document.querySelectorAll('[data-fade]');
-    if (fadeElements.length > 0) {
-        fadeElements.forEach(el => {
-            el.classList.add('opacity-0', 'translate-y-8', 'transition-all', 'duration-700', 'ease-out');
-        });
-
-        const fadeObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.remove('opacity-0', 'translate-y-8');
-                    entry.target.classList.add('opacity-100', 'translate-y-0');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { rootMargin: '0px 0px -50px 0px', threshold: 0.1 });
-
-        fadeElements.forEach(el => fadeObserver.observe(el));
-    }
-
-    // ── Animated Counter ([data-counter]) ──
-    const counterElements = document.querySelectorAll('[data-counter]');
-    if (counterElements.length > 0) {
-        const animateCounter = (el) => {
-            const targetText = el.dataset.original || el.innerText.trim();
-            const targetNumber = parseInt(targetText.replace(/[^0-9]/g, ''));
-            if (isNaN(targetNumber)) {
-                el.innerText = targetText;
-                return;
-            }
-            
-            let startTime = null;
-            const duration = 2000;
-            
-            const step = (currentTime) => {
-                if (!startTime) startTime = currentTime;
-                const progress = Math.min((currentTime - startTime) / duration, 1);
-                
-                const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-                const currentNumber = Math.floor(easeProgress * targetNumber);
-            if (direction === 'up') y = distance;
-            else if (direction === 'down') y = -distance;
             else if (direction === 'left') x = distance;
             else if (direction === 'right') x = -distance;
 
