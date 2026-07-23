@@ -12,17 +12,14 @@ get_header();
 
 <main id="primary" class="w-full bg-main min-h-screen pt-10 pb-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16">
-        <?php
-        get_template_part('template-parts/ui/breadcrumbs');
-        ?>
+        <?php get_template_part('template-parts/ui/breadcrumbs'); ?>
+    </div>
         
-        <header class="mb-12 mt-6">
-            <h1 class="font-display text-4xl text-primary font-bold mb-4">Hasil Pencarian</h1>
-            <?php
-            get_template_part('template-parts/sections/pencarian/search-bar');
-            ?>
-        </header>
+    <?php
+    get_template_part('template-parts/sections/pencarian/search-bar');
+    ?>
 
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <?php
         get_template_part('template-parts/sections/pencarian/results');
         ?>

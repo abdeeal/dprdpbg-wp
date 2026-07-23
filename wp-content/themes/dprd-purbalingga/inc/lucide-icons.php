@@ -19,6 +19,8 @@ function dprd_get_lucide_svg($icon, $size = 24, $class = '') {
         'scale' => '<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h18"/>',
         'wallet' => '<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>',
         'arrow-up-right' => '<path d="M7 7h10v10"/><path d="M7 17 17 7"/>',
+        'search' => '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.34-4.34"/>',
+        'user' => '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
     ];
 
     $path = isset($svgs[$icon]) ? $svgs[$icon] : '';
@@ -34,4 +36,11 @@ function dprd_get_lucide_svg($icon, $size = 24, $class = '') {
         esc_attr($class),
         $path
     );
+}
+
+/**
+ * Echoes the lucide SVG directly.
+ */
+function dprd_icon($icon, $class = '') {
+    echo dprd_get_lucide_svg($icon, 24, $class);
 }

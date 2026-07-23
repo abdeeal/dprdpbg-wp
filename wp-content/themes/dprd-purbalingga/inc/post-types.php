@@ -114,9 +114,9 @@ function dprd_custom_rewrite_rules() {
     );
     
     // Flush rewrite rules sekali saja jika belum dilakukan
-    if (!get_option('dprd_rules_flushed_v6')) {
+    if (!get_option('dprd_rules_flushed_v7')) {
         flush_rewrite_rules(false);
-        update_option('dprd_rules_flushed_v6', true);
+        update_option('dprd_rules_flushed_v7', true);
     }
 }
 add_action('init', 'dprd_custom_rewrite_rules', 20);

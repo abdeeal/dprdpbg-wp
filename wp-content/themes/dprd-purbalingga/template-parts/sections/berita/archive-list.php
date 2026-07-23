@@ -63,8 +63,7 @@ $query = new WP_Query($args);
                     $img_url = get_template_directory_uri() . '/assets/images/default-berita.jpg';
                 }
                 
-                // Format URL: /berita/[slug]-[id]/
-                $permalink = home_url('/berita/' . $slug . '-' . $post_id . '/');
+                $permalink = get_permalink($post_id);
             ?>
                 <a href="<?php echo esc_url($permalink); ?>" class="group flex flex-col w-full cursor-pointer">
                     <div class="relative w-full aspect-[16/10] overflow-hidden mb-4 rounded-md">
