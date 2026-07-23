@@ -521,4 +521,10 @@ add_action('template_redirect', function() {
         }
     }
 });
+
+// =============================================================================
+// KEAMANAN (SECURITY) & FORM RESERVASI
+// =============================================================================
+require get_template_directory() . '/inc/security-reservasi.php';
+
 
