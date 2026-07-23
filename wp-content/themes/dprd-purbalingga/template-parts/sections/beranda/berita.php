@@ -88,6 +88,7 @@ $recent_query = new WP_Query($recent_args);
                         src="<?php echo esc_url($img_url); ?>"
                         alt="<?php echo esc_attr($featured_post->post_title); ?>"
                         class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
                     />
                 </div>
                 <div class="flex gap-4 items-center text-xs sm:text-sm text-body-secondary font-mono mb-3 ">
@@ -124,6 +125,7 @@ $recent_query = new WP_Query($recent_args);
                                     src="<?php echo esc_url($r_img_url); ?>"
                                     alt="<?php the_title_attribute(); ?>"
                                     class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                                    loading="lazy"
                                 />
                             </div>
                             <div class="flex flex-col">

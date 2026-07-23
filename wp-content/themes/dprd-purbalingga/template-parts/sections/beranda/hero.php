@@ -28,6 +28,9 @@ $stats_periode_akhir = get_option('dprd_hero_stats_periode_akhir', '2029');
                 src="<?php echo esc_url($hero_bg_url); ?>"
                 alt="Gedung DPRD Purbalingga"
                 class="w-full h-full object-cover object-bottom lg:object-center"
+                fetchpriority="high"
+                loading="eager"
+                decoding="sync"
             />
             <!-- Gradient Overlay -->
             <div class="absolute inset-0 bg-gradient-to-t from-[#251818]/95 to-[#251818]/10 via-[#251818]/50 z-10 pointer-events-none"></div>

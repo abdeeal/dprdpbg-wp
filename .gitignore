@@ -14,8 +14,9 @@ wp-config.php
 wp-content/aiven-ca.pem
 *.pem
 
-# Uploads & media (biasanya tidak perlu di-version-control)
-wp-content/uploads/
+# Uploads & media (biasanya tidak perlu di-version-control, 
+# TAPI dibuka sementara selama masa migrasi agar tim bisa berbagi foto & PDF)
+# wp-content/uploads/
 
 # Cache & backup plugin
 wp-content/cache/

@@ -145,6 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         src="${item.image}" 
                         alt="${item.title}" 
                         class="object-cover w-full h-full transition-transform duration-500"
+                        loading="lazy"
                     />
                     <div class="absolute inset-0 bg-black/50 opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6 md:p-8 card-overlay">
                         <h3 class="text-white font-display text-lg md:text-xl text-center leading-snug">

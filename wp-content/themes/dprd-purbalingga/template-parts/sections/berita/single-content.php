@@ -78,7 +78,7 @@ if (!empty($additional_images) || !empty($additional_quotes)) {
                 $image_html = '
                 <figure class="my-10 w-full">
                     <div class="relative w-full aspect-[16/9] overflow-hidden rounded-card mb-3">
-                        <img src="' . esc_url($add_img_url) . '" class="object-cover w-full h-full" alt="Foto Tambahan" />
+                        <img src="' . esc_url($add_img_url) . '" class="object-cover w-full h-full" alt="Foto Tambahan" loading="lazy" />
                     </div>';
                 if (!empty($caption)) {
                     $image_html .= '<figcaption class="text-center font-sans text-xs md:text-[13px] text-body-secondary">' . esc_html($caption) . '</figcaption>';
@@ -167,6 +167,9 @@ $recent_news_posts = get_posts([
                     src="<?php echo esc_url($img_url); ?>" 
                     alt="<?php echo esc_attr($title); ?>"
                     class="object-cover w-full h-full"
+                    fetchpriority="high"
+                    loading="eager"
+                    decoding="sync"
                 />
             </div>
             <?php if (!empty($image_caption)) : ?>
@@ -279,6 +282,7 @@ $recent_news_posts = get_posts([
                                 src="<?php echo esc_url($r_img); ?>" 
                                 alt="<?php echo esc_attr($r_title); ?>"
                                 class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                                loading="lazy"
                             />
                         </div>
                         <div class="flex flex-col justify-center">
