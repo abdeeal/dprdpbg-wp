@@ -1,9 +1,9 @@
 # Progress Pekerjaan Aji — Migrasi Next.js ke WordPress
-Dokumen ini mencatat daftar tugas bagian **Aji** (SAKIP, Propemperda, Tokoh Sejarah, dan Selayang Pandang) yang dimulai dari **Fase 4** sesuai dengan panduan `Migrassion Next to WP.md` yang telah diselesaikan hari ini.
+Dokumen ini mencatat daftar tugas bagian **Aji** (SAKIP, Propemperda, Tokoh Sejarah, Selayang Pandang, PPID, Mega Menu Navbar, dan Reservasi Kunjungan Kerja) yang dimulai dari **Fase 4** hingga **Fase 7** sesuai dengan panduan `AGENTS.md`.
 
 ---
 
-## ## Fase 4 — Convert Komponen → PHP Template Parts
+## Fase 4 — Convert Komponen → PHP Template Parts
 
 Pada fase ini, komponen-komponen React/Next.js telah berhasil dikonversi menjadi berkas PHP Template Parts yang dinamis:
 
@@ -68,7 +68,7 @@ Mengerjakan halaman **PPID** (`/ppid`) agar 1:1 sesuai dengan Vercel `https://dp
 
 ### Fase 2 — Content Model PPID (Custom Meta Box & Data Importer)
 
-- [x] **Upgrade Meta Box PPID** — Menulis ulang [inc/meta-boxes/ppid.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/inc/meta-boxes/ppid.php) agar mendukung field `description` (subtitle akordion) dan repeater `documents_json` (Judul Dokumen + Media Library PDF Uploader).
+- [x] **Upgrade Meta Box PPID** — Menulis ulang [inc/meta-boxes/ppid.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/inc/meta-boxes/ppid.php) agar mendukung field `description` (subtitle akordion) dan repeater `documents_json` (Judul Dokumen + Media Library PDF Uploader).
 - [x] **Auto-Import 6 Data Default PPID** — Menambahkan importer di `inc/insert-default-data.php` (SK PPID, Informasi Publik, Permohonan Informasi, Serta Merta, Setiap Saat, Berkala).
 
 ### Fase 4 — Konversi Template Halaman PPID
@@ -78,4 +78,23 @@ Mengerjakan halaman **PPID** (`/ppid`) agar 1:1 sesuai dengan Vercel `https://dp
 ### Fase 5 — Interaktivitas Client-Side Accordion PPID
 
 - [x] **Vanilla JS Exclusive Accordion** — Logika eksklusif 1 terbuka di `src/js/main.js` dengan animasi `scrollHeight` 400ms `cubic-bezier(0.25, 1, 0.5, 1)`.
-- [x] **Kompilasi Aset Vite/Tailwind** — Menjalankan `npm run build` berhasil menghasilkan `main.css` (29.98 kB) dan `main.js` (6.81 kB).
+- [x] **Kompilasi Aset Vite/Tailwind** — Menjalankan `npm run build` berhasil menghasilkan `main.css` dan `main.js`.
+
+---
+
+## Fase 7 — Form Reservasi Kunjungan Kerja (23 Juli 2026)
+
+Membangun sistem pengajuan permohonan reservasi kunjungan dinas/studi banding lengkap dari frontend hingga backend:
+
+- [x] **Custom Post Type `reservasi`** — Meregistrasikan CPT `reservasi` di [inc/post-types.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/inc/post-types.php) untuk menyimpan permohonan masuk secara terstruktur di Database WordPress.
+- [x] **Handler Form Submission & PDF Uploader (`inc/backend-reservasi.php`)** — Mengolah data permohonan via AJAX (`dprd_submit_reservasi`), validasi file PDF Surat Permohonan (max 5MB), dan penyimpanan ke database `wp_posts` & `wp_postmeta`.
+- [x] **Sinkronisasi Real-time ke Google Sheets Webhook** — Integrasi otomatis via `wp_remote_post()` ke Google Apps Script Webhook sehingga data permohonan baru langsung muncul sebagai baris baru di Google Sheets secara live.
+- [x] **Form UI & Prefix WhatsApp (`+62`)** — Memperbarui [page-reservasi.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/page-reservasi.php) dengan input nomor WhatsApp ber-prefix `🇮🇩 +62`, filter angka murni, serta tanggal minimal hari ini.
+- [x] **Strict Validation Rules**:
+  - Validasi Email wajib berformat valid (`is_email` & ada `@`).
+  - Validasi WhatsApp 9–13 digit angka murni setelah prefix `+62`.
+  - Validasi Tanggal kunjungan tidak boleh masa lalu & khusus hari kerja (Senin–Jumat).
+  - Validasi Jumlah Peserta minimal 1 orang.
+  - Validasi Berkas Surat Permohonan wajib `.pdf` & max 5MB.
+- [x] **Custom Modal Popup Alert (Design System 1:1 Vercel)** — Mengganti alert browser standar dengan Modal Dialog Popup UI lengkap dengan backdrop blur, animasi scale 95%→100%, serta ikon Lucide SVG (`CheckCircle2` hijau untuk sukses, `AlertTriangle` merah untuk gagal).
+- [x] **Detail Meta Box Dashboard Admin** — Menampilkan seluruh detail instansi, email, tanggal permohonan, tombol langsung ke WhatsApp, status permohonan (*Pending / Disetujui / Ditolak*), dan tombol unduh PDF di WordPress Admin.

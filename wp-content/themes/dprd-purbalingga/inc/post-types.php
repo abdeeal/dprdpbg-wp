@@ -62,6 +62,12 @@ function dprd_register_post_types() {
             'supports' => ['title', 'thumbnail'],
             'icon'     => 'dashicons-welcome-learn-more',
         ],
+        'reservasi' => [
+            'singular' => 'Reservasi',
+            'plural'   => 'Reservasi Kunjungan',
+            'supports' => ['title'],
+            'icon'     => 'dashicons-id-alt',
+        ],
     ];
 
     foreach ($cpts as $slug => $cpt) {

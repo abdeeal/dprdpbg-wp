@@ -33,9 +33,9 @@ get_header();
 
         <!-- Form Card Container -->
         <div class="bg-white border border-line rounded-card p-6 md:p-10 shadow-sm">
-            <form id="dprd-reservasi-form" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" enctype="multipart/form-data" class="space-y-12">
-                <input type="hidden" name="action" value="submit_reservasi">
-                <?php wp_nonce_field('dprd_submit_reservasi_action', 'dprd_reservasi_nonce'); ?>
+            <form id="dprd-reservasi-form" method="post" enctype="multipart/form-data" class="space-y-12">
+                <?php wp_nonce_field('dprd_reservasi_nonce', 'dprd_reservasi_security'); ?>
+                <input type="hidden" name="action" value="dprd_submit_reservasi">
                 
                 <!-- Section 1: Informasi Instansi -->
                 <div>
@@ -76,7 +76,7 @@ get_header();
                             <label class="block font-sans text-[12px] text-ink font-medium mb-1.5" for="res_tanggal">
                                 Rencana Tanggal Kunjungan <span class="text-primary">*</span>
                             </label>
-                            <input type="date" id="res_tanggal" name="res_tanggal" required class="w-full border border-line rounded-button px-4 py-2.5 font-sans text-[14px] text-body-secondary focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 uppercase"/>
+                            <input type="date" id="res_tanggal" name="res_tanggal" min="<?php echo date('Y-m-d'); ?>" required class="w-full border border-line rounded-button px-4 py-2.5 font-sans text-[14px] text-body-secondary focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 uppercase"/>
                             <p class="font-sans text-[11px] text-body-secondary mt-1.5 italic">Kunjungan kerja hanya dilayani Senin - Jumat</p>
                         </div>
                         <div>
@@ -129,7 +129,12 @@ get_header();
                                 <label class="block font-sans text-[12px] text-ink font-medium mb-1.5" for="res_wa">
                                     Narahubung (WhatsApp) <span class="text-primary">*</span>
                                 </label>
-                                <input type="tel" id="res_wa" name="res_wa" required placeholder="08xx-xxxx-xxxx" class="w-full border border-line rounded-button px-4 py-2.5 font-sans text-[14px] text-ink placeholder:text-body-secondary/60 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50"/>
+                                <div class="flex items-center border border-line rounded-button overflow-hidden focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 h-[42px] bg-white">
+                                    <span class="bg-surface px-3 h-full flex items-center justify-center font-mono text-[13px] text-ink font-bold border-r border-line shrink-0 select-none">
+                                        🇮🇩 +62
+                                    </span>
+                                    <input type="tel" id="res_wa" name="res_wa" required placeholder="81234567890" maxlength="13" class="w-full px-3 h-full font-sans text-[14px] text-ink placeholder:text-body-secondary/60 outline-none bg-transparent"/>
+                                </div>
                             </div>
                         </div>
 
@@ -148,13 +153,174 @@ get_header();
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-sans font-medium text-[15px] py-3.5 rounded-button transition-colors shadow-sm cursor-pointer border-0 outline-none">
-                    Ajukan Reservasi
+                <button type="submit" id="dprd-submit-btn" class="w-full bg-primary hover:bg-primary/90 text-white font-sans font-medium text-[15px] py-3.5 rounded-button transition-all duration-300 shadow-sm cursor-pointer border-0 outline-none flex items-center justify-center gap-2">
+                    <span>Ajukan Reservasi</span>
                 </button>
             </form>
         </div>
     </div>
 </div>
+
+<!-- Modal Popup Alert Custom (Premium Design System 1:1 Vercel) -->
+<div id="dprd-modal-overlay" class="fixed inset-0 bg-ink/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="dprd-modal-card" class="bg-white border border-line rounded-card max-w-md w-full p-6 md:p-8 shadow-2xl transform scale-95 opacity-0 transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col items-center text-center">
+        <!-- Icon Container -->
+        <div id="dprd-modal-icon-bg" class="w-16 h-16 rounded-full flex items-center justify-center mb-5 transition-transform duration-500 scale-0">
+            <div id="dprd-modal-icon"></div>
+        </div>
+
+        <!-- Title & Message -->
+        <h3 id="dprd-modal-title" class="font-display font-bold text-xl md:text-2xl text-ink mb-2"></h3>
+        <p id="dprd-modal-message" class="font-sans text-[14px] text-body-secondary leading-relaxed mb-6"></p>
+
+        <!-- Action Button -->
+        <button id="dprd-modal-close-btn" type="button" class="w-full bg-primary hover:bg-primary/90 text-white font-sans font-medium text-[14px] py-3 rounded-button transition-colors cursor-pointer border-0 outline-none">
+            Tutup
+        </button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form          = document.getElementById('dprd-reservasi-form');
+    const submitBtn     = document.getElementById('dprd-submit-btn');
+    const uploadBox     = document.getElementById('dprd-upload-box');
+    const fileInput     = document.getElementById('res_file_surat');
+    const uploadText    = document.getElementById('dprd-upload-text');
+    const btnMinus      = document.getElementById('dprd-jumlah-minus');
+    const btnPlus       = document.getElementById('dprd-jumlah-plus');
+    const inputCount    = document.getElementById('res_jumlah_peserta');
+
+    // Modal UI Elements
+    const modalOverlay  = document.getElementById('dprd-modal-overlay');
+    const modalCard     = document.getElementById('dprd-modal-card');
+    const modalIconBg   = document.getElementById('dprd-modal-icon-bg');
+    const modalIcon     = document.getElementById('dprd-modal-icon');
+    const modalTitle    = document.getElementById('dprd-modal-title');
+    const modalMessage  = document.getElementById('dprd-modal-message');
+    const modalCloseBtn = document.getElementById('dprd-modal-close-btn');
+
+    function openModal(isSuccess, title, message) {
+        modalTitle.textContent   = title;
+        modalMessage.textContent = message;
+
+        if (isSuccess) {
+            modalIconBg.className = 'w-16 h-16 rounded-full flex items-center justify-center mb-5 bg-emerald-50 text-emerald-600 transition-transform duration-500 scale-100';
+            modalIcon.innerHTML   = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle-2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`;
+            modalCloseBtn.className = 'w-full bg-emerald-600 hover:bg-emerald-700 text-white font-sans font-medium text-[14px] py-3 rounded-button transition-colors cursor-pointer border-0 outline-none';
+        } else {
+            modalIconBg.className = 'w-16 h-16 rounded-full flex items-center justify-center mb-5 bg-rose-50 text-rose-600 transition-transform duration-500 scale-100';
+            modalIcon.innerHTML   = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-triangle"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+            modalCloseBtn.className = 'w-full bg-primary hover:bg-primary/90 text-white font-sans font-medium text-[14px] py-3 rounded-button transition-colors cursor-pointer border-0 outline-none';
+        }
+
+        modalOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        modalOverlay.classList.add('opacity-100');
+        
+        setTimeout(() => {
+            modalCard.classList.remove('scale-95', 'opacity-0');
+            modalCard.classList.add('scale-100', 'opacity-100');
+        }, 50);
+    }
+
+    function closeModal() {
+        modalCard.classList.remove('scale-100', 'opacity-100');
+        modalCard.classList.add('scale-95', 'opacity-0');
+        
+        setTimeout(() => {
+            modalOverlay.classList.remove('opacity-100');
+            modalOverlay.classList.add('opacity-0', 'pointer-events-none');
+        }, 200);
+    }
+
+    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+    }
+
+    // WhatsApp Input Numeric & Prefix Formatter
+    const waInput = document.getElementById('res_wa');
+    if (waInput) {
+        waInput.addEventListener('input', function() {
+            let val = this.value.replace(/[^0-9]/g, '');
+            if (val.startsWith('0')) {
+                val = val.substring(1);
+            } else if (val.startsWith('62')) {
+                val = val.substring(2);
+            }
+            this.value = val;
+        });
+    }
+
+    // Number Stepper Handler
+    if (btnMinus && btnPlus && inputCount) {
+        btnMinus.addEventListener('click', () => {
+            let val = parseInt(inputCount.value) || 1;
+            if (val > 1) inputCount.value = val - 1;
+        });
+        btnPlus.addEventListener('click', () => {
+            let val = parseInt(inputCount.value) || 1;
+            inputCount.value = val + 1;
+        });
+    }
+
+    // Drag and Drop File Handler
+    if (uploadBox && fileInput) {
+        uploadBox.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                uploadText.innerHTML = '<strong class="text-primary">📄 File Terpilih: ' + fileInput.files[0].name + '</strong>';
+            }
+        });
+    }
+
+    // AJAX Submission
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const nonceVal = document.getElementById('dprd_reservasi_security')?.value || '';
+            formData.append('dprd_reservasi_security', nonceVal);
+            formData.append('security', nonceVal);
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Mengirim Permohonan...</span>
+            `;
+
+            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Ajukan Reservasi</span>';
+
+                if (data.success) {
+                    openModal(true, 'Permohonan Berhasil Dikirim!', data.data.message);
+                    form.reset();
+                    if (uploadText) uploadText.innerHTML = 'Klik atau seret file PDF ke sini';
+                } else {
+                    openModal(false, 'Gagal Mengirim Permohonan', data.data?.message || 'Terjadi kesalahan pada sistem.');
+                }
+            })
+            .catch(err => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Ajukan Reservasi</span>';
+                openModal(false, 'Koneksi Terputus', 'Terjadi kesalahan jaringan. Silakan periksa koneksi internet Anda.');
+            });
+        });
+    }
+});
+</script>
 
 <?php
 get_footer();
