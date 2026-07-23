@@ -43,7 +43,11 @@ $galeri_query = new WP_Query([
                             class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700"
                             loading="lazy"
                         />
-                        <div class="absolute inset-0 bg-ink/0 group-hover:bg-ink/10 transition-colors duration-300"></div>
+                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6 text-center">
+                            <h3 class="text-white font-display text-base md:text-lg leading-snug">
+                                <?php echo esc_html(get_the_title($post_id)); ?>
+                            </h3>
+                        </div>
                     </div>
                 <?php 
                 endwhile;
