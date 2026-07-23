@@ -725,33 +725,22 @@ document.addEventListener('DOMContentLoaded', () => {
                             const animate = (currentTime) => {
                                 const elapsed = currentTime - startTime;
                                 const progress = Math.min(elapsed / duration, 1);
-                                const easedProgress = easePower2Out(progress);
-                                
-                                const currentVal1 = Math.floor(start1 + (targetStart - start1) * easedProgress);
-                                const currentVal2 = Math.floor(start2 + (targetEnd - start2) * easedProgress);
-                                
-                                el.textContent = currentVal1 + '-' + currentVal2;
-                                
-                                if (progress < 1) {
-                                    requestAnimationFrame(animate);
-                                } else {
-                                    el.textContent = targetStart + '-' + targetEnd;
-                                }
-                            };
-                            requestAnimationFrame(animate);
-                        }
-                    }
-                }
-            });
-        }, {
-            threshold: 0,
-            rootMargin: '0px 0px -10% 0px' // Memicu saat elemen berada 10% dari bawah viewport (mirip GSAP top 90%)
+        fadeElements.forEach(el => {
+            const direction = el.getAttribute('data-direction') || 'up';
+            const distance = el.getAttribute('data-distance') || '40';
+            
+            let x = 0, y = 0;
+            if (direction === 'up') y = distance;
+            else if (direction === 'down') y = -distance;
+            else if (direction === 'left') x = distance;
+            else if (direction === 'right') x = -distance;
+
+            // Initial state
+            el.style.opacity = '0';
+            el.style.transform = `translate(${x}px, ${y}px)`;
+            
+            fadeObserver.observe(el);
         });
-
-        counters.forEach(counter => observer.observe(counter));
-
     }
 
 });
-
-

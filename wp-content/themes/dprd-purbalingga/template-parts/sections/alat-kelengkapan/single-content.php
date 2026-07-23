@@ -565,7 +565,7 @@ get_template_part('template-parts/ui/breadcrumbs', null, [
                                 <!-- Divider line -->
                                 <div class="w-full h-px bg-body/30 mb-3"></div>
                                 
-                                <span class="font-sans text-sm md:text-[15px] font-semibold text-primary mb-4 text-center">
+                                <span class="font-display text-sm md:text-[15px]  mb-4 text-center">
                                     <?php echo esc_html($member['position']); ?>
                                 </span>
                                 
