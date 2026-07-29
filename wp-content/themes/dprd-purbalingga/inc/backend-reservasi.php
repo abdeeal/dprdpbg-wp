@@ -201,6 +201,21 @@ function dprd_handle_reservasi_submit() {
     }
     $file_url = $uploaded['url'];
 
+    // Konversi file PDF menjadi Base64
+    $local_file_path = $uploaded['file']; // Path absolut di server
+    $file_url = $uploaded['url']; // URL sementara
+    
+    $file_base64 = '';
+    $file_mime = $uploaded['type'] ?? 'application/pdf';
+    $file_name = basename($local_file_path);
+    
+    if (file_exists($local_file_path)) {
+        $file_content = file_get_contents($local_file_path);
+        if ($file_content !== false) {
+            $file_base64 = base64_encode($file_content);
+        }
+    }
+
     // 7. Simpan ke Database WordPress (CPT reservasi)
     $post_title = $nama_instansi . ' - ' . date('d M Y', $timestamp_tanggal);
     $post_id = wp_insert_post([
@@ -211,10 +226,14 @@ function dprd_handle_reservasi_submit() {
     ]);
 
     if (!$post_id || is_wp_error($post_id)) {
+        // Hapus file sementara jika post gagal dibuat
+        if (file_exists($local_file_path)) {
+            wp_delete_file($local_file_path);
+        }
         wp_send_json_error(['message' => 'Gagal menyimpan reservasi ke database. Silakan coba lagi.']);
     }
 
-    // Simpan Post Meta
+    // Simpan Post Meta sementara (URL lokal), nanti diupdate jika berhasil di-upload ke Drive
     update_post_meta($post_id, 'res_email', $email);
     update_post_meta($post_id, 'res_nama_instansi', $nama_instansi);
     update_post_meta($post_id, 'res_alamat_instansi', $alamat_instansi);
@@ -228,7 +247,10 @@ function dprd_handle_reservasi_submit() {
     update_post_meta($post_id, 'res_status', 'Pending');
 
     // 8. Kirim Real-time ke Google Sheets Webhook
-    $webhook_url = get_option('dprd_google_sheets_webhook_url', 'https://script.google.com/macros/s/AKfycbxxF2-PFfYxfm6FDB5yOSHMYuNp9DSxNsTF5tcr-680wZmkLAUyLxaWjrKbp_SyO2-Z/exec');
+    // 8. Kirim Real-time ke Google Sheets Webhook dan Upload ke Google Drive
+    // Fallback menggunakan webhook baru pengguna
+    $webhook_url = get_option('dprd_google_sheets_webhook_url', 'https://script.google.com/macros/s/AKfycbyP3sA4xbSGiY3dxyGsM1XTKo-aFA-o2vkBOQaYzlFt8gOWnynACCtMrn6i319wvtAicA/exec');
+    
     if (!empty($webhook_url)) {
         $sheet_data = [
             'timestamp'        => date('Y-m-d H:i:s'),
@@ -241,19 +263,38 @@ function dprd_handle_reservasi_submit() {
             'jabatan_pimpinan' => $jabatan_pimpinan,
             'jumlah_peserta'   => $jumlah_peserta,
             'wa'               => "'" . $formatted_wa, // Apostrof memaksa Google Sheets membaca sebagai teks, bukan formula
-            'file_url'         => $file_url,
+            'file_url'         => $file_url, // URL fallback
+            'file_base64'      => $file_base64,
+            'file_mime'        => $file_mime,
+            'file_name'        => $file_name,
             'status'           => 'Pending'
         ];
 
-        wp_remote_post($webhook_url, [
+        // Karena mengunggah file 5MB butuh waktu, timeout dinaikkan jadi 60s dan dibuat blocking
+        $response = wp_remote_post($webhook_url, [
             'method'      => 'POST',
-            'timeout'     => 10,
+            'timeout'     => 60,
             'redirection' => 5,
             'httpversion' => '1.1',
-            'blocking'    => false,
+            'blocking'    => true, // Harus blocking untuk dapat response URL Drive
             'headers'     => ['Content-Type' => 'application/json; charset=utf-8'],
             'body'        => wp_json_encode($sheet_data),
         ]);
+
+        if (!is_wp_error($response)) {
+            $body = wp_remote_retrieve_body($response);
+            $json_resp = json_decode($body, true);
+
+            // Jika Google Drive mengembalikan URL, update meta di WordPress
+            if (!empty($json_resp['drive_url'])) {
+                update_post_meta($post_id, 'res_file_url', $json_resp['drive_url']);
+            }
+        }
+    }
+
+    // Hapus file fisik dari server WordPress untuk menghemat memori (penyimpanan)
+    if (file_exists($local_file_path)) {
+        wp_delete_file($local_file_path);
     }
 
     wp_send_json_success(['message' => 'Permohonan reservasi kunjungan Anda berhasil dikirim dan tersimpan!']);
