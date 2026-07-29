@@ -49,6 +49,26 @@ function dprd_render_anggota_meta_box($post) {
             frame.on('select', function() {
                 const attachment = frame.state().get('selection').first().toJSON();
                 
+                // Auto-fill nama anggota dari nama file foto
+                const fileName = attachment.filename || attachment.title || '';
+                if (fileName) {
+                    const baseName = fileName.replace(/\.[^/.]+$/, "");
+                    const cleanName = baseName.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    
+                    if (window.wp && wp.data && wp.data.dispatch && wp.data.select) {
+                        const currentTitle = wp.data.select('core/editor').getEditedPostAttribute('title');
+                        if (!currentTitle || currentTitle.trim() === '') {
+                            wp.data.dispatch('core/editor').editPost({ title: cleanName });
+                        }
+                    } else {
+                        const titleInput = document.getElementById('title');
+                        if (titleInput && titleInput.value.trim() === '') {
+                            titleInput.value = cleanName;
+                            titleInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        }
+                    }
+                }
+                
                 if (typeof Cropper === 'undefined') {
                     alert('Cropper.js belum dimuat. Mohon muat ulang halaman.');
                     return;
