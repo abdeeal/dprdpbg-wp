@@ -99,3 +99,22 @@ Membangun sistem pengajuan permohonan reservasi kunjungan dinas/studi banding le
   - Validasi Berkas Surat Permohonan wajib `.pdf` & max 5MB.
 - [x] **Custom Modal Popup Alert (Premium UI)** — Mengganti alert browser standar dengan Modal khusus berdesain *clean* (font *regular*, deskripsi tidak *overflow*, dan tombol tutup transparan teks merah). Dilengkapi keyframe CSS *custom SVG animation* (*circle draw* + memunculkan centang *smooth* untuk sukses, dan animasi *shake* untuk error).
 - [x] **Detail Meta Box Dashboard Admin** — Menampilkan seluruh detail instansi, email, tanggal permohonan, tombol langsung ke WhatsApp, status permohonan (*Pending / Disetujui / Ditolak*), dan tombol unduh PDF di WordPress Admin.
+
+---
+
+## Peningkatan Reservasi Kunjungan — Google Drive Cloud Upload & Auto Clean-up (30 Juli 2026)
+
+- [x] **Upload Otomatis ke Google Drive** — Mengubah sistem penyimpanan berkas PDF Surat Permohonan dari local server storage menjadi upload langsung ke Google Drive via konversi Base64 dan Google Apps Script (GAS) Webhook.
+- [x] **Pembersihan Otomatis Storage Server (`unlink`)** — File PDF temporary yang diunggah pengunjung ke server WordPress akan langsung dihapus otomatis (`unlink()`) sesaat setelah berhasil diunggah ke Google Drive, sehingga penyimpanan server WordPress tidak akan penuh.
+- [x] **Pencatatan Link Google Drive Publik** — Mengolah balasan JSON dari Google Apps Script di [inc/backend-reservasi.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/inc/backend-reservasi.php) untuk mencatat URL unduhan Google Drive langsung ke Google Sheets dan ke post meta WordPress (`surat_permohonan_url`).
+
+---
+
+## Halaman Bagan Organisasi (30 Juli 2026)
+
+- [x] **Struktur URL & Hierarki Halaman** — Mengatur ulang slug halaman dan parent halaman di database WordPress menjadi `/sekretariat-dprd/struktur-organisasi/bagan-organisasi/`.
+- [x] **Bagan Organisasi SVG Presisi Tinggi 1:1** — Membuat template [page-bagan-organisasi.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/page-bagan-organisasi.php) dengan diagram struktur pohon (*SEKRETARIS DPRD*, *KELOMPOK JABATAN FUNGSIONAL* dengan kisi 2x7, *BAGIAN UMUM*, *BAGIAN PERSIDANGAN*, dan 6 *SUBBAGIAN*) berbasis SVG & HTML/Tailwind CSS yang 100% presisi dan identik dengan dokumen fisik asli.
+- [x] **Responsivitas Mobile & Tablet** — Menambahkan *container wrapper* `overflow-x-auto hide-scrollbar` dengan min-width 950px agar bagan tetap utuh, rapi, dan dapat di-scroll horizontal tanpa terpotong di layar HP/Tab.
+- [x] **Penyelarasan Tema & Layout Visual** — Menggunakan font sistem `Plus Jakarta Sans`, menyelaraskan breadcrumbs bawaan tema (`template-parts/ui/breadcrumbs`), warna font (`text-primary` untuk header, `text-ink` dan `text-body` untuk bagan), dan menghilangkan border outer card agar diagram menyatu transparan dengan latar belakang website.
+- [x] **Custom Meta Box Admin (Fase 2)** — Membuat [inc/meta-boxes/bagan-organisasi.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/inc/meta-boxes/bagan-organisasi.php) untuk memberikan kolom unggahan file gambar/PDF asli di editor WordPress Admin, yang secara otomatis menampilkan tombol *"Unduh Bagan Organisasi (Gambar)"* di bagian bawah halaman depan.
+
