@@ -115,6 +115,11 @@ add_action('init', 'dprd_register_post_types');
  */
 function dprd_custom_rewrite_rules() {
     add_rewrite_rule(
+        '^sekretariat-dprd/struktur-organisasi/pejabat/?$',
+        'index.php?pagename=pejabat-struktural',
+        'top'
+    );
+    add_rewrite_rule(
         '^profil-dprd/komisi/([1-4])/?$',
         'index.php?alat-kelengkapan=komisi&komisi_num=$matches[1]',
         'top'

@@ -856,4 +856,93 @@ add_action('init', function() {
     }
 });
 
+// --- IMPORT DEFAULT ANGGOTA & PEJABAT STRUKTURAL SEKRETARIAT DPRD ---
+add_action('init', function() {
+    if (!get_option('dprd_default_sekretariat_pejabat_imported_v1')) {
+        if (!function_exists('dprd_import_setup_anggota_sekretariat')) {
+            function dprd_import_setup_anggota_sekretariat($name) {
+                $posts = get_posts([
+                    'post_type'   => 'anggota-sekretariat',
+                    'title'       => $name,
+                    'post_status' => 'any',
+                    'numberposts' => 1
+                ]);
+
+                if (empty($posts)) {
+                    $post_id = wp_insert_post([
+                        'post_title'   => $name,
+                        'post_status'  => 'publish',
+                        'post_type'    => 'anggota-sekretariat',
+                    ]);
+                } else {
+                    $post_id = $posts[0]->ID;
+                }
+                return $post_id;
+            }
+        }
+
+        // Insert Anggota Sekretariat Dummy
+        $id_sekwan = dprd_import_setup_anggota_sekretariat('Drs. Edi Suryono, M.Si.');
+        $id_kabag1 = dprd_import_setup_anggota_sekretariat('H. Tri Gunawan, S.H., M.H.');
+        $id_kabag2 = dprd_import_setup_anggota_sekretariat('Bambang Triono, S.E., M.Si.');
+        $id_kabag3 = dprd_import_setup_anggota_sekretariat('Siti Nurjanah, S.Sos.');
+
+        $id_kasubag1 = dprd_import_setup_anggota_sekretariat('Rina Widyastuti, S.IP.');
+        $id_kasubag2 = dprd_import_setup_anggota_sekretariat('Agus Setiawan, S.E.');
+        $id_kasubag3 = dprd_import_setup_anggota_sekretariat('Dwi Cahyono, S.H.');
+        $id_kasubag4 = dprd_import_setup_anggota_sekretariat('Eko Prasetyo, S.STP.');
+
+        // Build Pejabat Struktural Multi-Level JSON
+        $pejabat_tree = [
+            [
+                'jabatan' => 'Sekretaris DPRD',
+                'anggota_id' => (string) $id_sekwan,
+                'children' => [
+                    [
+                        'jabatan' => 'Kepala Bagian Persidangan dan Perundang-undangan',
+                        'anggota_id' => (string) $id_kabag1,
+                        'children' => [
+                            [
+                                'jabatan' => 'Kasubag Perundang-undangan',
+                                'anggota_id' => (string) $id_kasubag1,
+                                'children' => []
+                            ],
+                            [
+                                'jabatan' => 'Kasubag Persidangan & Risalah',
+                                'anggota_id' => (string) $id_kasubag2,
+                                'children' => []
+                            ]
+                        ]
+                    ],
+                    [
+                        'jabatan' => 'Kepala Bagian Keuangan',
+                        'anggota_id' => (string) $id_kabag2,
+                        'children' => [
+                            [
+                                'jabatan' => 'Kasubag Perencanaan & Keuangan',
+                                'anggota_id' => (string) $id_kasubag3,
+                                'children' => []
+                            ]
+                        ]
+                    ],
+                    [
+                        'jabatan' => 'Kepala Bagian Umum & Humas',
+                        'anggota_id' => (string) $id_kabag3,
+                        'children' => [
+                            [
+                                'jabatan' => 'Kasubag Humas & Protokol',
+                                'anggota_id' => (string) $id_kasubag4,
+                                'children' => []
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        update_option('dprd_pejabat_struktural_json', wp_json_encode($pejabat_tree));
+        update_option('dprd_default_sekretariat_pejabat_imported_v1', true);
+    }
+});
+
 
