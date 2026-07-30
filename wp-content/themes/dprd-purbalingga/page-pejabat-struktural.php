@@ -45,7 +45,7 @@ function dprd_render_pejabat_card($node) {
         <div class="w-full h-px bg-body/30 mb-3"></div>
 
         <!-- Jabatan -->
-        <span class="font-display text-sm md:text-[15px] mb-4 text-center text-body-secondary">
+        <span class="font-display text-sm md:text-[15px] mb-4 text-center text-body-secondary h-[2.6em] min-h-[2.6em] flex items-center justify-center">
             <?php echo esc_html($position); ?>
         </span>
 
