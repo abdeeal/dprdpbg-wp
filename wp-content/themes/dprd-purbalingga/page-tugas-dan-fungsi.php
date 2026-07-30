@@ -66,7 +66,7 @@ $fungsi_list = [
             <div class="grid grid-cols-1 md:grid-cols-2 gap-y-12 gap-x-16">
                 <?php foreach ($fungsi_list as $index => $fungsi) : ?>
                     <div class="flex flex-col items-start gap-4">
-                        <div class="w-12 h-12 flex items-center justify-center bg-[#82111A] text-white font-sans font-semibold text-lg md:text-xl">
+                        <div class="w-12 h-14 flex items-center justify-center bg-[#82111A] text-white font-sans font-semibold text-xl md:text-2xl shadow-sm">
                             <?php echo esc_html($index + 1); ?>
                         </div>
                         <p class="font-sans text-[15px] md:text-[16px] text-body-secondary leading-relaxed">
