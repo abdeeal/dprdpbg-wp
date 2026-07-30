@@ -22,40 +22,58 @@ $pejabat_tree = json_decode($raw_json, true);
 if (!is_array($pejabat_tree)) $pejabat_tree = [];
 
 /**
- * Helper rekursif untuk mengumpulkan node pejabat per depth level
+ * Helper untuk merender node pejabat dan anak-anaknya secara rekursif (berdasarkan kepemilikan/hierarki)
  */
-function dprd_flatten_pejabat_tree($nodes, $depth = 0, &$levels = []) {
-    if (!is_array($nodes)) return;
-    foreach ($nodes as $node) {
-        $anggota_id = isset($node['anggota_id']) ? intval($node['anggota_id']) : 0;
-        $name = $anggota_id ? get_the_title($anggota_id) : '—';
-        $position = isset($node['jabatan']) ? $node['jabatan'] : '';
+function dprd_render_pejabat_node($node, $level = 0) {
+    if (!is_array($node)) return;
 
-        $foto_diri = $anggota_id ? get_post_meta($anggota_id, 'foto_diri', true) : 0;
-        $image_url = $foto_diri ? wp_get_attachment_image_url(intval($foto_diri), 'large') : '';
-        if (empty($image_url)) {
-            $image_url = get_template_directory_uri() . '/assets/images/placeholder/avatar.png';
-        }
+    $anggota_id = isset($node['anggota_id']) ? intval($node['anggota_id']) : 0;
+    $name = $anggota_id ? get_the_title($anggota_id) : '—';
+    $position = isset($node['jabatan']) ? $node['jabatan'] : '';
 
-        if (!isset($levels[$depth])) {
-            $levels[$depth] = [];
-        }
-
-        $levels[$depth][] = [
-            'name'     => $name,
-            'position' => $position,
-            'image'    => $image_url,
-        ];
-
-        if (!empty($node['children']) && is_array($node['children'])) {
-            dprd_flatten_pejabat_tree($node['children'], $depth + 1, $levels);
-        }
+    $foto_diri = $anggota_id ? get_post_meta($anggota_id, 'foto_diri', true) : 0;
+    $image_url = $foto_diri ? wp_get_attachment_image_url(intval($foto_diri), 'large') : '';
+    if (empty($image_url)) {
+        $image_url = get_template_directory_uri() . '/assets/images/placeholder/avatar.png';
     }
-}
 
-$grouped_levels = [];
-dprd_flatten_pejabat_tree($pejabat_tree, 0, $grouped_levels);
-ksort($grouped_levels);
+    $children = isset($node['children']) && is_array($node['children']) ? $node['children'] : [];
+    ?>
+    <div class="flex flex-col items-center w-full mb-12 last:mb-0">
+        <!-- Card Pejabat -->
+        <div class="w-full sm:w-[calc(50%-1.5rem)] md:w-[calc(33.333%-2.5rem)] max-w-[280px] flex flex-col items-center">
+            <!-- Nama Anggota/Pejabat -->
+            <h3 class="font-display text-lg md:text-[19px] font-normal text-body text-center mb-3 leading-snug h-[2.6em] min-h-[2.6em] flex items-center justify-center">
+                <?php echo esc_html($name); ?>
+            </h3>
+
+            <!-- Divider line -->
+            <div class="w-full h-px bg-body/30 mb-3"></div>
+
+            <!-- Jabatan -->
+            <span class="font-display text-sm md:text-[15px] mb-4 text-center text-body-secondary">
+                <?php echo esc_html($position); ?>
+            </span>
+
+            <!-- Foto Diri (3:4 Ratio) -->
+            <div class="relative w-full aspect-[3/4] rounded-sm overflow-hidden bg-surface shadow-sm border border-line/40">
+                <?php if ($image_url) : ?>
+                    <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($name); ?>" class="object-cover w-full h-full" loading="lazy">
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Render Sub-Jabatan / Children (Ditaruh sejajar langsung di bawahnya tanpa divider) -->
+        <?php if (!empty($children)) : ?>
+            <div class="w-full flex flex-wrap justify-center gap-x-6 gap-y-10 sm:gap-x-8 md:gap-x-12 mt-12">
+                <?php foreach ($children as $child) {
+                    dprd_render_pejabat_node($child, $level + 1);
+                } ?>
+            </div>
+        <?php endif; ?>
+    </div>
+    <?php
+}
 ?>
 
 <main id="primary" class="w-full bg-main min-h-screen pt-10 pb-24">
@@ -76,54 +94,12 @@ ksort($grouped_levels);
             </p>
         </div>
 
-        <!-- Members Grid Section (Fraksi-Fraksi Style) -->
-        <?php if (!empty($grouped_levels)) :
-            $sorted_levels = array_keys($grouped_levels);
-            ?>
-            <div class="flex flex-col mt-12 mb-16 max-w-4xl mx-auto w-full dprd-fade-in" data-direction="up" data-duration="0.8">
-                <?php
-                foreach ($sorted_levels as $index => $level_idx) :
-                    $lvl_members = $grouped_levels[$level_idx];
-                    $is_last_lvl = ($index === count($sorted_levels) - 1);
-                    ?>
-                    <div class="flex flex-col w-full">
-                        <!-- Grid Container -->
-                        <div class="flex flex-wrap justify-center gap-x-6 gap-y-10 sm:gap-x-8 md:gap-x-12 w-full">
-                            <?php foreach ($lvl_members as $member) : ?>
-                                <div class="w-full sm:w-[calc(50%-1.5rem)] md:w-[calc(33.333%-2.5rem)] max-w-[280px] flex justify-center">
-                                    <div class="flex flex-col items-center w-full">
-                                        <!-- Nama Anggota/Pejabat -->
-                                        <h3 class="font-display text-lg md:text-[19px] font-normal text-body text-center mb-3 leading-snug h-[2.6em] min-h-[2.6em] flex items-center justify-center">
-                                            <?php echo esc_html($member['name']); ?>
-                                        </h3>
-
-                                        <!-- Divider line -->
-                                        <div class="w-full h-px bg-body/30 mb-3"></div>
-
-                                        <!-- Jabatan -->
-                                        <span class="font-display text-sm md:text-[15px] mb-4 text-center text-body-secondary">
-                                            <?php echo esc_html($member['position']); ?>
-                                        </span>
-
-                                        <!-- Foto Diri (3:4 Ratio) -->
-                                        <div class="relative w-full aspect-[3/4] rounded-sm overflow-hidden bg-surface shadow-sm border border-line/40">
-                                            <?php if ($member['image']) : ?>
-                                                <img src="<?php echo esc_url($member['image']); ?>" alt="<?php echo esc_attr($member['name']); ?>" class="object-cover w-full h-full" loading="lazy">
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-
-                        <!-- Subtle separator line between levels -->
-                        <?php if (!$is_last_lvl) : ?>
-                            <div class="w-full flex justify-center my-12">
-                                <div class="w-3/4 max-w-2xl h-px bg-line/60"></div>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
+        <!-- Members Hierarchical Tree Section -->
+        <?php if (!empty($pejabat_tree)) : ?>
+            <div class="flex flex-col items-center mt-12 mb-16 max-w-5xl mx-auto w-full dprd-fade-in" data-direction="up" data-duration="0.8">
+                <?php foreach ($pejabat_tree as $root_node) {
+                    dprd_render_pejabat_node($root_node, 0);
+                } ?>
             </div>
         <?php else: ?>
             <div class="max-w-4xl mx-auto py-12 text-center">
