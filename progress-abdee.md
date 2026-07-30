@@ -67,3 +67,20 @@ Hari ini: Rabu, 22 Juli 2026
   - Penghapusan tautan fiktif _Kebijakan Privasi_ & _Syarat Ketentuan_.
   - Penambahan tombol ikon dokumen dan integrasi tautan yang mengarah ke _website_ Jaringan Dokumentasi dan Informasi Hukum (JDIH) Purbalingga.
   - Penyesuaian tautan sosial media ke *channel* YouTube resmi DPRD Purbalingga (@DPRDPurbalingga).
+
+## 7. Fitur Sekretariat DPRD & Migrasi Tugas dan Fungsi (Hari ini: 30 Juli 2026)
+- [x] **Admin Menu Sekretariat DPRD & Upload Bagan Organisasi**:
+  - Pembuatan top-level admin menu **Sekretariat DPRD**.
+  - Fitur upload file Bagan Organisasi (dukungan gambar & PDF, preview, dan tombol hapus).
+- [x] **Pejabat Struktural Multi-Level**:
+  - Pengelolaan struktur Pejabat Struktural secara bertingkat (multi-level tanpa batas).
+  - Integrasi dropdown pilihan anggota dari database CPT `anggota-sekretariat`.
+- [x] **Pemisahan CPT Anggota Dewan & Anggota Sekretariat**:
+  - Menyesuaikan CPT `anggota` menjadi **Anggota Dewan** (khusus Alat Kelengkapan).
+  - Menambahkan CPT baru `anggota-sekretariat` (**Anggota Sekretariat**).
+  - Meta box Foto Diri 3:4 dengan Cropper.js berlaku untuk kedua CPT.
+- [x] **Migrasi Halaman Tugas dan Fungsi Sekretariat DPRD**:
+  - Pembuatan template `page-tugas-dan-fungsi.php` 100% presisi sesuai referensi Next.js.
+  - Penerapan animasi scroll GSAP FadeIn (`dprd-fade-in` via IntersectionObserver).
+  - Penyesuaian rasio kontainer angka section Fungsi (`w-12 h-12` persegi) & kompilasi ulang CSS Vite.
+
