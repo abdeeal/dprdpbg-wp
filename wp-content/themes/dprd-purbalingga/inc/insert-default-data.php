@@ -945,4 +945,42 @@ add_action('init', function() {
     }
 });
 
+// --- DEDICATED PAGES INITIALIZER (Tugas dan Fungsi, Pejabat Struktural) ---
+add_action('init', function() {
+    if (!get_option('dprd_default_sekretariat_pages_created_v2')) {
+        $pages = [
+            [
+                'title'    => 'Pejabat Struktural',
+                'slug'     => 'pejabat-struktural',
+                'template' => 'page-pejabat-struktural.php'
+            ],
+            [
+                'title'    => 'Tugas dan Fungsi Sekretariat DPRD',
+                'slug'     => 'tugas-dan-fungsi-sekretariat-dprd',
+                'template' => 'page-tugas-dan-fungsi.php'
+            ]
+        ];
+
+        foreach ($pages as $p) {
+            $existing = get_page_by_path($p['slug']);
+            if (!$existing) {
+                $post_id = wp_insert_post([
+                    'post_title'  => $p['title'],
+                    'post_name'   => $p['slug'],
+                    'post_status' => 'publish',
+                    'post_type'   => 'page'
+                ]);
+                if ($post_id && !is_wp_error($post_id)) {
+                    update_post_meta($post_id, '_wp_page_template', $p['template']);
+                }
+            } else {
+                update_post_meta($existing->ID, '_wp_page_template', $p['template']);
+            }
+        }
+
+        flush_rewrite_rules(false);
+        update_option('dprd_default_sekretariat_pages_created_v2', true);
+    }
+});
+
 

@@ -475,13 +475,18 @@ add_action('template_redirect', function() {
                 foreach ($menu_items as $mi) {
                     $menu_url = $mi->url;
                     $menu_path = wp_parse_url($menu_url, PHP_URL_PATH) ?: '';
-                    
+
                     if ($site_path && strpos($menu_path, $site_path) === 0) {
                         $menu_path = substr($menu_path, strlen($site_path));
                     }
                     $menu_path = '/' . ltrim($menu_path, '/');
                     if ($menu_path !== '/' && substr($menu_path, -1) === '/') {
                         $menu_path = rtrim($menu_path, '/');
+                    }
+
+                    // Pengecualian halaman yang sudah ada template customnya
+                    if ($menu_path === '/sekretariat-dprd/struktur-organisasi/pejabat' || $menu_path === '/sekretariat-dprd/tugas-dan-fungsi') {
+                        continue;
                     }
 
                     if ($menu_path === $path) {
