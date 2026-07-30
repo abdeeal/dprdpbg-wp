@@ -33,8 +33,8 @@ $fungsi_list = [
             <?php get_template_part('template-parts/ui/breadcrumbs', null, ['items' => $breadcrumbs]); ?>
         </div>
 
-        <!-- Page Header -->
-        <div class="text-left">
+        <!-- Page Header dengan Animasi FadeIn -->
+        <div class="text-left dprd-fade-in" data-direction="up" data-duration="0.6" data-delay="0">
             <h1 class="font-display font-black text-3xl md:text-[36px] text-primary mb-2">
                 Tugas dan Fungsi Sekretariat DPRD
             </h1>
@@ -44,9 +44,9 @@ $fungsi_list = [
         </div>
     </div>
 
-    <!-- Full-width Highlight Banner -->
+    <!-- Full-width Highlight Banner (TugasPokok) dengan Animasi FadeIn -->
     <section class="w-full bg-[#82111A] text-white py-16 md:py-24">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center dprd-fade-in" data-direction="up" data-delay="0.1" data-duration="0.8">
             <h2 class="font-mono text-sm md:text-[15px] font-semibold tracking-[0.2em] uppercase mb-8 opacity-90">
                 Tugas Pokok
             </h2>
@@ -56,8 +56,8 @@ $fungsi_list = [
         </div>
     </section>
 
-    <!-- Bottom Container: Fungsi Grid -->
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-16">
+    <!-- Bottom Container: Fungsi Grid dengan Animasi FadeIn -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-16 dprd-fade-in" data-direction="up" data-duration="0.8" data-delay="0">
         <div class="py-16 md:py-20">
             <h2 class="font-display font-bold text-[32px] md:text-[40px] text-body mb-12">
                 Fungsi
