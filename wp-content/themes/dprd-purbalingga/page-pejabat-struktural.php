@@ -22,11 +22,9 @@ $pejabat_tree = json_decode($raw_json, true);
 if (!is_array($pejabat_tree)) $pejabat_tree = [];
 
 /**
- * Helper untuk merender node pejabat dan anak-anaknya secara rekursif (berdasarkan kepemilikan/hierarki)
+ * Helper untuk merender kartu satu pejabat
  */
-function dprd_render_pejabat_node($node, $level = 0) {
-    if (!is_array($node)) return;
-
+function dprd_render_pejabat_card($node) {
     $anggota_id = isset($node['anggota_id']) ? intval($node['anggota_id']) : 0;
     $name = $anggota_id ? get_the_title($anggota_id) : '—';
     $position = isset($node['jabatan']) ? $node['jabatan'] : '';
@@ -36,41 +34,27 @@ function dprd_render_pejabat_node($node, $level = 0) {
     if (empty($image_url)) {
         $image_url = get_template_directory_uri() . '/assets/images/placeholder/avatar.png';
     }
-
-    $children = isset($node['children']) && is_array($node['children']) ? $node['children'] : [];
     ?>
-    <div class="flex flex-col items-center w-full mb-12 last:mb-0">
-        <!-- Card Pejabat -->
-        <div class="w-full sm:w-[calc(50%-1.5rem)] md:w-[calc(33.333%-2.5rem)] max-w-[280px] flex flex-col items-center">
-            <!-- Nama Anggota/Pejabat -->
-            <h3 class="font-display text-lg md:text-[19px] font-normal text-body text-center mb-3 leading-snug h-[2.6em] min-h-[2.6em] flex items-center justify-center">
-                <?php echo esc_html($name); ?>
-            </h3>
+    <div class="flex flex-col items-center w-full max-w-[280px]">
+        <!-- Nama Anggota/Pejabat -->
+        <h3 class="font-display text-lg md:text-[19px] font-normal text-body text-center mb-3 leading-snug h-[2.6em] min-h-[2.6em] flex items-center justify-center">
+            <?php echo esc_html($name); ?>
+        </h3>
 
-            <!-- Divider line -->
-            <div class="w-full h-px bg-body/30 mb-3"></div>
+        <!-- Divider line -->
+        <div class="w-full h-px bg-body/30 mb-3"></div>
 
-            <!-- Jabatan -->
-            <span class="font-display text-sm md:text-[15px] mb-4 text-center text-body-secondary">
-                <?php echo esc_html($position); ?>
-            </span>
+        <!-- Jabatan -->
+        <span class="font-display text-sm md:text-[15px] mb-4 text-center text-body-secondary">
+            <?php echo esc_html($position); ?>
+        </span>
 
-            <!-- Foto Diri (3:4 Ratio) -->
-            <div class="relative w-full aspect-[3/4] rounded-sm overflow-hidden bg-surface shadow-sm border border-line/40">
-                <?php if ($image_url) : ?>
-                    <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($name); ?>" class="object-cover w-full h-full" loading="lazy">
-                <?php endif; ?>
-            </div>
+        <!-- Foto Diri (3:4 Ratio) -->
+        <div class="relative w-full aspect-[3/4] rounded-sm overflow-hidden bg-surface shadow-sm border border-line/40">
+            <?php if ($image_url) : ?>
+                <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($name); ?>" class="object-cover w-full h-full" loading="lazy">
+            <?php endif; ?>
         </div>
-
-        <!-- Render Sub-Jabatan / Children (Ditaruh sejajar langsung di bawahnya tanpa divider) -->
-        <?php if (!empty($children)) : ?>
-            <div class="w-full flex flex-wrap justify-center gap-x-6 gap-y-10 sm:gap-x-8 md:gap-x-12 mt-12">
-                <?php foreach ($children as $child) {
-                    dprd_render_pejabat_node($child, $level + 1);
-                } ?>
-            </div>
-        <?php endif; ?>
     </div>
     <?php
 }
@@ -96,10 +80,38 @@ function dprd_render_pejabat_node($node, $level = 0) {
 
         <!-- Members Hierarchical Tree Section -->
         <?php if (!empty($pejabat_tree)) : ?>
-            <div class="flex flex-col items-center mt-12 mb-16 max-w-5xl mx-auto w-full dprd-fade-in" data-direction="up" data-duration="0.8">
-                <?php foreach ($pejabat_tree as $root_node) {
-                    dprd_render_pejabat_node($root_node, 0);
-                } ?>
+            <div class="flex flex-col items-center mt-12 mb-16 max-w-7xl mx-auto w-full dprd-fade-in" data-direction="up" data-duration="0.8">
+                <?php foreach ($pejabat_tree as $root_node) : ?>
+                    <!-- LEVEL 0: Sekretaris DPRD (Paling Atas di Tengah) -->
+                    <div class="flex flex-col items-center w-full mb-16">
+                        <?php dprd_render_pejabat_card($root_node); ?>
+                    </div>
+
+                    <!-- LEVEL 1 & 2: Kabag-Kabag Bersampingan (Horizontal), Kasubag di Bawah Kabag Masing-Masing -->
+                    <?php
+                    $kabag_nodes = isset($root_node['children']) && is_array($root_node['children']) ? $root_node['children'] : [];
+                    if (!empty($kabag_nodes)) : ?>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-16 w-full items-start">
+                            <?php foreach ($kabag_nodes as $kabag) :
+                                $kasubag_nodes = isset($kabag['children']) && is_array($kabag['children']) ? $kabag['children'] : [];
+                                ?>
+                                <div class="flex flex-col items-center w-full">
+                                    <!-- Kabag (Level 1) -->
+                                    <?php dprd_render_pejabat_card($kabag); ?>
+
+                                    <!-- Kasubag-Kasubag di Bawah Kabag (Level 2) -->
+                                    <?php if (!empty($kasubag_nodes)) : ?>
+                                        <div class="flex flex-col items-center w-full gap-y-12 mt-12">
+                                            <?php foreach ($kasubag_nodes as $kasubag) {
+                                                dprd_render_pejabat_card($kasubag);
+                                            } ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
             </div>
         <?php else: ?>
             <div class="max-w-4xl mx-auto py-12 text-center">
