@@ -27,10 +27,16 @@ function dprd_register_post_types() {
             'icon'     => 'dashicons-calendar-alt',
         ],
         'anggota' => [
-            'singular' => 'Anggota',
-            'plural'   => 'Anggota',
+            'singular' => 'Anggota Dewan',
+            'plural'   => 'Anggota Dewan',
             'supports' => ['title', 'editor'],
             'icon'     => 'dashicons-groups',
+        ],
+        'anggota-sekretariat' => [
+            'singular' => 'Anggota Sekretariat',
+            'plural'   => 'Anggota Sekretariat',
+            'supports' => ['title', 'editor'],
+            'icon'     => 'dashicons-id',
         ],
         'alat-kelengkapan' => [
             'singular' => 'Alat Kelengkapan',
@@ -143,6 +149,7 @@ function dprd_change_title_placeholder($title, $post) {
     }
     switch ($post->post_type) {
         case 'anggota':
+        case 'anggota-sekretariat':
             return 'Nama Anggota';
         case 'alat-kelengkapan':
             return 'Nama Alat Kelengkapan';

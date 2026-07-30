@@ -63,6 +63,7 @@ require get_template_directory() . '/inc/post-types.php';
 require get_template_directory() . '/inc/taxonomies.php';
 require get_template_directory() . '/inc/class-repeater-field.php';
 require get_template_directory() . '/inc/options-pages.php';
+require get_template_directory() . '/inc/sekretariat-dprd.php';
 require get_template_directory() . '/inc/sekilas-data.php';
 require get_template_directory() . '/inc/lucide-icons.php';
 require get_template_directory() . '/inc/insert-default-data.php';

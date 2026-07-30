@@ -10,7 +10,7 @@ add_action('add_meta_boxes', function () {
         'dprd_anggota_meta',
         'Foto Diri (Rasio 3:4)',
         'dprd_render_anggota_meta_box',
-        'anggota',
+        ['anggota', 'anggota-sekretariat'],
         'normal',
         'high'
     );
