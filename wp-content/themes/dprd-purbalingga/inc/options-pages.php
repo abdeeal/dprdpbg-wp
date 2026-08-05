@@ -259,12 +259,12 @@ function dprd_render_site_settings_page() {
                 cropBtn.disabled = true;
                 
                 cropper.getCroppedCanvas({
-                    maxWidth: 2560,
-                    maxHeight: 1440
+                    width: 1920,
+                    height: 1080
                 }).toBlob(function(blob) {
                     var formData = new FormData();
                     formData.append('action', 'dprd_upload_cropped_image');
-                    formData.append('image', blob, 'cropped-hero-' + attachment.id + '.webp');
+                    formData.append('image', blob, 'cropped-hero-' + attachment.id + '.jpg');
                     formData.append('_ajax_nonce', dprd_repeater_vars.nonce);
                     formData.append('original_id', attachment.id);
 
@@ -287,8 +287,7 @@ function dprd_render_site_settings_page() {
                             cropBtn.disabled = false;
                         }
                     });
-                }, 'image/webp', 0.95);
-                }, 'image/webp', 0.75);
+                }, 'image/jpeg', 0.95);
             });
         }
         $('#dprd_remove_hero_btn').on('click', function(e) {

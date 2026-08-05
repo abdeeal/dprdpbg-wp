@@ -206,13 +206,13 @@ add_filter('wp_generate_attachment_metadata', function ($metadata, $attachment_i
     return $metadata;
 }, 10, 2);
 
-// Set kualitas kompresi WebP bawaan WordPress menjadi 95%
+// Set kualitas kompresi gambar bawaan WordPress menjadi 95%
 add_filter('wp_editor_set_quality', function($quality, $mime_type) {
-    if ('image/webp' === $mime_type) {
-        return 95;
-    }
-    return $quality;
+    return 95;
 }, 10, 2);
+add_filter('jpeg_quality', function($quality) {
+    return 95;
+});
 
 // Prioritaskan GD library dibanding Imagick untuk memproses gambar.
 // Ini memperbaiki error upload WebP di lingkungan local XAMPP/PHP yang Imagick-nya tidak memiliki library WebP.
