@@ -206,10 +206,10 @@ add_filter('wp_generate_attachment_metadata', function ($metadata, $attachment_i
     return $metadata;
 }, 10, 2);
 
-// Set kualitas kompresi WebP bawaan WordPress menjadi 80%
+// Set kualitas kompresi WebP bawaan WordPress menjadi 95%
 add_filter('wp_editor_set_quality', function($quality, $mime_type) {
     if ('image/webp' === $mime_type) {
-        return 80;
+        return 95;
     }
     return $quality;
 }, 10, 2);
