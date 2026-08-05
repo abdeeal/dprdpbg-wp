@@ -198,8 +198,7 @@ function dprd_render_berita_additional_meta_box($post) {
 
 function dprd_render_berita_images_meta_box($post) {
     wp_nonce_field('dprd_save_berita_images', 'dprd_berita_images_nonce');
-    $raw = get_post_meta($post->ID, 'dprd_berita_images_json', true);
-    $rows = $raw ? json_decode($raw, true) : [];
+    $rows = get_dprd_repeater($post->ID, 'dprd_berita_images_json');
 
     // Fallback pre-fill jika repeater kosong tapi ada data dari field tunggal lama
     if (empty($rows)) {
@@ -332,8 +331,7 @@ function dprd_render_berita_images_meta_box($post) {
 
 function dprd_render_berita_quotes_meta_box($post) {
     wp_nonce_field('dprd_save_berita_quotes', 'dprd_berita_quotes_nonce');
-    $raw = get_post_meta($post->ID, 'dprd_berita_quotes_json', true);
-    $rows = $raw ? json_decode($raw, true) : [];
+    $rows = get_dprd_repeater($post->ID, 'dprd_berita_quotes_json');
 
     // Fallback pre-fill jika repeater kosong tapi ada data kutipan tunggal lama
     if (empty($rows)) {
@@ -391,7 +389,7 @@ add_action('save_post', function ($post_id) {
                 if (isset($_POST['dprd_berita_images_json'])) {
                     $repeater = dprd_get_berita_images_repeater();
                     $clean_json = $repeater->sanitize_from_post($_POST['dprd_berita_images_json']);
-                    update_post_meta($post_id, 'dprd_berita_images_json', $clean_json);
+                    update_post_meta($post_id, 'dprd_berita_images_json', wp_slash($clean_json));
                 }
             }
         }
@@ -404,7 +402,7 @@ add_action('save_post', function ($post_id) {
                 if (isset($_POST['dprd_berita_quotes_json'])) {
                     $repeater = dprd_get_berita_quotes_repeater();
                     $clean_json = $repeater->sanitize_from_post($_POST['dprd_berita_quotes_json']);
-                    update_post_meta($post_id, 'dprd_berita_quotes_json', $clean_json);
+                    update_post_meta($post_id, 'dprd_berita_quotes_json', wp_slash($clean_json));
                 }
             }
         }

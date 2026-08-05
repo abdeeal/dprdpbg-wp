@@ -296,7 +296,7 @@ class DPRD_Repeater_Field {
         if (!isset($_POST[$this->id])) return;
 
         $sanitized = $this->sanitize_from_post($_POST[$this->id]);
-        update_post_meta($post_id, $this->id, wp_json_encode($sanitized));
+        update_post_meta($post_id, $this->id, wp_slash($sanitized));
     }
 
     /**
