@@ -307,18 +307,7 @@ class DPRD_Repeater_Field {
      * @return string JSON string yang sudah tersanitasi, siap update_option()
      */
     public function sanitize_from_post($raw_json) {
-        $decoded = null;
-        if (is_string($raw_json) && !empty($raw_json)) {
-            $json = wp_unslash($raw_json);
-            $decoded = json_decode($json, true);
-            if (!is_array($decoded)) {
-                $decoded = json_decode($raw_json, true);
-            }
-            if (!is_array($decoded)) {
-                $decoded = json_decode(stripslashes($raw_json), true);
-            }
-        }
-
+        $decoded = dprd_safe_json_decode($raw_json);
         if (!is_array($decoded)) return wp_json_encode([]);
 
         $clean_rows = [];
@@ -376,6 +365,30 @@ class DPRD_Repeater_Field {
     }
 }
 
+function dprd_safe_json_decode($str) {
+    if (empty($str) || !is_string($str)) return [];
+
+    $decoded = json_decode($str, true);
+    if (is_array($decoded)) return $decoded;
+
+    $decoded = json_decode(wp_unslash($str), true);
+    if (is_array($decoded)) return $decoded;
+
+    $decoded = json_decode(stripslashes($str), true);
+    if (is_array($decoded)) return $decoded;
+
+    // Perbaiki JSON rusak di mana tanda kutip di dalam quote_text tidak di-escape
+    $repaired = preg_replace_callback('/"quote_text"\s*:\s*"(.*?)"\s*,\s*"paragraph"/s', function($m) {
+        $inner = trim($m[1], '"');
+        return '"quote_text":' . wp_json_encode($inner) . ',"paragraph"';
+    }, $str);
+
+    $decoded = json_decode($repaired, true);
+    if (is_array($decoded)) return $decoded;
+
+    return [];
+}
+
 /**
  * Helper ambil data repeater dari post meta — mirip have_rows()/get_field() ACF.
  *
@@ -385,15 +398,7 @@ class DPRD_Repeater_Field {
  */
 function get_dprd_repeater($post_id, $field_id) {
     $raw = get_post_meta($post_id, $field_id, true);
-    if (empty($raw)) return [];
-    $decoded = json_decode($raw, true);
-    if (!is_array($decoded)) {
-        $decoded = json_decode(wp_unslash($raw), true);
-    }
-    if (!is_array($decoded)) {
-        $decoded = json_decode(stripslashes($raw), true);
-    }
-    return is_array($decoded) ? $decoded : [];
+    return dprd_safe_json_decode($raw);
 }
 
 /**
@@ -405,15 +410,7 @@ function get_dprd_repeater($post_id, $field_id) {
  */
 function dprd_get_option_repeater($option_name) {
     $raw = get_option($option_name, '[]');
-    if (empty($raw)) return [];
-    $decoded = json_decode($raw, true);
-    if (!is_array($decoded)) {
-        $decoded = json_decode(wp_unslash($raw), true);
-    }
-    if (!is_array($decoded)) {
-        $decoded = json_decode(stripslashes($raw), true);
-    }
-    return is_array($decoded) ? $decoded : [];
+    return dprd_safe_json_decode($raw);
 }
 
 /**
