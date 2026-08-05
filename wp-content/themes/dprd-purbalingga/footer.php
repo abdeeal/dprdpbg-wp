@@ -13,8 +13,8 @@ if (!defined('ABSPATH')) exit;
             <!-- Kolom 1: Title, Alamat & Icon Buttons -->
             <div class="col-span-1">
                 <h2 class="font-montserrat font-bold text-2xl lg:text-3xl text-body mb-6 leading-tight">DPRD<br/>Purbalingga</h2>
-                <p class="font-sans text-[13px] text-body-secondary mb-6 leading-relaxed max-w-[250px]">
-                    Jl. Oneng Saputra No.1, Purbalingga,<br/>Jawa Tengah 53311.
+                <p class="font-sans text-[13px] text-body-secondary mb-6 leading-relaxed max-w-[280px]">
+                    Jl. Onje No.2a, Purbalingga, Purbalingga Lor, Kec. Purbalingga, Kabupaten Purbalingga, Jawa Tengah 53311.
                 </p>
                 <div class="flex gap-3">
                     <a href="https://jdih.purbalinggakab.go.id/" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-surface hover:bg-line transition-colors flex items-center justify-center text-body" aria-label="JDIH Purbalingga">
@@ -56,12 +56,8 @@ if (!defined('ABSPATH')) exit;
                 <h3 class="font-sans font-bold text-[15px] text-body mb-6">Hubungi Kami</h3>
                 <ul class="space-y-4 font-sans text-[13px] text-body">
                     <li class="flex items-start gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary mt-0.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                        <span>(0281) 891000</span>
-                    </li>
-                    <li class="flex items-start gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary mt-0.5"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                        <span>info@dprd-purbalingga.go.id</span>
+                        <span>dprd.purbalinggakab@gmail.com</span>
                     </li>
                     <li class="flex items-start gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary mt-0.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>

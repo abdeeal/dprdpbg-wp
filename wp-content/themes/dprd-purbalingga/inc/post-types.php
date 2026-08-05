@@ -91,14 +91,18 @@ function dprd_register_post_types() {
             'not_found_in_trash' => $cpt['singular'] . ' tidak ditemukan di tempat sampah',
         ];
 
+        $has_archive        = ($slug === 'reservasi') ? false : true;
+        $publicly_queryable = ($slug === 'reservasi') ? false : true;
+
         $args = [
             'labels'             => $labels,
             'public'             => true,
-            'has_archive'        => true,
+            'publicly_queryable' => $publicly_queryable,
+            'has_archive'        => $has_archive,
             'show_in_rest'       => true, // Mengaktifkan editor Gutenberg
             'menu_icon'          => $cpt['icon'],
             'supports'           => $cpt['supports'],
-            'rewrite'            => ['slug' => ($slug === 'alat-kelengkapan' ? 'profil-dprd' : $slug)],
+            'rewrite'            => ($slug === 'reservasi') ? false : ['slug' => ($slug === 'alat-kelengkapan' ? 'profil-dprd' : $slug)],
         ];
 
         if (isset($cpt['taxonomies'])) {
