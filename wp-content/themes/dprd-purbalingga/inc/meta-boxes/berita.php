@@ -217,8 +217,117 @@ function dprd_render_berita_images_meta_box($post) {
 
     echo '<p class="description" style="margin-bottom: 12px; font-size: 13px; line-height: 1.6;">' .
          'Tambahkan satu atau lebih <strong>Foto Tambahan</strong> beserta <strong>Keterangan Foto (Caption)</strong> untuk disisipkan di tengah-tengah artikel berita.<br>' .
-         '💡 Pada kolom <strong>"Disisipkan Setelah Paragraf Ke- (Angka)"</strong>, ketik angka urutan paragraf tempat foto akan muncul (Contoh: ketik <code>2</code> agar foto tampil tepat di bawah paragraf ke-2).</p>';
+         '💡 Pada kolom <strong>"Disisipkan Setelah Paragraf Ke- (Angka)"</strong>, ketik angka urutan paragraf (Contoh: ketik <code>2</code> agar foto muncul di bawah paragraf ke-2). <strong>Teks kata terakhir paragraf akan muncul otomatis di bawah kolom untuk membantu Anda!</strong></p>';
     dprd_get_berita_images_repeater()->render_field_only($rows);
+    ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function getEditorParagraphs() {
+            var text = '';
+            // Cek Block Editor (Gutenberg)
+            if (typeof wp !== 'undefined' && wp.data && wp.data.select && wp.data.select('core/editor')) {
+                text = wp.data.select('core/editor').getEditedPostContent();
+            } else if (typeof tinyMCE !== 'undefined' && tinyMCE.activeEditor && !tinyMCE.activeEditor.isHidden()) {
+                text = tinyMCE.activeEditor.getContent();
+            } else {
+                var textarea = document.getElementById('content');
+                if (textarea) text = textarea.value;
+            }
+
+            if (!text) return [];
+
+            // Buat temp container untuk strip HTML
+            var temp = document.createElement('div');
+            temp.innerHTML = text;
+
+            var pElements = temp.querySelectorAll('p');
+            var paragraphs = [];
+
+            if (pElements.length > 0) {
+                pElements.forEach(function(p) {
+                    var cleanText = p.textContent.trim();
+                    if (cleanText.length > 0) {
+                        paragraphs.push(cleanText);
+                    }
+                });
+            } else {
+                // Fallback splitting by newline if no <p> tags
+                var rawLines = temp.textContent.split(/\n+/);
+                rawLines.forEach(function(line) {
+                    var cleanText = line.trim();
+                    if (cleanText.length > 0) {
+                        paragraphs.push(cleanText);
+                    }
+                });
+            }
+
+            return paragraphs;
+        }
+
+        function updateParagraphPreviews() {
+            var paragraphs = getEditorParagraphs();
+
+            document.querySelectorAll('.dprd-repeater input[data-key="paragraph"]').forEach(function(input) {
+                var cell = input.closest('td');
+                if (!cell) return;
+
+                var hint = cell.querySelector('.dprd-paragraph-hint');
+                if (!hint) {
+                    hint = document.createElement('div');
+                    hint.className = 'dprd-paragraph-hint';
+                    hint.style.cssText = 'margin-top: 6px; font-size: 11px; line-height: 1.4; padding: 4px 8px; border-radius: 4px; transition: all 0.2s ease;';
+                    cell.appendChild(hint);
+                }
+
+                var num = parseInt(input.value.trim(), 10);
+                if (isNaN(num) || num <= 0) {
+                    hint.style.display = 'none';
+                    return;
+                }
+
+                if (num <= paragraphs.length) {
+                    var pText = paragraphs[num - 1];
+                    var words = pText.split(/\s+/);
+                    var snippet = words.length > 8 ? '...' + words.slice(-8).join(' ') : pText;
+
+                    hint.style.display = 'block';
+                    hint.style.background = '#e7f5ea';
+                    hint.style.border = '1px solid #7ad08d';
+                    hint.style.color = '#135e23';
+                    hint.innerHTML = '<strong>Akhir Paragraf ke-' + num + ':</strong> "' + escHtml(snippet) + '"';
+                } else {
+                    hint.style.display = 'block';
+                    hint.style.background = '#fcf0f0';
+                    hint.style.border = '1px solid #f5c6cb';
+                    hint.style.color = '#a00';
+                    hint.innerHTML = '⚠️ Artikel hanya memiliki <strong>' + paragraphs.length + ' paragraf</strong>.';
+                }
+            });
+        }
+
+        function escHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // Event listener saat diketik atau diubah
+        document.addEventListener('input', function(e) {
+            if (e.target && e.target.matches('input[data-key="paragraph"]')) {
+                updateParagraphPreviews();
+            }
+        });
+
+        // Event listener jika artikel di editor Gutenberg atau TinyMCE berubah
+        if (typeof wp !== 'undefined' && wp.data && wp.data.subscribe) {
+            wp.data.subscribe(function() {
+                updateParagraphPreviews();
+            });
+        }
+
+        setInterval(updateParagraphPreviews, 2000);
+        setTimeout(updateParagraphPreviews, 1000);
+    });
+    </script>
+    <?php
 }
 
 function dprd_render_berita_quotes_meta_box($post) {
