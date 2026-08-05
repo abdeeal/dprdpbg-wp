@@ -69,10 +69,11 @@ if (!empty($additional_images) || !empty($additional_quotes)) {
     // 1. Gambar Tambahan
     foreach ($additional_images as $img) {
         $img_id = isset($img['image_id']) ? intval($img['image_id']) : 0;
-        $paragraph_idx = isset($img['paragraph']) ? intval($img['paragraph']) : 0;
+        $paragraph_idx = isset($img['paragraph']) ? intval($img['paragraph']) : 1;
+        if ($paragraph_idx <= 0) $paragraph_idx = 1;
         $caption = isset($img['caption']) ? $img['caption'] : '';
 
-        if ($img_id && $paragraph_idx > 0) {
+        if ($img_id > 0) {
             $add_img_url = wp_get_attachment_image_url($img_id, 'large');
             if ($add_img_url) {
                 $image_html = '
@@ -93,11 +94,12 @@ if (!empty($additional_images) || !empty($additional_quotes)) {
     // 2. Kutipan / Blockquote (Repeater)
     foreach ($additional_quotes as $qt) {
         $q_text = isset($qt['quote_text']) ? trim($qt['quote_text']) : '';
-        $q_para = isset($qt['paragraph']) ? intval($qt['paragraph']) : 0;
-        if (!empty($q_text) && $q_para > 0) {
+        $q_para = isset($qt['paragraph']) ? intval($qt['paragraph']) : 1;
+        if ($q_para <= 0) $q_para = 1;
+        if (!empty($q_text)) {
             $quote_html = '
             <blockquote class="wp-block-quote">
-                <p>' . esc_html($q_text) . '</p>
+                <p>' . nl2br(esc_html($q_text)) . '</p>
             </blockquote>';
             $inserts[$q_para][] = $quote_html;
         }

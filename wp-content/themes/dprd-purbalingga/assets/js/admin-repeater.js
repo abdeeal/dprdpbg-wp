@@ -48,8 +48,12 @@
     }
 
     function sync() {
-      hiddenInput.value = JSON.stringify(collectAll());
+      var jsonStr = JSON.stringify(collectAll());
+      hiddenInput.value = jsonStr;
+      hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+      hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
+    wrapper.dprdSync = sync;
 
     function attachImageHandlers(scopeEl) {
       scopeEl.querySelectorAll('.dprd-select-image').forEach(function (btn) {
