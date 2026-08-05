@@ -282,12 +282,11 @@
           cropBtn.disabled = true;
           
           cropper.getCroppedCanvas({
-              maxWidth: 1920,
-              maxHeight: 1080
+              width: 2560
           }).toBlob(function(blob) {
               var formData = new FormData();
               formData.append('action', 'dprd_upload_cropped_image');
-              formData.append('image', blob, 'cropped-' + attachment.id + '.webp');
+              formData.append('image', blob, 'cropped-' + attachment.id + '.jpg');
               formData.append('_ajax_nonce', dprd_repeater_vars.nonce);
               formData.append('original_id', attachment.id);
 
@@ -307,16 +306,12 @@
                       cropper.destroy();
                       modal.remove();
                   } else {
-                      alert('Gagal crop gambar: ' + (res.data || 'Error'));
+                      alert(res.data || 'Gagal menyimpan gambar.');
                       cropBtn.textContent = 'Crop & Gunakan';
                       cropBtn.disabled = false;
                   }
-              })
-              .catch(function(err) {
-                  alert('Terjadi kesalahan jaringan.');
-                  cropBtn.textContent = 'Crop & Gunakan';
-                  cropBtn.disabled = false;
               });
+          }, 'image/jpeg', 0.95);
           }, 'image/webp', 0.75);
       });
   }
