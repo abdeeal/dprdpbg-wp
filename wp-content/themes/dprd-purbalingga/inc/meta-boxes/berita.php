@@ -74,7 +74,7 @@ add_action('add_meta_boxes', function () {
     // Meta box untuk galeri foto tambahan di berita (repeater)
     add_meta_box(
         'dprd_berita_images_meta',
-        '📸 Foto & Caption Tambahan Berita (Disisipkan di Tengah Artikel)',
+        'Foto & Caption Tambahan Berita (Disisipkan di Tengah Artikel)',
         'dprd_render_berita_images_meta_box',
         'berita',
         'normal',
@@ -84,7 +84,7 @@ add_action('add_meta_boxes', function () {
     // Meta box untuk kutipan / blockquote tambahan di berita (repeater)
     add_meta_box(
         'dprd_berita_quotes_meta',
-        '💬 Kutipan / Blockquote Berita (Disisipkan di Tengah Artikel)',
+        'Kutipan / Blockquote Berita (Disisipkan di Tengah Artikel)',
         'dprd_render_berita_quotes_meta_box',
         'berita',
         'normal',
@@ -141,7 +141,7 @@ function dprd_render_berita_additional_meta_box($post) {
         <tr>
             <td colspan="2">
                 <p class="description" style="padding: 8px; background: #f0f7ff; border-left: 4px solid #2271b1; margin: 0;">
-                    <strong>💡 Ringkasan Berita</strong> diisi melalui kolom <strong>"Kutipan"</strong> di sidebar kanan editor (gulir ke bawah di panel Berita). Teks tersebut otomatis tampil di halaman depan website sebagai ringkasan berita.
+                    <strong>Ringkasan Berita:</strong> Diisi via kolom "Kutipan" di sidebar kanan editor.
                 </p>
             </td>
         </tr>
@@ -216,8 +216,8 @@ function dprd_render_berita_images_meta_box($post) {
     }
 
     echo '<p class="description" style="margin-bottom: 12px; font-size: 13px; line-height: 1.6;">' .
-         'Tambahkan satu atau lebih <strong>Foto Tambahan</strong> beserta <strong>Keterangan Foto (Caption)</strong> untuk disisipkan di tengah-tengah artikel berita.<br>' .
-         '💡 Pada kolom <strong>"Disisipkan Setelah Paragraf Ke- (Angka)"</strong>, ketik angka urutan paragraf (Contoh: ketik <code>2</code> agar foto muncul di bawah paragraf ke-2). <strong>Teks kata terakhir paragraf akan muncul otomatis di bawah kolom untuk membantu Anda!</strong></p>';
+         'Tambahkan foto tambahan dan caption untuk disisipkan di tengah artikel.<br>' .
+         'Isi kolom angka paragraf untuk menentukan posisi tampilnya foto.</p>';
     dprd_get_berita_images_repeater()->render_field_only($rows);
     ?>
     <script>
@@ -300,7 +300,7 @@ function dprd_render_berita_images_meta_box($post) {
                     hint.style.background = '#fcf0f0';
                     hint.style.border = '1px solid #f5c6cb';
                     hint.style.color = '#a00';
-                    hint.innerHTML = '⚠️ Artikel hanya memiliki <strong>' + paragraphs.length + ' paragraf</strong>.';
+                    hint.innerHTML = 'Artikel hanya memiliki <strong>' + paragraphs.length + ' paragraf</strong>.';
                 }
             });
         }
@@ -348,8 +348,8 @@ function dprd_render_berita_quotes_meta_box($post) {
     }
 
     echo '<p class="description" style="margin-bottom: 12px; font-size: 13px; line-height: 1.6;">' .
-         'Tambahkan satu atau lebih <strong>Teks Kutipan (Blockquote)</strong> dari narasumber atau hasil persidangan untuk disisipkan di tengah-tengah artikel.<br>' .
-         '💡 Pada kolom <strong>"Disisipkan Setelah Paragraf Ke- (Angka)"</strong>, ketik angka urutan paragraf tempat kutipan akan muncul (Contoh: ketik <code>3</code> agar kutipan tampil tepat di bawah paragraf ke-3).</p>';
+         'Tambahkan teks kutipan (blockquote) untuk disisipkan di tengah artikel. Tambahkan tanda kutip <code>"</code> secara manual pada kalimat narasumber jika diperlukan.<br>' .
+         'Isi kolom angka paragraf untuk menentukan posisi tampilnya kutipan.</p>';
     dprd_get_berita_quotes_repeater()->render_field_only($rows);
 }
 

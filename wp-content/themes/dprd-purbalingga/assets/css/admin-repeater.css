@@ -24,9 +24,19 @@
 }
 
 .dprd-repeater-row td input[type="text"],
-.dprd-repeater-row td input[type="url"],
-.dprd-repeater-row td textarea {
+.dprd-repeater-row td input[type="url"] {
   width: 100%;
+}
+
+.dprd-repeater-row td textarea,
+.dprd-repeater-child-row td textarea {
+  width: 100%;
+  min-height: 80px;
+  box-sizing: border-box;
+  resize: vertical;
+  line-height: 1.5;
+  padding: 8px;
+  overflow-y: hidden;
 }
 
 .dprd-row-actions {

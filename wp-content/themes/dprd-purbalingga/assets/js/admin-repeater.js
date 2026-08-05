@@ -98,6 +98,12 @@
       });
     }
 
+    function autoResizeTextarea(el) {
+      if (!el || el.tagName !== 'TEXTAREA') return;
+      el.style.height = 'auto';
+      el.style.height = Math.max(80, el.scrollHeight) + 'px';
+    }
+
     function attachRowHandlers(rowEl) {
       var removeBtn = rowEl.querySelector(':scope > td.dprd-row-actions > .dprd-remove-row');
       if (removeBtn) {
@@ -115,7 +121,15 @@
 
       // input change listeners
       rowEl.querySelectorAll('input[data-key], textarea[data-key]').forEach(function (input) {
-        input.addEventListener('input', sync);
+        if (input.tagName === 'TEXTAREA') {
+          autoResizeTextarea(input);
+          input.addEventListener('input', function () {
+            autoResizeTextarea(input);
+            sync();
+          });
+        } else {
+          input.addEventListener('input', sync);
+        }
       });
 
       attachImageHandlers(rowEl);
@@ -154,7 +168,15 @@
         });
       }
       childRowEl.querySelectorAll('input[data-key], textarea[data-key]').forEach(function (input) {
-        input.addEventListener('input', sync);
+        if (input.tagName === 'TEXTAREA') {
+          autoResizeTextarea(input);
+          input.addEventListener('input', function () {
+            autoResizeTextarea(input);
+            sync();
+          });
+        } else {
+          input.addEventListener('input', sync);
+        }
       });
       attachImageHandlers(childRowEl);
     }
@@ -162,6 +184,10 @@
     // Bind existing rows on load
     tbody.querySelectorAll(':scope > tr.dprd-repeater-row').forEach(attachRowHandlers);
     tbody.querySelectorAll('.dprd-repeater-child-row').forEach(attachChildRowHandlers);
+    tbody.querySelectorAll('textarea[data-key]').forEach(autoResizeTextarea);
+    setTimeout(function() {
+      tbody.querySelectorAll('textarea[data-key]').forEach(autoResizeTextarea);
+    }, 200);
 
     if (addBtn && rowTemplate) {
       addBtn.addEventListener('click', function () {

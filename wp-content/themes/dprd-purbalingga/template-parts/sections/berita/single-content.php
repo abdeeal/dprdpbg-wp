@@ -97,7 +97,7 @@ if (!empty($additional_images) || !empty($additional_quotes)) {
         if (!empty($q_text) && $q_para > 0) {
             $quote_html = '
             <blockquote class="wp-block-quote">
-                <p>"' . esc_html($q_text) . '"</p>
+                <p>' . esc_html($q_text) . '</p>
             </blockquote>';
             $inserts[$q_para][] = $quote_html;
         }
