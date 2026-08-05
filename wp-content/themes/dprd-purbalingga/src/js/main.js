@@ -526,7 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             const startTimer = () => {
-                timer = setInterval(nextSlide, 3000);
+                timer = setInterval(nextSlide, 5000);
             };
 
             const stopTimer = () => {
