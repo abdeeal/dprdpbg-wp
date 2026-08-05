@@ -73,4 +73,29 @@ Dokumen ini mencatat seluruh modul, fitur kustom, dan optimasi yang telah disele
   * Penyelarasan file konfigurasi `.htaccess` lokal dengan nama folder `/dprdpbg-wp/` untuk kelancaran jalannya REST API lokal.
 
 ---
-*Laporan progres ini disusun sebagai bukti penyelesaian pekerjaan Fase 4.*
+
+## 🔍 6. Pencarian Global & Penyempurnaan Fitur Tambahan
+* **File Terkait:** `inc/search.php`, `template-parts/sections/pencarian/results.php`, `inc/meta-boxes/galeri.php`
+* **Pekerjaan yang Diselesaikan:**
+  * **Pencarian Lintas CPT (Global Search):** Sistem pencarian kini memindai seluruh *Custom Post Type* secara komprehensif, mencakup Berita, Galeri, Anggota (termasuk Alat Kelengkapan & Tokoh Sejarah), serta Dokumen (SAKIP, PPID, Propemperda).
+  * **Pengurutan Pintar (Smart Sorting):** Hasil pencarian otomatis diurutkan dengan algoritma spesifik. Berita dan Dokumen diurutkan berdasarkan tanggal terbaru. Sedangkan untuk pencarian Anggota, pimpinan (Ketua DPRD, Wakil Ketua) akan secara otomatis tampil di posisi teratas mendahului anggota biasa.
+  * **Daftar Jabatan Anggota:** Mengimplementasikan pemindai multi-jabatan (`dprd_get_member_positions`) sehingga saat mencari nama anggota DPRD, seluruh jabatan yang mereka emban di berbagai komisi/fraksi akan tampil runtut sebagai *bullet points*.
+  * **Penyederhanaan & Validasi Caption Galeri:** Menghapus kolom meta Caption yang tumpang tindih dan langsung menggunakan *Judul Bawaan WordPress* sebagai teks hover caption galeri (baik di Beranda maupun Halaman Galeri).
+  * **Validasi Keamanan Server-Side (Galeri):** Mencegah pengguna mempublikasikan galeri tanpa judul/caption. Jika kosong, sistem otomatis mengubah status menjadi *Draft* dan memunculkan *Admin Notice* bergaya native WordPress (tanpa JavaScript pop-up alert yang mengganggu).
+
+---
+
+## ⏳ Apa Saja yang Belum Dikerjakan? (Menuju Fase 8: Migrasi & Go-Live)
+Secara fitur fungsional (Fase 0 hingga 7), sistem sudah **100% selesai dibangun**. Langkah selanjutnya difokuskan pada tahap penyelesaian akhir (*Finishing* & QA) sesuai dengan panduan migrasi:
+
+1. **Migrasi Data Penuh (Data Entry/Seeding):**
+   Memasukkan data asli/dummy secara menyeluruh (berita, semua daftar anggota dewan, file PDF SAKIP/PPID, dsb) untuk menggantikan teks statis atau data uji coba saat ini.
+2. **Quality Assurance (QA) Visual & Responsivitas:**
+   Mengecek keselarasan desain piksel-ke-piksel (*pixel-perfect*) dengan versi Next.js asli/Figma, baik di tampilan HP maupun Desktop.
+3. **Optimasi SEO (Search Engine Optimization):**
+   Memastikan setiap template menyuntikkan Meta Title, Meta Description, dan struktur Heading (H1, H2) yang tepat agar ramah mesin pencari.
+4. **Persiapan Deployment ke Server Production (cPanel):**
+   Memindahkan struktur database lokal ke database production cPanel dan menyesuaikan file `wp-config.php` ke environment live.
+
+---
+*Laporan progres ini disusun sebagai bukti penyelesaian pekerjaan Fase 4 hingga Fase 7.*
