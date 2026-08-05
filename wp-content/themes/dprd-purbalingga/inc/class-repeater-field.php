@@ -307,8 +307,17 @@ class DPRD_Repeater_Field {
      * @return string JSON string yang sudah tersanitasi, siap update_option()
      */
     public function sanitize_from_post($raw_json) {
-        $json    = wp_unslash($raw_json);
-        $decoded = json_decode($json, true);
+        $decoded = null;
+        if (is_string($raw_json) && !empty($raw_json)) {
+            $json = wp_unslash($raw_json);
+            $decoded = json_decode($json, true);
+            if (!is_array($decoded)) {
+                $decoded = json_decode($raw_json, true);
+            }
+            if (!is_array($decoded)) {
+                $decoded = json_decode(stripslashes($raw_json), true);
+            }
+        }
 
         if (!is_array($decoded)) return wp_json_encode([]);
 
@@ -376,7 +385,14 @@ class DPRD_Repeater_Field {
  */
 function get_dprd_repeater($post_id, $field_id) {
     $raw = get_post_meta($post_id, $field_id, true);
-    $decoded = $raw ? json_decode($raw, true) : [];
+    if (empty($raw)) return [];
+    $decoded = json_decode($raw, true);
+    if (!is_array($decoded)) {
+        $decoded = json_decode(wp_unslash($raw), true);
+    }
+    if (!is_array($decoded)) {
+        $decoded = json_decode(stripslashes($raw), true);
+    }
     return is_array($decoded) ? $decoded : [];
 }
 
@@ -389,7 +405,14 @@ function get_dprd_repeater($post_id, $field_id) {
  */
 function dprd_get_option_repeater($option_name) {
     $raw = get_option($option_name, '[]');
+    if (empty($raw)) return [];
     $decoded = json_decode($raw, true);
+    if (!is_array($decoded)) {
+        $decoded = json_decode(wp_unslash($raw), true);
+    }
+    if (!is_array($decoded)) {
+        $decoded = json_decode(stripslashes($raw), true);
+    }
     return is_array($decoded) ? $decoded : [];
 }
 
