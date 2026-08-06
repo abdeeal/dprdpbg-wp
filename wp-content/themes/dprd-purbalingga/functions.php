@@ -91,6 +91,7 @@ foreach (glob(get_template_directory() . '/inc/meta-boxes/*.php') as $file) {
 // --- Kompresi Gambar Otomatis & Konversi ke WEBP saat Upload ---
 add_filter('wp_handle_upload', 'dprd_convert_upload_to_webp');
 function dprd_convert_upload_to_webp($upload) {
+    @ini_set('memory_limit', '256M');
     if ($upload['type'] == 'image/jpeg' || $upload['type'] == 'image/png' || $upload['type'] == 'image/webp') {
         $file_path = $upload['file'];
         $image = null;
