@@ -6,6 +6,50 @@
 if (!defined('ABSPATH')) exit;
 
 /**
+ * Ekstrak hari dan tanggal rilis secara otomatis dari isi artikel berita
+ */
+function dprd_extract_indonesian_date($text) {
+    if (empty($text)) return '';
+
+    $text = html_entity_decode(strip_tags($text));
+
+    $days = "Senin|Selasa|Rabu|Kamis|Jumat|Jum'at|Sabtu|Minggu";
+    $months = "Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember|Jan|Feb|Mar|Apr|Mei|Jun|Jul|Ags|Sep|Okt|Nov|Des";
+
+    // 1. Match "Jumat (17/7/2026)", "Jumat, 17/7/2026", "Jumat (17 Juli 2026)", "Jumat, 17 Juli 2026"
+    $pattern1 = '/\b(' . $days . ')\s*[\(\,]\s*(\d{1,2}[\/\-\.](?:\d{1,2}|' . $months . ')[\/\-\.]\d{4})\s*[\)]?/i';
+
+    if (preg_match($pattern1, $text, $matches)) {
+        if (strpos($matches[0], '(') !== false) {
+            return trim($matches[1]) . ' (' . trim($matches[2]) . ')';
+        }
+        return trim($matches[1]) . ', ' . trim($matches[2]);
+    }
+
+    // 2. Match "Jumat, 17 Juli 2026" atau "Jumat 17 Juli 2026"
+    $pattern2 = '/\b(' . $days . ')\s*,?\s*(\d{1,2}\s+(?:' . $months . ')\s+\d{4})\b/i';
+    if (preg_match($pattern2, $text, $matches)) {
+        return trim($matches[1]) . ', ' . trim($matches[2]);
+    }
+
+    // 3. Match tanggal "17/7/2026" atau "17-07-2026" tanpa nama hari -> hitung nama harinya
+    $pattern3 = '/\b(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})\b/';
+    if (preg_match($pattern3, $text, $matches)) {
+        $d = intval($matches[1]);
+        $m = intval($matches[2]);
+        $y = intval($matches[3]);
+        if (checkdate($m, $d, $y)) {
+            $ts = mktime(0, 0, 0, $m, $d, $y);
+            $day_num = date('N', $ts);
+            $day_names = [1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'];
+            return $day_names[$day_num] . ' (' . $d . '/' . $m . '/' . $y . ')';
+        }
+    }
+
+    return '';
+}
+
+/**
  * Singleton untuk instance repeater Foto Tambahan Berita
  */
 function dprd_get_berita_images_repeater() {
@@ -120,8 +164,11 @@ function dprd_render_berita_additional_meta_box($post) {
         <tr>
             <th><label for="dprd_day">Hari & Tanggal Rilis</label></th>
             <td>
-                <input type="text" name="day" id="dprd_day" value="<?php echo esc_attr($day); ?>" placeholder="Contoh: Senin, 14 Okt 2024" class="regular-text">
-                <p class="description">Bisa dikosongkan. Isi jika ingin menentukan tanggal rilis sendiri.</p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="text" name="day" id="dprd_day" value="<?php echo esc_attr($day); ?>" placeholder="Contoh: Jumat (17/7/2026)" class="regular-text">
+                    <button type="button" class="button" id="dprd_detect_date_btn" title="Deteksi otomatis tanggal rilis dari isi artikel">🔍 Deteksi dari Artikel</button>
+                </div>
+                <p class="description">Sistem akan otomatis mendeteksi tanggal dari isi berita (contoh: <em>Jumat (17/7/2026)</em>). Kosongkan jika tidak terdeteksi atau ingin diketik manual.</p>
             </td>
         </tr>
         <tr>
@@ -158,6 +205,69 @@ function dprd_render_berita_additional_meta_box($post) {
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        var dayInput = document.getElementById('dprd_day');
+        var detectBtn = document.getElementById('dprd_detect_date_btn');
+
+        // Fungsi pendeteksi tanggal dari isi berita
+        function extractDateFromArticleText(text) {
+            if (!text) return '';
+            var cleanText = text.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ');
+            
+            var days = "Senin|Selasa|Rabu|Kamis|Jumat|Jum'at|Sabtu|Minggu";
+            var months = "Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember|Jan|Feb|Mar|Apr|Mei|Jun|Jul|Ags|Sep|Okt|Nov|Des";
+            
+            // Pattern 1: Hari (DD/MM/YYYY) atau Hari, DD/MM/YYYY
+            var regex1 = new RegExp('\\b(' + days + ')\\s*[\\(\\,]\\s*(\\d{1,2}[\\/\\-\\.](\\d{1,2}|' + months + ')[\\/\\-\\.]\\d{4})\\s*[\\)]?', 'i');
+            var match1 = cleanText.match(regex1);
+            if (match1) {
+                if (match1[0].indexOf('(') !== -1) {
+                    return match1[1].trim() + ' (' + match1[2].trim() + ')';
+                }
+                return match1[1].trim() + ', ' + match1[2].trim();
+            }
+            
+            // Pattern 2: Hari, DD Month YYYY
+            var regex2 = new RegExp('\\b(' + days + ')\\s*,?\\s*(\\d{1,2}\\s+(?:' + months + ')\\s+\\d{4})\\b', 'i');
+            var match2 = cleanText.match(regex2);
+            if (match2) {
+                return match2[1].trim() + ', ' + match2[2].trim();
+            }
+
+            return '';
+        }
+
+        function runAutoDetectDate(force) {
+            if (!dayInput) return;
+            if (!force && dayInput.value.trim() !== '') return;
+
+            var content = '';
+            if (typeof wp !== 'undefined' && wp.data && wp.data.select && wp.data.select('core/editor')) {
+                content = wp.data.select('core/editor').getEditedPostContent();
+            } else {
+                var contentElem = document.getElementById('content');
+                if (contentElem) content = contentElem.value;
+            }
+
+            var detected = extractDateFromArticleText(content);
+            if (detected) {
+                dayInput.value = detected;
+            }
+        }
+
+        if (detectBtn) {
+            detectBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                runAutoDetectDate(true);
+            });
+        }
+
+        // Auto detect saat Gutenberg selesai dimuat jika field day kosong
+        if (typeof wp !== 'undefined' && wp.data && wp.data.select) {
+            setTimeout(function() {
+                runAutoDetectDate(false);
+            }, 1500);
+        }
+
         var captionField = document.getElementById('dprd_image_caption');
         if (!captionField) return;
 
@@ -367,7 +477,14 @@ add_action('save_post', function ($post_id) {
         if (!defined('DOING_AUTOSAVE') || !DOING_AUTOSAVE) {
             if (current_user_can('edit_post', $post_id)) {
                 if (isset($_POST['day'])) {
-                    update_post_meta($post_id, 'day', sanitize_text_field($_POST['day']));
+                    $day_val = sanitize_text_field($_POST['day']);
+                    if (empty($day_val)) {
+                        $post_obj = get_post($post_id);
+                        if ($post_obj && !empty($post_obj->post_content)) {
+                            $day_val = dprd_extract_indonesian_date($post_obj->post_content);
+                        }
+                    }
+                    update_post_meta($post_id, 'day', $day_val);
                 }
                 if (isset($_POST['time'])) {
                     update_post_meta($post_id, 'time', sanitize_text_field($_POST['time']));
