@@ -88,52 +88,64 @@ if ($slug === 'pimpinan-dprd') {
     $breadcrumbs[] = ['label' => 'Pimpinan DPRD'];
     $title = 'Pimpinan DPRD Kabupaten Purbalingga';
     
-    // Query members
-    $leaders_query = new WP_Query([
-        'post_type'      => 'anggota',
-        'posts_per_page' => -1,
-        'post_status'    => 'publish',
-        'orderby'        => 'ID',
-        'order'          => 'ASC'
-    ]);
-    
+    // Ambil anggota dari struktur dprd_ak_struktur_json (bukan semua anggota)
+    $flat_members = dprd_get_flat_members_from_hierarki(isset($ak_data['hierarki']) ? $ak_data['hierarki'] : []);
+
     $pimpinan_list = [];
-    if ($leaders_query->have_posts()) {
-        while ($leaders_query->have_posts()) {
-            $leaders_query->the_post();
-            $leader_id = get_the_ID();
-            $l_name = get_the_title();
-            $l_content = get_the_content();
-            $l_position = ($l_name === 'H.R Bambang Irawan, S.H., S.Sos., M.M.') ? 'Ketua DPRD Kabupaten Purbalingga' : 'Wakil Ketua DPRD Kabupaten Purbalingga';
-            
-            $foto_diri = get_post_meta($leader_id, 'foto_diri', true);
-            $l_image = '';
-            if ($foto_diri) {
-                $l_image = wp_get_attachment_image_url(intval($foto_diri), 'large');
-            }
-            if (empty($l_image)) {
-                $name_clean = trim(strtolower($l_name));
-                if (strpos($name_clean, 'bambang irawan') !== false) {
-                    $l_image = get_template_directory_uri() . '/assets/images/profil-dprd/pimpinan-dprd/1.png';
-                } elseif (strpos($name_clean, 'aris widiarso') !== false) {
-                    $l_image = get_template_directory_uri() . '/assets/images/profil-dprd/pimpinan-dprd/2.png';
-                } elseif (strpos($name_clean, 'aman waliyudin') !== false) {
-                    $l_image = get_template_directory_uri() . '/assets/images/profil-dprd/pimpinan-dprd/3.png';
-                } elseif (strpos($name_clean, 'tenny juliawaty') !== false) {
-                    $l_image = get_template_directory_uri() . '/assets/images/profil-dprd/pimpinan-dprd/4.png';
-                } else {
-                    $l_image = get_template_directory_uri() . '/assets/images/placeholder/avatar.png';
+    foreach ($flat_members as $fm) {
+        $anggota_id = 0;
+        // flat members sudah resolved name/position/image, tapi kita butuh anggota_id untuk deskripsi
+        // Cari anggota_id dari hierarki langsung
+        $pimpinan_list[] = [
+            'name'        => $fm['name'],
+            'position'    => $fm['position'],
+            'description' => '',
+            'image'       => $fm['image'],
+            '_from_flat'  => true,
+        ];
+    }
+
+    // Enrich dengan deskripsi per anggota_id dari hierarki
+    $pimpinan_list = [];
+    if (isset($ak_data['hierarki']) && is_array($ak_data['hierarki'])) {
+        foreach ($ak_data['hierarki'] as $level_data) {
+            if (!isset($level_data['members']) || !is_array($level_data['members'])) continue;
+            foreach ($level_data['members'] as $item) {
+                $anggota_id = isset($item['anggota_id']) ? intval($item['anggota_id']) : 0;
+                if (!$anggota_id) continue;
+
+                $l_name     = get_the_title($anggota_id);
+                $l_position = isset($item['jabatan']) ? $item['jabatan'] : '';
+                $l_desc     = get_post_meta($anggota_id, 'dprd_anggota_deskripsi', true);
+
+                $foto_diri = get_post_meta($anggota_id, 'foto_diri', true);
+                $l_image   = '';
+                if ($foto_diri) {
+                    $l_image = wp_get_attachment_image_url(intval($foto_diri), 'large');
                 }
+                if (empty($l_image)) {
+                    $name_clean = trim(strtolower($l_name));
+                    if (strpos($name_clean, 'bambang irawan') !== false) {
+                        $l_image = get_template_directory_uri() . '/assets/images/profil-dprd/pimpinan-dprd/1.png';
+                    } elseif (strpos($name_clean, 'aris widiarso') !== false) {
+                        $l_image = get_template_directory_uri() . '/assets/images/profil-dprd/pimpinan-dprd/2.png';
+                    } elseif (strpos($name_clean, 'aman waliyudin') !== false) {
+                        $l_image = get_template_directory_uri() . '/assets/images/profil-dprd/pimpinan-dprd/3.png';
+                    } elseif (strpos($name_clean, 'tenny juliawaty') !== false) {
+                        $l_image = get_template_directory_uri() . '/assets/images/profil-dprd/pimpinan-dprd/4.png';
+                    } else {
+                        $l_image = get_template_directory_uri() . '/assets/images/placeholder/avatar.png';
+                    }
+                }
+
+                $pimpinan_list[] = [
+                    'name'        => $l_name,
+                    'position'    => $l_position,
+                    'description' => $l_desc,
+                    'image'       => $l_image,
+                ];
             }
-            
-            $pimpinan_list[] = [
-                'name'        => $l_name,
-                'position'    => $l_position,
-                'description' => $l_content,
-                'image'       => $l_image
-            ];
         }
-        wp_reset_postdata();
     }
     
     // Dasar Hukum & Tugas

@@ -20,7 +20,7 @@
 
     function collectRow(rowEl) {
       var data = {};
-      rowEl.querySelectorAll(':scope > td > input[data-key], :scope > td > textarea[data-key], :scope > td > .dprd-image-field > input[data-key]').forEach(function (input) {
+      rowEl.querySelectorAll(':scope > td input[data-key], :scope > td textarea[data-key], :scope > td select[data-key]').forEach(function (input) {
         data[input.dataset.key] = input.value;
       });
       return data;
@@ -54,6 +54,12 @@
       hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
     wrapper.dprdSync = sync;
+
+    wrapper.addEventListener('input', function (e) {
+      if (e.target && e.target.classList.contains('dprd-points-hidden')) {
+        sync();
+      }
+    });
 
     function attachImageHandlers(scopeEl) {
       scopeEl.querySelectorAll('.dprd-select-image').forEach(function (btn) {

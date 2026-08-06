@@ -14,6 +14,14 @@ add_action('add_meta_boxes', function () {
         'normal',
         'high'
     );
+    add_meta_box(
+        'dprd_anggota_deskripsi_meta',
+        'Deskripsi / Biografi Singkat',
+        'dprd_render_anggota_deskripsi_meta_box',
+        'anggota',
+        'normal',
+        'default'
+    );
 });
 
 function dprd_render_anggota_meta_box($post) {
@@ -186,5 +194,33 @@ add_action('save_post', function ($post_id) {
 
     if (isset($_POST['foto_diri'])) {
         update_post_meta($post_id, 'foto_diri', absint($_POST['foto_diri']));
+    }
+});
+
+function dprd_render_anggota_deskripsi_meta_box($post) {
+    wp_nonce_field('dprd_save_anggota_deskripsi', 'dprd_anggota_deskripsi_nonce');
+    $deskripsi = get_post_meta($post->ID, 'dprd_anggota_deskripsi', true);
+    ?>
+    <table class="form-table">
+        <tr>
+            <td>
+                <textarea id="dprd_anggota_deskripsi" name="dprd_anggota_deskripsi" class="large-text" rows="6"
+                    placeholder="Deskripsi singkat tentang anggota ini (ditampilkan di halaman Pimpinan DPRD)..."><?php echo esc_textarea($deskripsi); ?></textarea>
+                <p class="description">Biografi singkat, ditampilkan di bawah nama &amp; jabatan pada halaman Pimpinan DPRD.</p>
+            </td>
+        </tr>
+    </table>
+    <?php
+}
+
+add_action('save_post', function ($post_id) {
+    if (!isset($_POST['dprd_anggota_deskripsi_nonce']) || !wp_verify_nonce($_POST['dprd_anggota_deskripsi_nonce'], 'dprd_save_anggota_deskripsi')) {
+        return;
+    }
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+
+    if (isset($_POST['dprd_anggota_deskripsi'])) {
+        update_post_meta($post_id, 'dprd_anggota_deskripsi', sanitize_textarea_field($_POST['dprd_anggota_deskripsi']));
     }
 });

@@ -76,6 +76,10 @@ add_action('init', function() {
                         'post_content' => $content
                     ]);
                 }
+                // Simpan deskripsi ke postmeta agar bisa diedit via admin
+                if ($post_id && !is_wp_error($post_id)) {
+                    update_post_meta($post_id, 'dprd_anggota_deskripsi', $content);
+                }
                 return $post_id;
             }
         }
@@ -981,6 +985,27 @@ add_action('init', function() {
         flush_rewrite_rules(false);
         update_option('dprd_default_sekretariat_pages_created_v2', true);
     }
+});
+
+// Migrasi deskripsi anggota dari post_content → dprd_anggota_deskripsi postmeta (sekali jalan)
+add_action('init', function() {
+    if (get_option('dprd_anggota_deskripsi_migrated_v1')) return;
+
+    $anggota_posts = get_posts([
+        'post_type'      => 'anggota',
+        'posts_per_page' => -1,
+        'post_status'    => 'any',
+    ]);
+
+    foreach ($anggota_posts as $a) {
+        $existing_meta = get_post_meta($a->ID, 'dprd_anggota_deskripsi', true);
+        // Hanya migrate jika postmeta kosong dan post_content ada isinya
+        if (empty($existing_meta) && !empty(trim($a->post_content))) {
+            update_post_meta($a->ID, 'dprd_anggota_deskripsi', wp_strip_all_tags($a->post_content));
+        }
+    }
+
+    update_option('dprd_anggota_deskripsi_migrated_v1', true);
 });
 
 

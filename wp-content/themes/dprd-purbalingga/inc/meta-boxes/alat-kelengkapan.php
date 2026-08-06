@@ -35,6 +35,12 @@ function dprd_render_ak_struktur_meta($post) {
         $anggota_options[$a->ID] = esc_html($a->post_title);
     }
     ?>
+    <style>
+    .dprd-member-opt:hover {
+        background-color: #0073aa !important;
+        color: #ffffff !important;
+    }
+    </style>
     <div id="ak-builder-wrapper">
         <input type="hidden" name="dprd_ak_struktur_json" id="dprd_ak_struktur_json" value="<?php echo esc_attr($data); ?>">
         <div id="ak-builder-container"></div>
@@ -58,6 +64,88 @@ function dprd_render_ak_struktur_meta($post) {
             }
             return current;
         }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function renderMemberSelect(pathStr, lIdx, mIdx, selectedId) {
+            let currentTitle = anggotaOptions[selectedId] || '';
+            let optionsHtml = `<div class="dprd-member-opt" data-id="" style="padding:6px 10px; cursor:pointer; color:#888; border-bottom:1px solid #eee;" onclick="selectMemberOpt(this, '${pathStr}', ${lIdx}, ${mIdx})">-- Tanpa Anggota / Kosongkan --</div>`;
+            
+            for (const id in anggotaOptions) {
+                let title = anggotaOptions[id];
+                let isSel = (id == selectedId) ? 'background:#e7f3f9; font-weight:bold;' : '';
+                optionsHtml += `<div class="dprd-member-opt" data-id="${id}" data-search="${escapeHtml(title.toLowerCase())}" style="padding:6px 10px; cursor:pointer; border-bottom:1px solid #f9f9f9; ${isSel}" onclick="selectMemberOpt(this, '${pathStr}', ${lIdx}, ${mIdx})">${escapeHtml(title)}</div>`;
+            }
+
+            return `<div class="dprd-member-select-wrapper" style="position:relative; width:100%;">
+                <div style="position:relative; display:flex; align-items:center;">
+                    <input type="text" 
+                           class="widefat dprd-member-search-input" 
+                           value="${escapeHtml(currentTitle)}" 
+                           placeholder="-- Cari & Pilih Anggota Dewan --"
+                           onfocus="openMemberDropdown(this)"
+                           oninput="filterMemberDropdown(this)"
+                           autocomplete="off"
+                           style="padding-right:24px;">
+                    <span class="dashicons dashicons-arrow-down-alt2" style="position:absolute; right:6px; color:#666; pointer-events:none;"></span>
+                </div>
+                <div class="dprd-member-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; max-height:220px; overflow-y:auto; background:#fff; border:1px solid #0073aa; border-radius:0 0 4px 4px; box-shadow:0 6px 16px rgba(0,0,0,0.15); z-index:99999;">
+                    ${optionsHtml}
+                </div>
+            </div>`;
+        }
+
+        window.openMemberDropdown = function(input) {
+            document.querySelectorAll('.dprd-member-dropdown').forEach(d => d.style.display = 'none');
+            let dropdown = input.closest('.dprd-member-select-wrapper').querySelector('.dprd-member-dropdown');
+            dropdown.style.display = 'block';
+            filterMemberDropdown(input);
+        };
+
+        window.filterMemberDropdown = function(input) {
+            let term = input.value.toLowerCase().trim();
+            let wrapper = input.closest('.dprd-member-select-wrapper');
+            let dropdown = wrapper.querySelector('.dprd-member-dropdown');
+            dropdown.style.display = 'block';
+            let opts = dropdown.querySelectorAll('.dprd-member-opt');
+            
+            opts.forEach(opt => {
+                if (!opt.dataset.id) {
+                    opt.style.display = 'block';
+                    return;
+                }
+                let search = opt.dataset.search || '';
+                if (search.indexOf(term) !== -1) {
+                    opt.style.display = 'block';
+                } else {
+                    opt.style.display = 'none';
+                }
+            });
+        };
+
+        window.selectMemberOpt = function(optEl, pathStr, lIdx, mIdx) {
+            let id = optEl.dataset.id || '';
+            let title = id ? (anggotaOptions[id] || '') : '';
+            let wrapper = optEl.closest('.dprd-member-select-wrapper');
+            let input = wrapper.querySelector('.dprd-member-search-input');
+            input.value = title;
+            wrapper.querySelector('.dprd-member-dropdown').style.display = 'none';
+            updateMember(pathStr, lIdx, mIdx, 'anggota_id', id);
+        };
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dprd-member-select-wrapper')) {
+                document.querySelectorAll('.dprd-member-dropdown').forEach(d => d.style.display = 'none');
+            }
+        });
 
         window.updateNodeTipe = function(pathStr, tipe) {
             let path = JSON.parse(pathStr);
@@ -198,18 +286,15 @@ function dprd_render_ak_struktur_meta($post) {
                         html += `<div style="border:1px solid #e2e4e7; padding:10px; margin-bottom:10px; background:#f9f9f9;">
                             <h4 style="margin-top:0;">Level Hierarki ${lIdx}</h4>
                             <table class="widefat" style="margin-bottom:10px;">
-                                <thead><tr><th>Jabatan</th><th>Nama Anggota</th><th style="width:80px;">Aksi</th></tr></thead>
+                                <thead><tr><th style="width:35%;">Jabatan</th><th style="width:55%;">Nama Anggota (Cari & Pilih)</th><th style="width:10%; text-align:center;">Aksi</th></tr></thead>
                                 <tbody>`;
                         if (level.members) {
                             level.members.forEach((m, mIdx) => {
-                                let opts = '<option value="">-- Pilih Anggota --</option>';
-                                for (const id in anggotaOptions) {
-                                    opts += `<option value="${id}" ${m.anggota_id==id?'selected':''}>${anggotaOptions[id]}</option>`;
-                                }
+                                let selectHtml = renderMemberSelect(pathStr, lIdx, mIdx, m.anggota_id);
                                 html += `<tr>
-                                    <td><input type="text" class="widefat" value="${m.jabatan||''}" onchange="updateMember('${pathStr}', ${lIdx}, ${mIdx}, 'jabatan', this.value)" placeholder="mis. Ketua"></td>
-                                    <td><select class="widefat" onchange="updateMember('${pathStr}', ${lIdx}, ${mIdx}, 'anggota_id', this.value)">${opts}</select></td>
-                                    <td><button type="button" class="button" onclick="removeMember('${pathStr}', ${lIdx}, ${mIdx})">Hapus</button></td>
+                                    <td style="vertical-align:top;"><input type="text" class="widefat" value="${m.jabatan||''}" onchange="updateMember('${pathStr}', ${lIdx}, ${mIdx}, 'jabatan', this.value)" placeholder="mis. Ketua"></td>
+                                    <td style="vertical-align:top;">${selectHtml}</td>
+                                    <td style="vertical-align:top; text-align:center;"><button type="button" class="button" onclick="removeMember('${pathStr}', ${lIdx}, ${mIdx})">Hapus</button></td>
                                 </tr>`;
                             });
                         }
