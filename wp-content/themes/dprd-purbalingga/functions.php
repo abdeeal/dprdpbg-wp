@@ -220,6 +220,9 @@ function dprd_convert_upload_to_webp($upload) {
     return $upload;
 }
 
+// Matikan pembuatan sub-ukuran (sub-sizes) gambar otomatis oleh WordPress agar tidak ada file duplikat berlebihan
+add_filter('intermediate_image_sizes_advanced', '__return_empty_array');
+
 // Pastikan semua ukuran thumbnail yang digenerate oleh WordPress otomatis dalam format WebP
 add_filter('image_editor_output_format', function ($formats) {
     $formats['image/jpeg'] = 'image/webp';
