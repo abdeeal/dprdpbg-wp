@@ -151,10 +151,53 @@ function dprd_convert_upload_to_webp($upload) {
                 $webp_path = preg_replace('/\\.(jpg|jpeg|png)$/i', '.webp', $file_path);
             }
             
-            // Simpan gambar sebagai WebP dengan kualitas tinggi 90%
+            // Simpan gambar WebP dengan target ukuran maksimal 400 KB (409.600 bytes)
+            $max_bytes = 409600;
             $saved = false;
+
             if (function_exists('imagewebp')) {
-                $saved = imagewebp($image, $webp_path, 90);
+                // Coba kompresi awal dengan kualitas tinggi 90% sampai 65%
+                $qualities = [90, 85, 80, 75, 70, 65];
+                foreach ($qualities as $q) {
+                    imagewebp($image, $webp_path, $q);
+                    clearstatcache();
+                    if (filesize($webp_path) <= $max_bytes) {
+                        $saved = true;
+                        break;
+                    }
+                }
+
+                // Jika file size masih > 400KB, penyesuaian resolusi presisi agar tetap <= 400KB
+                if (!$saved || (file_exists($webp_path) && filesize($webp_path) > $max_bytes)) {
+                    $curr_w = imagesx($image);
+                    $curr_h = imagesy($image);
+                    $factors = [0.85, 0.75, 0.65];
+
+                    foreach ($factors as $factor) {
+                        $new_w = floor($curr_w * $factor);
+                        $new_h = floor($curr_h * $factor);
+
+                        $resized = imagecreatetruecolor($new_w, $new_h);
+                        imagealphablending($resized, false);
+                        imagesavealpha($resized, true);
+                        imagecopyresampled($resized, $image, 0, 0, 0, 0, $new_w, $new_h, $curr_w, $curr_h);
+
+                        foreach ([85, 75, 65] as $q) {
+                            imagewebp($resized, $webp_path, $q);
+                            clearstatcache();
+                            if (filesize($webp_path) <= $max_bytes) {
+                                $saved = true;
+                                imagedestroy($resized);
+                                break 2;
+                            }
+                        }
+                        imagedestroy($resized);
+                    }
+                }
+
+                if (file_exists($webp_path)) {
+                    $saved = true;
+                }
             }
             
             // PENTING DI WINDOWS: Harus panggil imagedestroy() sebelum unlink() agar file tidak terkunci oleh GD
