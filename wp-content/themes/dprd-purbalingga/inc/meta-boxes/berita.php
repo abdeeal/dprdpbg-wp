@@ -227,8 +227,8 @@ function dprd_render_berita_additional_meta_box($post) {
                 <label for="dprd_image_caption">Keterangan Foto Utama (Caption & Sumber Foto) <span style="color: #d63638;">*</span></label>
             </th>
             <td>
-                <textarea name="imageCaption" id="dprd_image_caption" rows="2" class="large-text" required placeholder="Contoh: Suasana Rapat Paripurna DPRD Purbalingga bersama Bupati (Foto: Humas DPRD)"><?php echo esc_textarea($image_caption); ?></textarea>
-                <p class="description">Teks keterangan atau sumber foto (caption) yang akan tampil tepat di bawah foto utama di halaman detail berita. <strong>Wajib diisi.</strong></p>
+                <textarea name="imageCaption" id="dprd_image_caption" rows="2" class="large-text" required placeholder="Contoh: Suasana Rapat Paripurna DPRD Purbalingga bersama Bupati (Foto: Humas DPRD)" style="overflow-y: hidden; min-height: 60px; line-height: 1.5; resize: vertical; box-sizing: border-box; width: 100%;"><?php echo esc_textarea($image_caption); ?></textarea>
+                <p class="description">Teks keterangan atau sumber foto (caption) yang akan tampil tepat di bawah foto utama di halaman detail berita. <strong>Wajib diisi.</strong> Kotak akan otomatis melebar saat mengetik teks panjang.</p>
             </td>
         </tr>
     </table>
@@ -332,6 +332,17 @@ function dprd_render_berita_additional_meta_box($post) {
 
         var captionField = document.getElementById('dprd_image_caption');
         if (!captionField) return;
+
+        // Auto-expand tinggi box caption secara otomatis saat diketik
+        function autoExpandCaption(elem) {
+            if (!elem) return;
+            elem.style.height = 'auto';
+            elem.style.height = Math.max(60, elem.scrollHeight + 4) + 'px';
+        }
+
+        autoExpandCaption(captionField);
+        captionField.addEventListener('input', function() { autoExpandCaption(this); });
+        captionField.addEventListener('change', function() { autoExpandCaption(this); });
 
         // Validasi untuk Editor Gutenberg
         if (typeof wp !== 'undefined' && wp.data && wp.data.dispatch && wp.data.select) {
