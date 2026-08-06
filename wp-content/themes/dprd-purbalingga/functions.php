@@ -227,29 +227,27 @@ add_filter('image_editor_output_format', function ($formats) {
     return $formats;
 });
 
-// Bersihkan file uncompressed (JPG/PNG lama) secara otomatis saat attachment metadata di-generate/update
+// Bersihkan file uncompressed (JPG/PNG asli lama) secara otomatis saat attachment metadata di-generate/update
 add_filter('wp_generate_attachment_metadata', function ($metadata, $attachment_id) {
     if (!empty($metadata['file'])) {
         $upload_dir = wp_upload_dir();
         $base_dir = $upload_dir['basedir'] . '/' . dirname($metadata['file']);
         
-        // Jika file utamanya .webp, cari apakah ada sisa file .jpg/.png dengan nama sama yang belum terhapus
+        // Hapus file asli non-WebP (.jpg/.jpeg/.png) jika versi WebP sudah terbentuk
         $file_name = basename($metadata['file']);
-        if (preg_match('/\\.webp$/i', $file_name)) {
-            $base_name = preg_replace('/\\.webp$/i', '', $file_name);
-            foreach (['.jpg', '.jpeg', '.png'] as $ext) {
-                $old_file = $base_dir . '/' . $base_name . $ext;
-                if (file_exists($old_file)) {
-                    @unlink($old_file);
-                }
+        $base_name = preg_replace('/\\.(webp|jpg|jpeg|png)$/i', '', $file_name);
+        foreach (['.jpg', '.jpeg', '.png'] as $ext) {
+            $old_file = $base_dir . '/' . $base_name . $ext;
+            if (file_exists($old_file)) {
+                @unlink($old_file);
             }
         }
 
-        // Hapus juga file sisa di sub-ukuran (sizes) jika masih ada versi JPG/PNG
+        // Hapus juga file sisa di sub-ukuran (sizes) jika ada versi JPG/PNG mentah
         if (!empty($metadata['sizes']) && is_array($metadata['sizes'])) {
             foreach ($metadata['sizes'] as $size => $info) {
-                if (isset($info['file']) && preg_match('/\\.webp$/i', $info['file'])) {
-                    $base_name_size = preg_replace('/\\.webp$/i', '', $info['file']);
+                if (isset($info['file'])) {
+                    $base_name_size = preg_replace('/\\.(webp|jpg|jpeg|png)$/i', '', $info['file']);
                     foreach (['.jpg', '.jpeg', '.png'] as $ext) {
                         $old_size_file = $base_dir . '/' . $base_name_size . $ext;
                         if (file_exists($old_size_file)) {
