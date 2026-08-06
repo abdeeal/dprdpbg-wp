@@ -16,11 +16,12 @@ add_action('add_meta_boxes', function () {
     );
 });
 
-// Enqueue WP Media Uploader hanya di halaman edit CPT ppid
+// Enqueue WP Media Uploader & jQuery UI Sortable hanya di halaman edit CPT ppid
 add_action('admin_enqueue_scripts', function ($hook) {
     global $post;
     if (($hook === 'post.php' || $hook === 'post-new.php') && isset($post) && $post->post_type === 'ppid') {
         wp_enqueue_media();
+        wp_enqueue_script('jquery-ui-sortable');
     }
 });
 
@@ -40,10 +41,28 @@ function dprd_render_ppid_meta_box($post) {
             align-items: center;
             gap: 8px;
             margin-bottom: 10px;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 8px 10px;
+            background: #ffffff;
+            border: 1px solid #ccd0d4;
+            border-radius: 6px;
+            padding: 8px 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            transition: background 0.15s ease;
+        }
+        .ppid-doc-row:hover {
+            background: #f8fafc;
+        }
+        .ppid-drag-handle {
+            cursor: grab;
+            font-size: 18px;
+            color: #788c9e;
+            padding: 2px 6px;
+            user-select: none;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+        }
+        .ppid-drag-handle:hover {
+            color: #2271b1;
         }
         .ppid-doc-row .ppid-doc-title {
             flex: 1;
@@ -87,6 +106,20 @@ function dprd_render_ppid_meta_box($post) {
         .ppid-remove-file-btn.visible {
             display: inline;
         }
+        .ppid-move-btn {
+            padding: 0 6px !important;
+            min-height: 28px !important;
+            line-height: 26px !important;
+            font-size: 11px !important;
+            color: #50575e !important;
+        }
+        .ppid-doc-placeholder {
+            border: 2px dashed #2271b1;
+            background: #f0f6fc;
+            height: 48px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
     </style>
 
     <p>
@@ -100,7 +133,10 @@ function dprd_render_ppid_meta_box($post) {
     <hr style="margin: 15px 0;">
 
     <label><strong>Daftar Dokumen PDF / Upload:</strong></label>
-    <p style="font-size:12px; color:#888; margin:4px 0 10px;">Unggah file PDF dokumen. Kolom Judul wajib diisi.</p>
+    <p style="font-size:12px; color:#646970; margin:4px 0 10px; display:flex; items-center; gap:4px;">
+        <span class="dashicons dashicons-lightbulb" style="font-size:16px; width:16px; height:16px; color:#f0b849; flex-shrink:0;"></span>
+        <span><strong>Tips:</strong> Tahan ikon <span style="font-size:14px; font-weight:bold;">☰</span> di sebelah kiri untuk menggeser (drag & drop) urutan dokumen, atau gunakan tombol panah <span style="font-weight:bold;">▲ / ▼</span>.</span>
+    </p>
 
     <div id="ppid-documents-container">
         <?php foreach ($documents as $index => $doc) :
@@ -108,6 +144,13 @@ function dprd_render_ppid_meta_box($post) {
             $file_name = $has_file ? basename($doc['url']) : '';
         ?>
             <div class="ppid-doc-row">
+                <!-- Drag Handle -->
+                <span class="ppid-drag-handle" title="Tahan dan geser ke atas/bawah untuk mengurutkan">☰</span>
+
+                <!-- Tombol Naik / Turun Cepat -->
+                <button type="button" class="button ppid-move-btn ppid-move-up-btn" title="Pindah ke Atas">▲</button>
+                <button type="button" class="button ppid-move-btn ppid-move-down-btn" title="Pindah ke Bawah">▼</button>
+
                 <!-- Judul -->
                 <div class="ppid-doc-title">
                     <input type="text"
@@ -150,10 +193,22 @@ function dprd_render_ppid_meta_box($post) {
     <script>
     jQuery(document).ready(function ($) {
 
+        // ── Inisialisasi Drag & Drop (jQuery UI Sortable) ───────────────
+        $('#ppid-documents-container').sortable({
+            handle: '.ppid-drag-handle',
+            placeholder: 'ppid-doc-placeholder',
+            axis: 'y',
+            opacity: 0.75,
+            cursor: 'grabbing'
+        });
+
         // ── Template baris baru ──────────────────────────────────────────
         function newDocRow() {
             return $(
                 '<div class="ppid-doc-row">' +
+                    '<span class="ppid-drag-handle" title="Tahan dan geser ke atas/bawah untuk mengurutkan">☰</span>' +
+                    '<button type="button" class="button ppid-move-btn ppid-move-up-btn" title="Pindah ke Atas">▲</button>' +
+                    '<button type="button" class="button ppid-move-btn ppid-move-down-btn" title="Pindah ke Bawah">▼</button>' +
                     '<div class="ppid-doc-title">' +
                         '<input type="text" name="ppid_doc_title[]" value="" placeholder="Judul Dokumen" class="widefat">' +
                     '</div>' +
@@ -176,6 +231,24 @@ function dprd_render_ppid_meta_box($post) {
         // ── Hapus baris ──────────────────────────────────────────────────
         $(document).on('click', '.remove-doc-row-btn', function () {
             $(this).closest('.ppid-doc-row').remove();
+        });
+
+        // ── Tombol Geser Ke Atas (▲) ─────────────────────────────────────
+        $(document).on('click', '.ppid-move-up-btn', function () {
+            var $row = $(this).closest('.ppid-doc-row');
+            var $prev = $row.prev('.ppid-doc-row');
+            if ($prev.length) {
+                $row.insertBefore($prev);
+            }
+        });
+
+        // ── Tombol Geser Ke Bawah (▼) ────────────────────────────────────
+        $(document).on('click', '.ppid-move-down-btn', function () {
+            var $row = $(this).closest('.ppid-doc-row');
+            var $next = $row.next('.ppid-doc-row');
+            if ($next.length) {
+                $row.insertAfter($next);
+            }
         });
 
         // ── Hapus file dari baris (reset ke #) ───────────────────────────

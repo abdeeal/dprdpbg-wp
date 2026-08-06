@@ -118,3 +118,21 @@ Membangun sistem pengajuan permohonan reservasi kunjungan dinas/studi banding le
 - [x] **Penyelarasan Tema & Layout Visual** — Menggunakan font sistem `Plus Jakarta Sans`, menyelaraskan breadcrumbs bawaan tema (`template-parts/ui/breadcrumbs`), warna font (`text-primary` untuk header, `text-ink` dan `text-body` untuk bagan), dan menghilangkan border outer card agar diagram menyatu transparan dengan latar belakang website.
 - [x] **Custom Meta Box Admin (Fase 2)** — Membuat [inc/meta-boxes/bagan-organisasi.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/inc/meta-boxes/bagan-organisasi.php) untuk memberikan kolom unggahan file gambar/PDF asli di editor WordPress Admin, yang secara otomatis menampilkan tombol *"Unduh Bagan Organisasi (Gambar)"* di bagian bawah halaman depan.
 
+---
+
+## Penyesuaian Backend SAKIP & Fitur Drag & Drop PPID (5 - 6 Agustus 2026)
+
+- [x] **Penyesuaian Sistem SAKIP 100% Identik PPID**:
+  - Mengubah struktur pengolahan SAKIP di [inc/meta-boxes/sakip.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/inc/meta-boxes/sakip.php) agar menggunakan field `description` (subtitle) dan repeater `documents_json` (banyak PDF uploader) persis seperti PPID.
+  - Mengubah template [archive-sakip.php](file:///d:/instalasi_aplikasi/xampp/htdocs/dprd-purbalingga/wp-content/themes/dprd-purbalingga/archive-sakip.php) agar menampilkan daftar pos SAKIP sebagai *accordion* dengan transisi smooth dan ikon panah.
+  - Menyiapkan 8 kategori/koleksi SAKIP utama (*Renstra*, *Renja*, *Perjanjian Kinerja*, *IKU*, *Rencana Aksi*, *Cascading Kinerja*, *DPA*, *Laporan Kinerja*).
+  - Menghapus taksonomi `kategori-sakip` di `inc/taxonomies.php` yang sudah redundan sehingga antarmuka admin lebih bersih.
+- [x] **Fitur Drag & Drop Reordering PPID & SAKIP**:
+  - Menambahkan dukungan jQuery UI Sortable di WordPress Admin dengan pegangan **`☰`** untuk menggeser (*drag and drop*) urutan dokumen PDF secara visual.
+  - Menambahkan tombol panah naik/turun cepat (**`▲` / `▼`**) untuk mengurutkan dokumen baris demi baris.
+  - Mengganti emoji dengan ikon resmi WordPress Dashicons (`dashicons-lightbulb`).
+- [x] **Penyesuaian Footer & Halaman Reservasi**:
+  - Memperbarui alamat footer resmi `Jl. Onje No.2a, Purbalingga Lor...` dan email `dprd.purbalinggakab@gmail.com`.
+  - Menghapus nomor telepon dari kolom *Hubungi Kami* di footer.
+  - Memperbaiki konflik *URL rewrite* pada CPT reservasi agar URL `/reservasi/` 100% membuka Halaman Form Pendaftaran (`page-reservasi.php`).
+
