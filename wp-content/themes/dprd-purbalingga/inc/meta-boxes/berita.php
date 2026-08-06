@@ -534,6 +534,48 @@ function dprd_render_berita_quotes_meta_box($post) {
     dprd_get_berita_quotes_repeater()->render_field_only($rows);
 }
 
+/**
+ * Konversi string tanggal Indonesia (misal: "Jumat, 24 Juli 2026") menjadi format MySQL (YYYY-MM-DD)
+ */
+function dprd_parse_indonesian_date_to_mysql($str) {
+    if (empty($str)) return null;
+
+    $str = preg_replace('/<[^>]*>/', '', $str);
+    $str = str_replace('&nbsp;', ' ', $str);
+
+    $months = [
+        'januari' => '01', 'jan' => '01',
+        'februari' => '02', 'feb' => '02',
+        'maret' => '03', 'mar' => '03',
+        'april' => '04', 'apr' => '04',
+        'mei' => '05',
+        'juni' => '06', 'jun' => '06',
+        'juli' => '07', 'jul' => '07',
+        'agustus' => '08', 'ags' => '08', 'agust' => '08',
+        'september' => '09', 'sep' => '09',
+        'oktober' => '10', 'okt' => '10',
+        'november' => '11', 'nov' => '11',
+        'desember' => '12', 'des' => '12',
+    ];
+
+    if (preg_match('/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/', $str, $m)) {
+        $d = sprintf('%02d', $m[1]);
+        $mo = sprintf('%02d', $m[2]);
+        $y = $m[3];
+        return "$y-$mo-$d";
+    }
+
+    if (preg_match('/(\d{1,2})\s*,?\s*([a-zA-Z]+)\s+(\d{4})/', $str, $m)) {
+        $d = sprintf('%02d', $m[1]);
+        $m_lower = strtolower($m[2]);
+        $mo = isset($months[$m_lower]) ? $months[$m_lower] : '01';
+        $y = $m[3];
+        return "$y-$mo-$d";
+    }
+
+    return null;
+}
+
 add_action('save_post', function ($post_id) {
     // 1. Simpan metadata Featured
     if (isset($_POST['dprd_berita_meta_nonce']) && wp_verify_nonce($_POST['dprd_berita_meta_nonce'], 'dprd_save_berita_meta')) {
@@ -558,6 +600,28 @@ add_action('save_post', function ($post_id) {
                         }
                     }
                     update_post_meta($post_id, 'day', $day_val);
+
+                    // Sinkronisasi post_date WP agar pengurutan berita otomatis dari yang terbaru di atas ke terlama di bawah
+                    $time_val = isset($_POST['time']) ? sanitize_text_field($_POST['time']) : '';
+                    $parsed_date = dprd_parse_indonesian_date_to_mysql($day_val);
+                    if ($parsed_date) {
+                        $hour_str = '12:00:00';
+                        if (!empty($time_val) && preg_match('/(\d{1,2})[\:\.](\d{2})/', $time_val, $tm)) {
+                            $hour_str = sprintf('%02d:%02d:00', $tm[1], $tm[2]);
+                        }
+                        $new_datetime = "$parsed_date $hour_str";
+
+                        global $wpdb;
+                        $wpdb->update(
+                            $wpdb->posts,
+                            [
+                                'post_date'     => $new_datetime,
+                                'post_date_gmt' => get_gmt_from_date($new_datetime)
+                            ],
+                            ['ID' => $post_id]
+                        );
+                        clean_post_cache($post_id);
+                    }
                 }
                 if (isset($_POST['time'])) {
                     update_post_meta($post_id, 'time', sanitize_text_field($_POST['time']));
