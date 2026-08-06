@@ -18,15 +18,19 @@ add_action('add_meta_boxes', function () {
 
 function dprd_render_agenda_meta_box($post) {
     wp_nonce_field('dprd_save_agenda_meta', 'dprd_agenda_meta_nonce');
+    $today = current_time('Y-m-d');
     $tanggal = get_post_meta($post->ID, 'tanggal', true);
+    if (empty($tanggal)) {
+        $tanggal = $today;
+    }
     $waktu = get_post_meta($post->ID, 'waktu', true);
     ?>
     <table class="form-table">
         <tr>
             <th><label for="dprd_tanggal">Tanggal Agenda</label></th>
             <td>
-                <input type="date" name="tanggal" id="dprd_tanggal" value="<?php echo esc_attr($tanggal); ?>" class="regular-text">
-                <p class="description">Pilih tanggal dilaksanakannya agenda ini.</p>
+                <input type="date" name="tanggal" id="dprd_tanggal" value="<?php echo esc_attr($tanggal); ?>" min="<?php echo esc_attr($today); ?>" class="regular-text">
+                <p class="description">Pilih tanggal dilaksanakannya agenda ini. Tanggal sebelum hari ini tidak dapat dipilih.</p>
             </td>
         </tr>
         <tr>
@@ -37,6 +41,21 @@ function dprd_render_agenda_meta_box($post) {
             </td>
         </tr>
     </table>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var inputTanggal = document.getElementById('dprd_tanggal');
+        if (inputTanggal) {
+            var todayStr = '<?php echo esc_js($today); ?>';
+            inputTanggal.setAttribute('min', todayStr);
+            inputTanggal.addEventListener('change', function() {
+                if (this.value && this.value < todayStr) {
+                    alert('Tanggal agenda tidak boleh kurang dari hari ini!');
+                    this.value = todayStr;
+                }
+            });
+        }
+    });
+    </script>
     <?php
 }
 
