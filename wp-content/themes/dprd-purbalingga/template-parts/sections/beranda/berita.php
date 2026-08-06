@@ -74,7 +74,7 @@ $recent_query = new WP_Query($recent_args);
             if (empty($day_meta)) {
                 $day_meta = get_the_date('l, d M Y', $post_id);
             }
-            $img_url = get_the_post_thumbnail_url($post_id, 'large');
+            $img_url = get_the_post_thumbnail_url($post_id, 'full');
             if (empty($img_url)) {
                 $img_url = get_template_directory_uri() . '/assets/images/default-berita.jpg'; // fallback
             }
@@ -113,7 +113,7 @@ $recent_query = new WP_Query($recent_args);
                         if (empty($r_day_meta)) {
                             $r_day_meta = get_the_date('l, d M Y', $r_post_id);
                         }
-                        $r_img_url = get_the_post_thumbnail_url($r_post_id, 'medium');
+                        $r_img_url = get_the_post_thumbnail_url($r_post_id, 'full');
                         if (empty($r_img_url)) {
                             $r_img_url = get_template_directory_uri() . '/assets/images/default-berita.jpg'; // fallback
                         }

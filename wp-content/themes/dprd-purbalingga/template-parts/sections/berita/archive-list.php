@@ -58,7 +58,7 @@ $query = new WP_Query($args);
                     $day = get_the_date('d M Y', $post_id);
                 }
                 
-                $img_url = get_the_post_thumbnail_url($post_id, 'large');
+                $img_url = get_the_post_thumbnail_url($post_id, 'full');
                 if (empty($img_url)) {
                     $img_url = get_template_directory_uri() . '/assets/images/default-berita.jpg';
                 }

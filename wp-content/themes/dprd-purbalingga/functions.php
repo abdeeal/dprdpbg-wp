@@ -278,6 +278,21 @@ add_filter('wp_image_editors', function($editors) {
     return ['WP_Image_Editor_GD', 'WP_Image_Editor_Imagick'];
 });
 
+// Fallback otomatis: Jika WP meminta URL image sub-size yang file-nya tidak ada, alihkan otomatis ke URL 'full'
+add_filter('wp_get_attachment_image_src', function ($image, $attachment_id, $size, $icon) {
+    if ($image && isset($image[0]) && $size !== 'full') {
+        $upload_dir = wp_upload_dir();
+        $file_path = str_replace($upload_dir['baseurl'], $upload_dir['basedir'], $image[0]);
+        if (!file_exists($file_path)) {
+            $full_image = wp_get_attachment_image_src($attachment_id, 'full', $icon);
+            if ($full_image) {
+                return $full_image;
+            }
+        }
+    }
+    return $image;
+}, 10, 4);
+
 /**
  * Auto-fix nav menu item URLs if missing home_url base or containing double slashes
  */

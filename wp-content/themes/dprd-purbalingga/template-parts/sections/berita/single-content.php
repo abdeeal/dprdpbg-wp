@@ -17,7 +17,7 @@ $author = get_post_meta($post_id, 'author', true);
 $image_caption = get_post_meta($post_id, 'imageCaption', true);
 
 // Gambar Utama
-$img_url = get_the_post_thumbnail_url($post_id, 'large');
+$img_url = get_the_post_thumbnail_url($post_id, 'full');
 if (empty($img_url)) {
     $img_url = get_template_directory_uri() . '/assets/images/default-berita.jpg'; // fallback
 }
@@ -74,7 +74,7 @@ if (!empty($additional_images) || !empty($additional_quotes)) {
         $caption = isset($img['caption']) ? $img['caption'] : '';
 
         if ($img_id > 0) {
-            $add_img_url = wp_get_attachment_image_url($img_id, 'large');
+            $add_img_url = wp_get_attachment_image_url($img_id, 'full');
             if ($add_img_url) {
                 $image_html = '
                 <figure class="my-10 w-full">
@@ -272,7 +272,7 @@ $recent_news_posts = get_posts([
                     if (empty($r_day)) {
                         $r_day = get_the_date('d M Y', $r_post_id);
                     }
-                    $r_img = get_the_post_thumbnail_url($r_post_id, 'thumbnail');
+                    $r_img = get_the_post_thumbnail_url($r_post_id, 'full');
                     if (empty($r_img)) {
                         $r_img = get_template_directory_uri() . '/assets/images/default-berita.jpg';
                     }
