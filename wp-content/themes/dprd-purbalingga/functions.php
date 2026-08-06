@@ -121,10 +121,10 @@ function dprd_convert_upload_to_webp($upload) {
         }
 
         if ($image) {
-            // Resize gambar jika ukurannya terlalu besar untuk membatasi file size di bawah 200KB
+            // Resize gambar jika ukurannya terlalu besar (maksimal 1920px Full HD)
             $width = imagesx($image);
             $height = imagesy($image);
-            $max_size = 1200; // Maksimal lebar/tinggi 1200px sudah sangat tajam untuk web
+            $max_size = 1920; // Maksimal resolusi 1920px Full HD tajam
             
             if ($width > $max_size || $height > $max_size) {
                 if ($width > $height) {
@@ -151,10 +151,10 @@ function dprd_convert_upload_to_webp($upload) {
                 $webp_path = preg_replace('/\\.(jpg|jpeg|png)$/i', '.webp', $file_path);
             }
             
-            // Simpan gambar sebagai WebP dengan kualitas 75%
+            // Simpan gambar sebagai WebP dengan kualitas tinggi 90%
             $saved = false;
             if (function_exists('imagewebp')) {
-                $saved = imagewebp($image, $webp_path, 75);
+                $saved = imagewebp($image, $webp_path, 90);
             }
             
             // PENTING DI WINDOWS: Harus panggil imagedestroy() sebelum unlink() agar file tidak terkunci oleh GD

@@ -16,9 +16,9 @@ $galeri_posts = get_posts([
 $galeri_data = [];
 foreach ($galeri_posts as $gp) {
     $image_id = get_post_meta($gp->ID, 'image_id', true);
-    $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'large') : '';
+    $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'full') : '';
     if (empty($image_url)) {
-        $image_url = get_the_post_thumbnail_url($gp->ID, 'large');
+        $image_url = get_the_post_thumbnail_url($gp->ID, 'full');
     }
     if (empty($image_url)) {
         $image_url = get_template_directory_uri() . '/assets/images/default-galeri.jpg';

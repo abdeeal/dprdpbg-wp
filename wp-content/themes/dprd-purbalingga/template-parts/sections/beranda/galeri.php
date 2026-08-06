@@ -28,9 +28,9 @@ $galeri_query = new WP_Query([
                 while ($galeri_query->have_posts()) : $galeri_query->the_post();
                     $post_id = get_the_ID();
                     $image_id = get_post_meta($post_id, 'image_id', true);
-                    $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'large') : '';
+                    $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'full') : '';
                     if (empty($image_url)) {
-                        $image_url = get_the_post_thumbnail_url($post_id, 'large');
+                        $image_url = get_the_post_thumbnail_url($post_id, 'full');
                     }
                     if (empty($image_url)) {
                         $image_url = get_template_directory_uri() . '/assets/images/default-galeri.jpg'; // fallback
