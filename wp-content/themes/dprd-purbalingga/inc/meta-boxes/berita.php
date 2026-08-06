@@ -178,6 +178,9 @@ function dprd_render_berita_additional_meta_box($post) {
     $day = get_post_meta($post->ID, 'day', true);
     $time = get_post_meta($post->ID, 'time', true);
     $author = get_post_meta($post->ID, 'author', true);
+    if (empty($author)) {
+        $author = 'Humpro DPRD Kabupaten Purbalingga';
+    }
     $image_caption = get_post_meta($post->ID, 'imageCaption', true);
     $quote_text = get_post_meta($post->ID, 'dprd_quote_text', true);
     $quote_paragraph = get_post_meta($post->ID, 'dprd_quote_paragraph', true);
@@ -205,8 +208,11 @@ function dprd_render_berita_additional_meta_box($post) {
         <tr>
             <th><label for="dprd_author">Nama Penulis / Sumber</label></th>
             <td>
-                <input type="text" name="author" id="dprd_author" value="<?php echo esc_attr($author); ?>" placeholder="Contoh: Sekretariat DPRD" class="regular-text">
-                <p class="description">Bisa dikosongkan. Isi jika ditulis oleh pihak lain selain akun Anda.</p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="text" name="author" id="dprd_author" value="<?php echo esc_attr($author); ?>" placeholder="Contoh: Humpro DPRD Kabupaten Purbalingga" class="regular-text">
+                    <button type="button" class="button" id="dprd_preset_humpro_btn" title="Klik untuk mengisi otomatis Humpro DPRD Kabupaten Purbalingga">⚡ Humpro DPRD</button>
+                </div>
+                <p class="description">Default: <strong>Humpro DPRD Kabupaten Purbalingga</strong>. Klik tombol <em>⚡ Humpro DPRD</em> jika ingin mengisinya secara cepat.</p>
             </td>
         </tr>
         <tr>
@@ -305,6 +311,15 @@ function dprd_render_berita_additional_meta_box($post) {
             detectBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 runAutoDetectDate(true);
+            });
+        }
+
+        var authorInput = document.getElementById('dprd_author');
+        var presetHumproBtn = document.getElementById('dprd_preset_humpro_btn');
+        if (presetHumproBtn && authorInput) {
+            presetHumproBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                authorInput.value = 'Humpro DPRD Kabupaten Purbalingga';
             });
         }
 
@@ -537,7 +552,11 @@ add_action('save_post', function ($post_id) {
                     update_post_meta($post_id, 'time', sanitize_text_field($_POST['time']));
                 }
                 if (isset($_POST['author'])) {
-                    update_post_meta($post_id, 'author', sanitize_text_field($_POST['author']));
+                    $author_val = sanitize_text_field($_POST['author']);
+                    if (empty($author_val)) {
+                        $author_val = 'Humpro DPRD Kabupaten Purbalingga';
+                    }
+                    update_post_meta($post_id, 'author', $author_val);
                 }
                 if (isset($_POST['imageCaption'])) {
                     update_post_meta($post_id, 'imageCaption', sanitize_textarea_field($_POST['imageCaption']));
