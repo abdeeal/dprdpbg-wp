@@ -510,34 +510,72 @@ add_action('init', function() {
             ])
         ], '2026-07-21 12:00:05');
 
+        // Helper lokal untuk lookup ID Anggota berdasarkan pencarian nama
+        $get_aid = function($title_query) {
+            $posts = get_posts([
+                'post_type'      => 'anggota',
+                'title'          => $title_query,
+                'posts_per_page' => 1,
+                'post_status'    => 'any'
+            ]);
+            if (!empty($posts)) return $posts[0]->ID;
+            $posts_like = get_posts([
+                'post_type'      => 'anggota',
+                's'              => $title_query,
+                'posts_per_page' => 1,
+                'post_status'    => 'any'
+            ]);
+            return !empty($posts_like) ? $posts_like[0]->ID : 0;
+        };
+
         // 3. Badan Anggaran
         $banggar_json = wp_json_encode([
             'tipe' => 'badan',
             'nama' => 'Badan Anggaran',
             'hierarki' => [
+                // Level 0: Ketua Merangkap Anggota
                 [
                     'members' => [
                         ['jabatan' => 'Ketua Merangkap Anggota', 'anggota_id' => $id_bambang]
                     ]
                 ],
+                // Level 1: Wakil Ketua Merangkap Anggota
                 [
                     'members' => [
-                        ['jabatan' => 'Wakil Ketua Merangkap Anggota', 'anggota_id' => $id_aris],
                         ['jabatan' => 'Wakil Ketua Merangkap Anggota', 'anggota_id' => $id_aman],
+                        ['jabatan' => 'Wakil Ketua Merangkap Anggota', 'anggota_id' => $id_aris],
                         ['jabatan' => 'Wakil Ketua Merangkap Anggota', 'anggota_id' => $id_tenny]
                     ]
                 ],
+                // Level 2: Sekretaris Bukan Anggota
                 [
                     'members' => [
-                        ['jabatan' => 'Sekretaris Bukan Anggota', 'anggota_id' => $id_bambang]
+                        ['jabatan' => 'Sekretaris Bukan Anggota', 'anggota_id' => $get_aid('Edhy Suryono')]
                     ]
                 ],
+                // Level 3: Anggota
                 [
                     'members' => [
-                        ['jabatan' => 'Anggota', 'anggota_id' => $id_bambang],
-                        ['jabatan' => 'Anggota', 'anggota_id' => $id_aris],
-                        ['jabatan' => 'Anggota', 'anggota_id' => $id_aman],
-                        ['jabatan' => 'Anggota', 'anggota_id' => $id_tenny]
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Karseno')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Imawan Taqiudin')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Wuriyati')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Tongat')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Katno')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Uswatun Khasanah')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('In\'am Birohmatillah')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Puput Adi Purnomo')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Miswanto')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Khodirin')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Titi Yeni Sugiarti')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Cahyo Susilo')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Siti Sifa')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Ahmad Sa\'bani')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Adi Supriyanto')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Adi Yowono')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Yuniarti')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Sarjono')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Suharto')],
+                        ['jabatan' => 'Anggota', 'anggota_id' => $get_aid('Setiaji')]
                     ]
                 ]
             ]
