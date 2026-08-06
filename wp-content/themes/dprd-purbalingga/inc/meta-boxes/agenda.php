@@ -71,7 +71,12 @@ add_action('save_post', function ($post_id) {
     }
 
     if (isset($_POST['tanggal'])) {
-        update_post_meta($post_id, 'tanggal', sanitize_text_field($_POST['tanggal']));
+        $tgl = sanitize_text_field($_POST['tanggal']);
+        $today = current_time('Y-m-d');
+        if (empty($tgl) || $tgl < $today) {
+            $tgl = $today;
+        }
+        update_post_meta($post_id, 'tanggal', $tgl);
     }
     if (isset($_POST['waktu'])) {
         update_post_meta($post_id, 'waktu', sanitize_text_field($_POST['waktu']));
