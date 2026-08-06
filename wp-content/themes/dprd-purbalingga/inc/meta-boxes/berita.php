@@ -14,25 +14,49 @@ function dprd_extract_indonesian_date($text) {
     $text = html_entity_decode(strip_tags($text));
 
     $days = "Senin|Selasa|Rabu|Kamis|Jumat|Jum'at|Sabtu|Minggu";
-    $months = "Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember|Jan|Feb|Mar|Apr|Mei|Jun|Jul|Ags|Sep|Okt|Nov|Des";
+    $months_regex = "Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember|Jan|Feb|Mar|Apr|Mei|Jun|Jul|Ags|Sep|Okt|Nov|Des";
 
-    // 1. Match "Jumat (17/7/2026)", "Jumat, 17/7/2026", "Jumat (17 Juli 2026)", "Jumat, 17 Juli 2026"
-    $pattern1 = '/\b(' . $days . ')\s*[\(\,]\s*(\d{1,2}[\/\-\.](?:\d{1,2}|' . $months . ')[\/\-\.]\d{4})\s*[\)]?/i';
+    $months_map = [
+        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        'jan' => 'Januari', 'feb' => 'Februari', 'mar' => 'Maret', 'apr' => 'April',
+        'mei' => 'Mei', 'jun' => 'Juni', 'jul' => 'Juli', 'ags' => 'Agustus',
+        'sep' => 'September', 'okt' => 'Oktober', 'nov' => 'November', 'des' => 'Desember'
+    ];
+
+    $format_date = function($day_name, $d_num, $m_val, $y_num) use ($months_map) {
+        $m_lower = strtolower(trim($m_val));
+        if (is_numeric($m_lower)) {
+            $m_int = intval($m_lower);
+            $month_name = isset($months_map[$m_int]) ? $months_map[$m_int] : $m_val;
+        } else {
+            $month_name = isset($months_map[$m_lower]) ? $months_map[$m_lower] : ucfirst($m_lower);
+        }
+
+        $d_int = intval($d_num);
+        $day_clean = trim($day_name);
+
+        if (!empty($day_clean)) {
+            return $day_clean . ', ' . $d_int . ' ' . $month_name . ' ' . $y_num;
+        }
+        return $d_int . ' ' . $month_name . ' ' . $y_num;
+    };
+
+    // 1. Match "Kamis (09/07/2026)", "Jumat (17/7/2026)", "Jumat, 17/7/2026", "Jumat (17 Juli 2026)", "Jumat, 17 Juli 2026"
+    $pattern1 = '/\b(' . $days . ')\s*[\(\,]\s*(\d{1,2})[\/\-\.](\d{1,2}|' . $months_regex . ')[\/\-\.](\d{4})\s*[\)]?/i';
 
     if (preg_match($pattern1, $text, $matches)) {
-        if (strpos($matches[0], '(') !== false) {
-            return trim($matches[1]) . ' (' . trim($matches[2]) . ')';
-        }
-        return trim($matches[1]) . ', ' . trim($matches[2]);
+        return $format_date($matches[1], $matches[2], $matches[3], $matches[4]);
     }
 
     // 2. Match "Jumat, 17 Juli 2026" atau "Jumat 17 Juli 2026"
-    $pattern2 = '/\b(' . $days . ')\s*,?\s*(\d{1,2}\s+(?:' . $months . ')\s+\d{4})\b/i';
+    $pattern2 = '/\b(' . $days . ')\s*,?\s*(\d{1,2})\s+(' . $months_regex . ')\s+(\d{4})\b/i';
     if (preg_match($pattern2, $text, $matches)) {
-        return trim($matches[1]) . ', ' . trim($matches[2]);
+        return $format_date($matches[1], $matches[2], $matches[3], $matches[4]);
     }
 
-    // 3. Match tanggal "17/7/2026" atau "17-07-2026" tanpa nama hari -> hitung nama harinya
+    // 3. Match tanggal "17/7/2026" atau "09/07/2026" tanpa nama hari -> hitung nama harinya secara otomatis
     $pattern3 = '/\b(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})\b/';
     if (preg_match($pattern3, $text, $matches)) {
         $d = intval($matches[1]);
@@ -42,7 +66,7 @@ function dprd_extract_indonesian_date($text) {
             $ts = mktime(0, 0, 0, $m, $d, $y);
             $day_num = date('N', $ts);
             $day_names = [1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'];
-            return $day_names[$day_num] . ' (' . $d . '/' . $m . '/' . $y . ')';
+            return $format_date($day_names[$day_num], $d, $m, $y);
         }
     }
 
@@ -214,23 +238,46 @@ function dprd_render_berita_additional_meta_box($post) {
             var cleanText = text.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ');
             
             var days = "Senin|Selasa|Rabu|Kamis|Jumat|Jum'at|Sabtu|Minggu";
-            var months = "Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember|Jan|Feb|Mar|Apr|Mei|Jun|Jul|Ags|Sep|Okt|Nov|Des";
+            var monthsRegex = "Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember|Jan|Feb|Mar|Apr|Mei|Jun|Jul|Ags|Sep|Okt|Nov|Des";
             
+            var monthsMap = {
+                1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April',
+                5: 'Mei', 6: 'Juni', 7: 'Juli', 8: 'Agustus',
+                9: 'September', 10: 'Oktober', 11: 'November', 12: 'Desember',
+                'jan': 'Januari', 'feb': 'Februari', 'mar': 'Maret', 'apr': 'April',
+                'mei': 'Mei', 'jun': 'Juni', 'jul': 'Juli', 'ags': 'Agustus',
+                'sep': 'September', 'okt': 'Oktober', 'nov': 'November', 'des': 'Desember'
+            };
+
+            function formatDate(dayName, dNum, mVal, yNum) {
+                var mLower = String(mVal).trim().toLowerCase();
+                var monthName = mVal;
+                if (!isNaN(mLower)) {
+                    var mInt = parseInt(mLower, 10);
+                    if (monthsMap[mInt]) monthName = monthsMap[mInt];
+                } else if (monthsMap[mLower]) {
+                    monthName = monthsMap[mLower];
+                }
+                var dInt = parseInt(dNum, 10);
+                var dayClean = String(dayName).trim();
+                if (dayClean) {
+                    return dayClean + ', ' + dInt + ' ' + monthName + ' ' + yNum;
+                }
+                return dInt + ' ' + monthName + ' ' + yNum;
+            }
+
             // Pattern 1: Hari (DD/MM/YYYY) atau Hari, DD/MM/YYYY
-            var regex1 = new RegExp('\\b(' + days + ')\\s*[\\(\\,]\\s*(\\d{1,2}[\\/\\-\\.](\\d{1,2}|' + months + ')[\\/\\-\\.]\\d{4})\\s*[\\)]?', 'i');
+            var regex1 = new RegExp('\\b(' + days + ')\\s*[\\(\\,]\\s*(\\d{1,2})[\\/\\-\\.](\\d{1,2}|' + monthsRegex + ')[\\/\\-\\.](\\d{4})\\s*[\\)]?', 'i');
             var match1 = cleanText.match(regex1);
             if (match1) {
-                if (match1[0].indexOf('(') !== -1) {
-                    return match1[1].trim() + ' (' + match1[2].trim() + ')';
-                }
-                return match1[1].trim() + ', ' + match1[2].trim();
+                return formatDate(match1[1], match1[2], match1[3], match1[4]);
             }
             
             // Pattern 2: Hari, DD Month YYYY
-            var regex2 = new RegExp('\\b(' + days + ')\\s*,?\\s*(\\d{1,2}\\s+(?:' + months + ')\\s+\\d{4})\\b', 'i');
+            var regex2 = new RegExp('\\b(' + days + ')\\s*,?\\s*(\\d{1,2})\\s+(' + monthsRegex + ')\\s+(\\d{4})\\b', 'i');
             var match2 = cleanText.match(regex2);
             if (match2) {
-                return match2[1].trim() + ', ' + match2[2].trim();
+                return formatDate(match2[1], match2[2], match2[3], match2[4]);
             }
 
             return '';
