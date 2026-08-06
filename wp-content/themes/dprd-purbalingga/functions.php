@@ -58,6 +58,19 @@ function dprd_enqueue_assets() {
 }
 add_action('wp_enqueue_scripts', 'dprd_enqueue_assets');
 
+// --- Enqueue Admin Scripts (Auto Split Paste Tag) ---
+add_action('admin_enqueue_scripts', function($hook) {
+    if (in_array($hook, ['post.php', 'post-new.php'])) {
+        wp_enqueue_script(
+            'dprd-admin-tag-paster',
+            get_template_directory_uri() . '/assets/js/admin-tag-paster.js',
+            ['wp-api-fetch', 'wp-data'],
+            filemtime(get_template_directory() . '/assets/js/admin-tag-paster.js'),
+            true
+        );
+    }
+});
+
 // --- Load CPT, Taxonomies, and Custom Systems ---
 require get_template_directory() . '/inc/post-types.php';
 require get_template_directory() . '/inc/taxonomies.php';
