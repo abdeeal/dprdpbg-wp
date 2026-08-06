@@ -193,7 +193,7 @@ function dprd_render_berita_additional_meta_box($post) {
             <td>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <input type="text" name="day" id="dprd_day" value="<?php echo esc_attr($day); ?>" placeholder="Contoh: Jumat (17/7/2026)" class="regular-text">
-                    <button type="button" class="button" id="dprd_detect_date_btn" title="Deteksi otomatis tanggal rilis dari isi artikel">🔍 Deteksi dari Artikel</button>
+                    <button type="button" class="button" id="dprd_detect_date_btn" title="Deteksi otomatis tanggal rilis dari isi artikel">Deteksi dari Artikel</button>
                 </div>
                 <p class="description">Sistem akan otomatis mendeteksi tanggal dari isi berita (contoh: <em>Jumat (17/7/2026)</em>). Kosongkan jika tidak terdeteksi atau ingin diketik manual.</p>
             </td>
@@ -210,9 +210,9 @@ function dprd_render_berita_additional_meta_box($post) {
             <td>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <input type="text" name="author" id="dprd_author" value="<?php echo esc_attr($author); ?>" placeholder="Contoh: Humpro DPRD Kabupaten Purbalingga" class="regular-text">
-                    <button type="button" class="button" id="dprd_preset_humpro_btn" title="Klik untuk mengisi otomatis Humpro DPRD Kabupaten Purbalingga">⚡ Humpro DPRD</button>
+                    <button type="button" class="button" id="dprd_preset_humpro_btn" title="Klik untuk mengisi otomatis Humpro DPRD Kabupaten Purbalingga">Humpro DPRD</button>
                 </div>
-                <p class="description">Default: <strong>Humpro DPRD Kabupaten Purbalingga</strong>. Klik tombol <em>⚡ Humpro DPRD</em> jika ingin mengisinya secara cepat.</p>
+                <p class="description">Default: <strong>Humpro DPRD Kabupaten Purbalingga</strong>. Klik tombol <em>Humpro DPRD</em> jika ingin mengisinya secara cepat.</p>
             </td>
         </tr>
         <tr>
