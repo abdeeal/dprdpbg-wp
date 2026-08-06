@@ -140,8 +140,9 @@ class DPRD_Repeater_Field {
                 <thead>
                     <tr>
                         <?php if ($this->nestable) : ?><th style="width:24px;"></th><?php endif; ?>
-                        <?php foreach ($this->sub_fields as $def) : ?>
-                            <th><?php echo esc_html($def['label']); ?></th>
+                        <?php foreach ($this->sub_fields as $key => $def) : ?>
+                            <?php $th_style = isset($def['width']) && $def['width'] !== 'auto' ? 'style="width:' . esc_attr($def['width']) . ';"' : ''; ?>
+                            <th <?php echo $th_style; ?> data-col-key="<?php echo esc_attr($key); ?>"><?php echo esc_html($def['label']); ?></th>
                         <?php endforeach; ?>
                         <th style="width:1%;"></th>
                     </tr>

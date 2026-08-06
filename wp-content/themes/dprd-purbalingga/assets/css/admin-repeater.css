@@ -87,8 +87,21 @@
   display: block;
 }
 
-.dprd-remove-image {
-  color: #b32d2e;
+.dprd-remove-image,
+.button-link.dprd-remove-image {
+  color: #d63638 !important;
+  text-decoration: none;
+}
+
+.dprd-remove-image:hover,
+.button-link.dprd-remove-image:hover {
+  color: #b32d2e !important;
+  text-decoration: underline;
+}
+
+/* Restrict input paragraph width inside repeater */
+.dprd-repeater input[data-key="paragraph"] {
+  max-width: 160px;
 }
 
 /* Hide raw <template> tags from layout (browsers already do this, just being explicit) */

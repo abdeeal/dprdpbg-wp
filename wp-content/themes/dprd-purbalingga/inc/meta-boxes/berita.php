@@ -16,9 +16,9 @@ function dprd_get_berita_images_repeater() {
             'Foto-Foto Tambahan Berita (Disisipkan di Tengah Artikel)',
             null,
             [
-                'image_id'  => ['label' => 'Foto Tambahan', 'type' => 'image'],
-                'caption'   => ['label' => 'Keterangan Foto (Caption)', 'type' => 'textarea'],
-                'paragraph' => ['label' => 'Disisipkan Setelah Paragraf Ke- (Angka)', 'type' => 'text'],
+                'image_id'  => ['label' => 'Foto Tambahan', 'type' => 'image', 'width' => '220px'],
+                'caption'   => ['label' => 'Keterangan Foto (Caption)', 'type' => 'textarea', 'width' => 'auto'],
+                'paragraph' => ['label' => 'Disisipkan Setelah Paragraf Ke- (Angka)', 'type' => 'text', 'width' => '220px'],
             ]
         );
     }
@@ -36,8 +36,8 @@ function dprd_get_berita_quotes_repeater() {
             'Kutipan-Kutipan Berita (Blockquote di Tengah Artikel)',
             null,
             [
-                'quote_text' => ['label' => 'Isi Teks Kutipan (Blockquote)', 'type' => 'textarea'],
-                'paragraph'  => ['label' => 'Disisipkan Setelah Paragraf Ke- (Angka)', 'type' => 'text'],
+                'quote_text' => ['label' => 'Isi Teks Kutipan (Blockquote)', 'type' => 'textarea', 'width' => 'auto'],
+                'paragraph'  => ['label' => 'Disisipkan Setelah Paragraf Ke- (Angka)', 'type' => 'text', 'width' => '220px'],
             ]
         );
     }
