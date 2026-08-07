@@ -2,7 +2,7 @@
 **Proyek:** Website DPRD Kabupaten Purbalingga (Next.js Headless → WordPress Native)
 **Fase:** Fase 4 (Convert Komponen React → PHP Template Parts) & Pengembangannya
 
-Dokumen ini mencatat seluruh modul, fitur kustom, dan optimasi yang telah diselesaikan untuk bagian **Agenda, Berita, Galeri, dan Sekilas tentang Purbalingga** dalam migrasi WordPress (100% Gratis & Bebas Plugin Berbayar).
+Dokumen ini mencatat seluruh modul, fitur kustom, dan optimasi yang telah diselesaikan untuk bagian **Agenda, Berita, Galeri, Sekilas tentang Purbalingga, Pencarian Global, dan Sistem Manajemen Kategori Admin** dalam migrasi WordPress (100% Gratis & Bebas Plugin Berbayar).
 
 ---
 
@@ -28,6 +28,7 @@ Dokumen ini mencatat seluruh modul, fitur kustom, dan optimasi yang telah disele
     * Penambahan ikon kalender (waktu rilis) dan ikon user (penulis/sumber) yang kompatibel di semua ukuran browser.
     * Tombol **Bagikan (Share)** interaktif (membuka menu share bawaan pada smartphone atau otomatis menyalin link URL ke clipboard pada komputer).
     * Sidebar kanan **Update Berita Serupa** (menampilkan 3 rekomendasi berita sejenis, otomatis mengecualikan berita yang sedang dibaca).
+    * Penyempurnaan tombol **Lihat Semua Berita** menjadi tautan teks *borderless* yang bersih tanpa kotak border yang mengganggu (`Lihat Semua Berita →`).
   * **Kemudahan Input Admin Berita (Meta Box Kustom):**
     * Kolom kustom **Ringkasan Berita (Tampil di Halaman Depan)** agar admin tidak perlu mencari menu kutipan di sidebar kanan bawaan WordPress.
     * Menonaktifkan dukungan kutipan default WordPress agar panel *"Tambah kutipan..."* di sidebar kanan hilang untuk menghilangkan kebingungan admin.
@@ -40,14 +41,25 @@ Dokumen ini mencatat seluruh modul, fitur kustom, dan optimasi yang telah disele
 * **File Template Daftar Galeri:** `template-parts/sections/galeri/archive-list.php` (dipanggil di `archive-galeri.php`)
 * **Pekerjaan yang Diselesaikan:**
   * Tampilan grid 4 galeri terbaru di halaman utama.
-  * **Interaktivitas Halaman Galeri (Vanilla JS):** Meniru persis perilaku React (`GaleriClient.jsx`) tanpa memberatkan server:
-    * *Pencarian Instan:* Filter pencarian judul foto secara real-time saat mengetik.
-    * *Penyaring Tab Kategori:* Klik tab kategori (Rapat Paripurna, Reses, Rapat Komisi, dll.) akan menyaring foto secara instan.
-    * *Pagination Dinamis:* Pembagian halaman foto secara instan di browser.
+  * **Interaktivitas Halaman Galeri (Vanilla JS & Dynamic Layout):**
+    * **Desain Tombol Filter Popover Minimalis:** Tombol filter kustom berbentuk kotak presisi (`w-12 h-12`) dengan ikon 3-garis horizontal (`filter-3`). Saat ditekan, menampilkan menu popover melayang tanpa teks terlipat (`whitespace-nowrap`).
+    * **Paginasi Responsif Sesuai Ukuran Layar:** Batas kartu galeri diatur dinamis — **maksimal 10 kartu ke bawah** per halaman pada layar HP / mobile (< 640px) dan **20 kartu** per halaman pada layar desktop (>= 640px).
+    * **Ekstraksi Tanggal & Pengurutan Otomatis (Terbaru ke Terlama):** Sistem secara otomatis mengekstrak tanggal kegiatan dari judul foto (mendukung berbagai format: `YYYY.MM.DD`, `YYYY-MM-DD`, `DD-MM-YYYY`, `DD.MM.YYYY`, `DD [Bulan] YYYY`) dan mengurutkan seluruh galeri secara *Descending* (terbaru di paling atas, terlama di bawah).
+    * **Pembersihan Ekstensi File pada Judul:** Ekstensi file seperti `.jpg`, `.Jpg`, `.png`, dan `.webp` yang tersisa di judul secara otomatis dibersihkan dari tampilan publik.
+    * **Otomatisasi Judul dari Nama File:** Saat admin mengunggah foto galeri baru, nama file foto secara otomatis diproses, dibersihkan dari garis/strip, dan diisikan langsung sebagai Judul Galeri secara instan.
 
 ---
 
-## 🏛️ 4. Sekilas Tentang Purbalingga (Data Statistik & Profil)
+## 🏷️ 4. Sistem Manajemen Kategori Admin (Unified Category Manager)
+* **File Utama:** `inc/category-manager.php` & `inc/taxonomies.php`
+* **Pekerjaan yang Diselesaikan:**
+  * **1 Meta Box Tunggal Ringkas ("Kategori [Tipe Konten]"):** Menyatukan Meta Box kategori bawaan yang duplikat menjadi 1 box kustom tunggal yang bersih di sidebar kanan WP Admin.
+  * **Fitur Hapus & Tambah Kategori Instan:** Menyediakan tombol merah **Hapus** pada setiap item kategori untuk menghapus kategori yang salah buat secara permanen dari database via AJAX (dilengkapi konfirmasi), serta tombol **+ Tambah Kategori Baru**.
+  * **Scoping Tipe Konten yang Tepat:** Meta Box kategori diaktifkan khusus untuk CPT yang membutuhkan pengelompokan kategori (`Galeri`, `Berita`, `Alat Kelengkapan`) dan di-nonaktifkan pada CPT dokumen (`SAKIP`, `PPID`, `Propemperda`) agar tampilan admin tetap rapi.
+
+---
+
+## 🏛️ 5. Sekilas Tentang Purbalingga (Data Statistik & Profil)
 * **File Template Halaman:** `page-sekilas-tentang-purbalingga.php`
 * **File Sub-Section (`template-parts/sections/sekilas/`):**
   * `letak-geografis.php` (Card kompas batas wilayah & tabel jarak kota besar).
@@ -59,12 +71,12 @@ Dokumen ini mencatat seluruh modul, fitur kustom, dan optimasi yang telah disele
   * `kependudukan.php` (Kepadatan penduduk & laju pertumbuhan).
   * `sosial-fasilitas.php` (Tabel jumlah Sekolah, Rumah Sakit, Tempat Ibadah).
 * **Fitur Tambahan:**
-  * **Sidebar Daftar Isi (Table of Contents):** Daftar isi di kanan layar yang otomatis berpindah aktif (scroll-spy) mengikuti posisi scroll mouse pembaca secara real-time.
+  * **Sidebar Daftar Isi (Table of Contents):** Daftar isi di kanan layar yang otomatis berpindah aktif (*scroll-spy*) mengikuti posisi scroll mouse pembaca secara real-time.
   * **Penyediaan Data Fallback (`inc/sekilas-data.php`):** Menyimpan database data statistik BPS 2024 Purbalingga sebagai fallback otomatis jika database online kosong agar tampilan website tidak kosong.
 
 ---
 
-## 🚀 5. Optimasi Performa & Keamanan Sistem
+## 🚀 6. Optimasi Performa & Keamanan Sistem
 * **Kompresi & Konversi WebP Otomatis:**
   * Ditambahkan hook di `functions.php` agar setiap gambar berformat JPG, JPEG, atau PNG yang diunggah ke WordPress otomatis dikonversi ke format **WebP** dengan tingkat kompresi optimal **80%**.
   * File asli JPG/PNG otomatis dihapus dari server untuk menghemat kapasitas penyimpanan hosting.
@@ -74,14 +86,16 @@ Dokumen ini mencatat seluruh modul, fitur kustom, dan optimasi yang telah disele
 
 ---
 
-## 🔍 6. Pencarian Global & Penyempurnaan Fitur Tambahan
+## 🔍 7. Pencarian Global & Penyempurnaan Fitur Tambahan
 * **File Terkait:** `inc/search.php`, `template-parts/sections/pencarian/results.php`, `inc/meta-boxes/galeri.php`
 * **Pekerjaan yang Diselesaikan:**
-  * **Pencarian Lintas CPT (Global Search):** Sistem pencarian kini memindai seluruh *Custom Post Type* secara komprehensif, mencakup Berita, Galeri, Anggota (termasuk Alat Kelengkapan & Tokoh Sejarah), serta Dokumen (SAKIP, PPID, Propemperda).
-  * **Pengurutan Pintar (Smart Sorting):** Hasil pencarian otomatis diurutkan dengan algoritma spesifik. Berita dan Dokumen diurutkan berdasarkan tanggal terbaru. Sedangkan untuk pencarian Anggota, pimpinan (Ketua DPRD, Wakil Ketua) akan secara otomatis tampil di posisi teratas mendahului anggota biasa.
-  * **Daftar Jabatan Anggota:** Mengimplementasikan pemindai multi-jabatan (`dprd_get_member_positions`) sehingga saat mencari nama anggota DPRD, seluruh jabatan yang mereka emban di berbagai komisi/fraksi akan tampil runtut sebagai *bullet points*.
-  * **Penyederhanaan & Validasi Caption Galeri:** Menghapus kolom meta Caption yang tumpang tindih dan langsung menggunakan *Judul Bawaan WordPress* sebagai teks hover caption galeri (baik di Beranda maupun Halaman Galeri).
-  * **Validasi Keamanan Server-Side (Galeri):** Mencegah pengguna mempublikasikan galeri tanpa judul/caption. Jika kosong, sistem otomatis mengubah status menjadi *Draft* dan memunculkan *Admin Notice* bergaya native WordPress (tanpa JavaScript pop-up alert yang mengganggu).
+  * **Pencarian Lintas CPT (Global Search):** Sistem pencarian memindai seluruh *Custom Post Type* secara komprehensif (Berita, Galeri, Anggota, Alat Kelengkapan, Tokoh Sejarah, SAKIP, PPID, Propemperda).
+  * **Unduhan Berkas Dokumen Langsung:** Pada hasil pencarian dokumen (SAKIP, PPID, Propemperda), berkas file PDF langsung ditampilkan di dalam kartu pencarian dengan ikon unduh, sehingga ketika di-klik akan **langsung membuka/mengunduh file PDF** secara terbuka tanpa melalui halaman tunggal yang kosong.
+  * **Pengalihan Otomatis URL Tunggal (Single Redirect):** Jika ada URL tunggal CPT dokumen yang diakses, sistem secara otomatis mengalihkan pengguna langsung ke file PDF atau ke halaman arsip utama dengan *accordion* kategori yang terbuka.
+  * **Desain Kartu Dokumen Bersih (*Clear*):** Menghapus garis pembatas dan label teks tambahan pada kartu hasil pencarian dokumen agar tampil rapi dan bersih.
+  * **Pengurutan Pintar (Smart Sorting):** Berita & Dokumen diurutkan berdasarkan tanggal terbaru. Pada pencarian Anggota, pimpinan (Ketua DPRD, Wakil Ketua) secara otomatis tampil di posisi teratas mendahului anggota biasa.
+  * **Daftar Jabatan Anggota:** Mengimplementasikan pemindai multi-jabatan (`dprd_get_member_positions`) sehingga seluruh jabatan anggota DPRD di berbagai komisi/fraksi tampil runtut sebagai *bullet points*.
+  * **Hasil Anggota Hover-only:** Item hasil pencarian Anggota & Organisasi dapat di-hover secara interaktif namun tidak dapat di-klik menuju URL tunggal yang kosong.
 
 ---
 
@@ -96,6 +110,3 @@ Secara fitur fungsional (Fase 0 hingga 7), sistem sudah **100% selesai dibangun*
    Memastikan setiap template menyuntikkan Meta Title, Meta Description, dan struktur Heading (H1, H2) yang tepat agar ramah mesin pencari.
 4. **Persiapan Deployment ke Server Production (cPanel):**
    Memindahkan struktur database lokal ke database production cPanel dan menyesuaikan file `wp-config.php` ke environment live.
-
----
-*Laporan progres ini disusun sebagai bukti penyelesaian pekerjaan Fase 4 hingga Fase 7.*
