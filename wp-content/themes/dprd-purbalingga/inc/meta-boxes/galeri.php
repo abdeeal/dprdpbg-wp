@@ -76,6 +76,24 @@ function dprd_render_galeri_meta_box($post) {
                             $('#dprd_image_id').val(attachment.id);
                             $('#dprd_image_preview').html('<img src="'+attachment.url+'" style="max-width: 250px; max-height: 250px; display: block; border: 1px solid #ccc; padding: 4px; border-radius: 4px;">');
                             $('#dprd_remove_button').show();
+
+                            // Otomatis isi Judul Galeri dari nama file foto jika judul masih kosong
+                            var rawName = attachment.filename || attachment.title || '';
+                            if (rawName) {
+                                var cleanName = rawName.replace(/\.[^/.]+$/, ""); // Hapus ekstensi (.jpg, .png, dll)
+                                cleanName = cleanName.replace(/[-_]+/g, " ").trim(); // Ganti - dan _ dengan spasi
+                                cleanName = cleanName.replace(/\b\w/g, function(l){ return l.toUpperCase(); }); // Capitalize
+
+                                if (cleanName) {
+                                    var currentTitle = $.trim($('#title').val());
+                                    if (!currentTitle || currentTitle.indexOf('Auto Draft') !== -1 || currentTitle === '') {
+                                        $('#title').val(cleanName).focus();
+                                        if (typeof wp !== 'undefined' && wp.data && wp.data.dispatch && wp.data.dispatch('core/editor')) {
+                                            wp.data.dispatch('core/editor').editPost({ title: cleanName });
+                                        }
+                                    }
+                                }
+                            }
                         });
                         file_frame.open();
                     });
@@ -105,23 +123,33 @@ add_action('save_post', function ($post_id) {
         return;
     }
 
-    // Validasi Judul (post_title) tidak boleh kosong untuk Galeri
-    if (isset($_POST['post_title']) && trim($_POST['post_title']) === '') {
-        // Hapus aksi sementara agar tidak infinite loop
-        remove_action('save_post', 'dprd_save_galeri_meta'); // Note: ini closure sebenarnya, lebih aman panggil wp_update_post langsung tapi hati-hati
-        // Karena kita menggunakan anonymous function, lebih aman kita remove action dengan function terpisah kalau butuh, tapi post status update butuh remove.
-        // Solusi: kita update database wp_posts langsung atau unhook semua save_post sementara
-        // wp_update_post triggers save_post, tapi karena kita return setelahnya, closure ini akan dipanggil lagi tapi kondisi nonce mungkin masih ada.
-        // Kita cukup ubah post_status
-        global $wpdb;
-        $wpdb->update($wpdb->posts, ['post_status' => 'draft'], ['ID' => $post_id]);
-        
-        // Set notifikasi error
-        set_transient('dprd_galeri_title_error_' . get_current_user_id(), '1', 45);
+    $img_id = isset($_POST['image_id']) ? absint($_POST['image_id']) : 0;
+    if ($img_id > 0) {
+        update_post_meta($post_id, 'image_id', $img_id);
     }
 
-    if (isset($_POST['image_id'])) {
-        update_post_meta($post_id, 'image_id', absint($_POST['image_id']));
+    // Cek Judul (post_title)
+    $title = isset($_POST['post_title']) ? trim($_POST['post_title']) : '';
+
+    // Jika Judul Kosong, Otomatis Ambil dari Nama File Foto yang Diunggah
+    if (empty($title) && $img_id > 0) {
+        $att_post = get_post($img_id);
+        if ($att_post && !empty($att_post->post_title)) {
+            $raw = $att_post->post_title;
+            $clean = ucwords(trim(str_replace(['-', '_'], ' ', $raw)));
+            if (!empty($clean)) {
+                global $wpdb;
+                $wpdb->update($wpdb->posts, ['post_title' => $clean, 'post_status' => 'publish'], ['ID' => $post_id]);
+                return;
+            }
+        }
+    }
+
+    // Validasi Judul (post_title) jika tetap kosong setelah diajukan
+    if (empty($title)) {
+        global $wpdb;
+        $wpdb->update($wpdb->posts, ['post_status' => 'draft'], ['ID' => $post_id]);
+        set_transient('dprd_galeri_title_error_' . get_current_user_id(), '1', 45);
     }
 });
 
