@@ -60,10 +60,10 @@ if (!empty($db_terms) && !is_wp_error($db_terms)) {
 ?>
 
 <div>
-    <!-- Search & Filter Bar (Sejajar Kanan-Kiri dalam 1 Parent Div) -->
+    <!-- Search & Filter Bar (Sejajar Kanan-Kiri: Search ~75% Kiri, Filter Dropdown ~25% Kanan) -->
     <div class="my-8 md:my-12 w-full flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-        <!-- Search Bar (Kiri) -->
-        <div class="relative flex-1 w-full">
+        <!-- Search Bar (Kiri - Jauh Lebih Panjang) -->
+        <div class="relative w-full md:flex-[3] min-w-0">
             <input 
                 type="text" 
                 id="dprd-galeri-search"
@@ -75,9 +75,9 @@ if (!empty($db_terms) && !is_wp_error($db_terms)) {
             </svg>
         </div>
 
-        <!-- Tombol Dropdown Filter Kategori (Kanan) -->
-        <div class="relative w-full md:w-72 flex-shrink-0">
-            <div class="relative">
+        <!-- Tombol Dropdown Filter Kategori (Kanan - Ringkas) -->
+        <div class="relative w-full md:w-56 lg:w-64 flex-shrink-0">
+            <div class="relative w-full">
                 <select 
                     id="dprd-galeri-category-select"
                     class="w-full border border-gray-300 focus:border-[#82111A] rounded-none px-5 py-3 text-sm md:text-base outline-none transition-colors text-body bg-white appearance-none cursor-pointer pr-10 shadow-sm font-medium"
