@@ -1,7 +1,7 @@
 <?php
 /**
- * Quick Category Manager & Deleter for DPRD Purbalingga Theme
- * Memberikan fitur hapus & tambah kategori langsung dari Meta Box dan Admin Menu.
+ * Unified Category Manager & Deleter for DPRD Purbalingga Theme
+ * Menggabungkan pemilihan kategori, penambahan kategori baru, dan fitur Hapus Kategori menjadi 1 Meta Box tunggal yang bersih.
  */
 
 if (!defined('ABSPATH')) exit;
@@ -21,29 +21,36 @@ function dprd_get_cpt_taxonomy_map() {
 }
 
 /**
- * Register Meta Box "Kelola & Hapus Kategori" di halaman edit post
+ * Hapus Meta Box Bawaan WordPress yang Duplikat dan Daftarkan 1 Meta Box Tunggal yang Bersih
  */
 add_action('add_meta_boxes', function () {
     $map = dprd_get_cpt_taxonomy_map();
+
     foreach ($map as $post_type => $taxonomy) {
         $tax_obj = get_taxonomy($taxonomy);
-        $tax_name = $tax_obj ? $tax_obj->labels->singular_name : 'Kategori';
-        
+        if (!$tax_obj) continue;
+
+        // 1. Hapus Meta Box Bawaan WP agar tidak duplikat
+        remove_meta_box($taxonomy . 'div', $post_type, 'side');
+        remove_meta_box('tagsdiv-' . $taxonomy, $post_type, 'side');
+
+        // 2. Daftarkan 1 Meta Box Tunggal "Kategori [Nama Tipe Konten]"
+        $box_title = $tax_obj->labels->name;
         add_meta_box(
-            'dprd_category_manager_box',
-            'Kelola & Hapus ' . $tax_name,
-            'dprd_render_category_manager_box',
+            'dprd_unified_category_box',
+            $box_title,
+            'dprd_render_unified_category_box',
             $post_type,
             'side',
-            'default'
+            'high'
         );
     }
-});
+}, 99);
 
 /**
- * Render tampilan Meta Box Kelola & Hapus Kategori
+ * Render Tampilan Meta Box Kategori Tunggal (Pilih, Tambah, Hapus)
  */
-function dprd_render_category_manager_box($post) {
+function dprd_render_unified_category_box($post) {
     $map = dprd_get_cpt_taxonomy_map();
     $taxonomy = $map[$post->post_type] ?? '';
     if (!$taxonomy) return;
@@ -53,43 +60,69 @@ function dprd_render_category_manager_box($post) {
         'hide_empty' => false,
     ]);
 
+    // Ambil kategori yang saat ini terpilih pada post
+    $assigned_terms = wp_get_object_terms($post->ID, $taxonomy, ['fields' => 'ids']);
+    if (is_wp_error($assigned_terms)) {
+        $assigned_terms = [];
+    }
+
     wp_nonce_field('dprd_cat_mgr_nonce', 'dprd_cat_mgr_nonce_field');
     ?>
-    <div id="dprd-cat-mgr-wrapper" data-taxonomy="<?php echo esc_attr($taxonomy); ?>">
-        <p style="margin-top:0; font-size:12px; color:#646970;">
-            Daftar kategori terdaftar. Klik <strong>Hapus</strong> untuk menghapus kategori yang salah dibuat.
+    <div id="dprd-unified-cat-box" data-taxonomy="<?php echo esc_attr($taxonomy); ?>">
+        <p style="margin:0 0 8px; font-size:12px; color:#646970;">
+            Centang untuk memilih kategori. Klik <strong>Hapus</strong> untuk menghapus kategori dari database.
         </p>
 
-        <!-- List Kategori -->
-        <ul id="dprd-cat-list" style="margin: 8px 0 15px; padding: 0; list-style: none; max-height: 200px; overflow-y: auto; border: 1px solid #ccd0d4; border-radius: 4px; background: #fff;">
-            <?php if (empty($terms) || is_wp_error($terms)) : ?>
-                <li style="padding: 8px 10px; font-style: italic; color: #888; font-size: 12px;">Belum ada kategori.</li>
-            <?php else : ?>
-                <?php foreach ($terms as $t) : ?>
-                    <li style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #f0f0f1; font-size: 13px;" data-term-id="<?php echo esc_attr($t->term_id); ?>">
-                        <span style="font-weight: 500; color: #1d2327;"><?php echo esc_html($t->name); ?></span>
-                        <button type="button" class="button button-small dprd-del-cat-btn" data-id="<?php echo esc_attr($t->term_id); ?>" data-name="<?php echo esc_attr($t->name); ?>" style="color: #b32d2e; border-color: #b32d2e; background: #fff;">
-                            Hapus
-                        </button>
-                    </li>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </ul>
+        <!-- Daftar Kategori dengan Checkbox + Tombol Hapus -->
+        <div id="dprd-cat-list-container" style="max-height: 220px; overflow-y: auto; border: 1px solid #ccd0d4; border-radius: 4px; background: #fff; margin-bottom: 10px;">
+            <ul id="dprd-cat-list" style="margin: 0; padding: 0; list-style: none;">
+                <?php if (empty($terms) || is_wp_error($terms)) : ?>
+                    <li style="padding: 8px 10px; font-style: italic; color: #888; font-size: 12px;" class="no-cat-item">Belum ada kategori.</li>
+                <?php else : ?>
+                    <?php foreach ($terms as $t) : 
+                        $checked = in_array($t->term_id, $assigned_terms) ? 'checked' : '';
+                    ?>
+                        <li style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #f0f0f1; font-size: 13px;" data-term-id="<?php echo esc_attr($t->term_id); ?>">
+                            <label style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; margin: 0; cursor: pointer; user-select: none;">
+                                <input type="checkbox" name="dprd_post_categories[]" value="<?php echo esc_attr($t->term_id); ?>" <?php echo $checked; ?> style="margin: 0; shrink: 0;">
+                                <span style="font-weight: 500; color: #1d2327; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo esc_html($t->name); ?></span>
+                            </label>
+                            <button type="button" class="dprd-del-cat-btn" data-id="<?php echo esc_attr($t->term_id); ?>" data-name="<?php echo esc_attr($t->name); ?>" title="Hapus kategori dari database" style="background: none; border: none; color: #b32d2e; cursor: pointer; font-size: 11px; padding: 2px 6px; border-radius: 3px; font-weight: 600; flex-shrink: 0; margin-left: 6px;">
+                                Hapus
+                            </button>
+                        </li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </ul>
+        </div>
 
-        <!-- Input Tambah Kategori Baru -->
-        <div style="display: flex; gap: 6px;">
-            <input type="text" id="dprd-new-cat-input" placeholder="Nama kategori baru..." style="flex: 1; font-size: 12px; height: 30px;">
-            <button type="button" id="dprd-add-cat-btn" class="button button-secondary button-small" style="height: 30px; white-space: nowrap;">
-                + Tambah
+        <!-- Form Tambah Kategori Baru -->
+        <div id="dprd-add-cat-toggle-wrapper">
+            <button type="button" class="button-link" id="dprd-toggle-add-cat" style="font-size: 12px; text-decoration: none; color: #2271b1;">
+                + Tambah Kategori Baru
             </button>
+
+            <div id="dprd-add-cat-form" style="display: none; margin-top: 8px; border-top: 1px solid #f0f0f1; padding-top: 8px;">
+                <input type="text" id="dprd-new-cat-input" placeholder="Nama kategori baru..." class="widefat" style="margin-bottom: 6px; font-size: 12px; height: 30px;">
+                <button type="button" id="dprd-add-cat-btn" class="button button-secondary button-small" style="width: 100%; height: 30px;">
+                    Tambah Kategori
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
     jQuery(document).ready(function($) {
-        var wrapper = $('#dprd-cat-mgr-wrapper');
+        var wrapper = $('#dprd-unified-cat-box');
         var taxonomy = wrapper.data('taxonomy');
         var nonce = $('#dprd_cat_mgr_nonce_field').val();
+
+        // Toggle Form Tambah Kategori
+        $('#dprd-toggle-add-cat').on('click', function(e) {
+            e.preventDefault();
+            $('#dprd-add-cat-form').slideToggle(200);
+            $('#dprd-new-cat-input').focus();
+        });
 
         // Handler Hapus Kategori
         $(document).on('click', '.dprd-del-cat-btn', function(e) {
@@ -98,7 +131,7 @@ function dprd_render_category_manager_box($post) {
             var termId = btn.data('id');
             var termName = btn.data('name');
 
-            if (!confirm('Apakah Anda yakin ingin menghapus kategori "' + termName + '"? Kategori ini akan dihapus permanen.')) {
+            if (!confirm('Apakah Anda yakin ingin menghapus kategori "' + termName + '"? Kategori ini akan dihapus permanen dari database.')) {
                 return;
             }
 
@@ -118,7 +151,7 @@ function dprd_render_category_manager_box($post) {
                         btn.closest('li').fadeOut(300, function() {
                             $(this).remove();
                             if ($('#dprd-cat-list li').length === 0) {
-                                $('#dprd-cat-list').html('<li style="padding: 8px 10px; font-style: italic; color: #888; font-size: 12px;">Belum ada kategori.</li>');
+                                $('#dprd-cat-list').html('<li style="padding: 8px 10px; font-style: italic; color: #888; font-size: 12px;" class="no-cat-item">Belum ada kategori.</li>');
                             }
                         });
                     } else {
@@ -145,7 +178,7 @@ function dprd_render_category_manager_box($post) {
             }
 
             var btn = $(this);
-            btn.prop('disabled', true).text('Proses...');
+            btn.prop('disabled', true).text('Memproses...');
 
             $.ajax({
                 url: ajaxurl,
@@ -157,16 +190,19 @@ function dprd_render_category_manager_box($post) {
                     nonce: nonce
                 },
                 success: function(res) {
-                    btn.prop('disabled', false).text('+ Tambah');
+                    btn.prop('disabled', false).text('Tambah Kategori');
                     if (res.success) {
                         input.val('');
                         var t = res.data;
                         var newLi = '<li style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #f0f0f1; font-size: 13px;" data-term-id="' + t.term_id + '">' +
-                            '<span style="font-weight: 500; color: #1d2327;">' + t.name + '</span>' +
-                            '<button type="button" class="button button-small dprd-del-cat-btn" data-id="' + t.term_id + '" data-name="' + t.name + '" style="color: #b32d2e; border-color: #b32d2e; background: #fff;">Hapus</button>' +
+                            '<label style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; margin: 0; cursor: pointer; user-select: none;">' +
+                            '<input type="checkbox" name="dprd_post_categories[]" value="' + t.term_id + '" checked style="margin: 0; shrink: 0;">' +
+                            '<span style="font-weight: 500; color: #1d2327; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + t.name + '</span>' +
+                            '</label>' +
+                            '<button type="button" class="dprd-del-cat-btn" data-id="' + t.term_id + '" data-name="' + t.name + '" title="Hapus kategori dari database" style="background: none; border: none; color: #b32d2e; cursor: pointer; font-size: 11px; padding: 2px 6px; border-radius: 3px; font-weight: 600; flex-shrink: 0; margin-left: 6px;">Hapus</button>' +
                             '</li>';
                         
-                        if ($('#dprd-cat-list li').first().text().indexOf('Belum ada kategori') !== -1) {
+                        if ($('#dprd-cat-list .no-cat-item').length > 0) {
                             $('#dprd-cat-list').empty();
                         }
                         $('#dprd-cat-list').append(newLi);
@@ -175,7 +211,7 @@ function dprd_render_category_manager_box($post) {
                     }
                 },
                 error: function() {
-                    btn.prop('disabled', false).text('+ Tambah');
+                    btn.prop('disabled', false).text('Tambah Kategori');
                     alert('Gagal menambah kategori.');
                 }
             });
@@ -184,6 +220,30 @@ function dprd_render_category_manager_box($post) {
     </script>
     <?php
 }
+
+/**
+ * Simpan Pilihan Kategori pada Post saat Disimpan
+ */
+add_action('save_post', function ($post_id) {
+    if (!isset($_POST['dprd_cat_mgr_nonce_field']) || !wp_verify_nonce($_POST['dprd_cat_mgr_nonce_field'], 'dprd_cat_mgr_nonce')) {
+        return;
+    }
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+
+    $map = dprd_get_cpt_taxonomy_map();
+    $post_type = get_post_type($post_id);
+    $taxonomy = $map[$post_type] ?? '';
+
+    if ($taxonomy) {
+        $selected_cat_ids = isset($_POST['dprd_post_categories']) ? array_map('intval', (array)$_POST['dprd_post_categories']) : [];
+        wp_set_object_terms($post_id, $selected_cat_ids, $taxonomy);
+    }
+});
 
 /**
  * AJAX Handler: Hapus Kategori (wp_delete_term)
