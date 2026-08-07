@@ -160,7 +160,7 @@ $has_any = $has_berita || $has_galeri || $has_anggota || $has_dokumen;
                             $member_positions = dprd_get_member_positions($item->ID);
                         }
                     ?>
-                    <a href="<?php echo esc_url($permalink); ?>" class="flex items-center gap-6 py-5 <?php echo ($index !== count($anggota_items) - 1) ? 'border-b border-line' : ''; ?> group cursor-pointer">
+                    <div class="flex items-center gap-6 py-5 <?php echo ($index !== count($anggota_items) - 1) ? 'border-b border-line' : ''; ?> group">
                         <div class="relative w-28 sm:w-36 h-36 sm:h-48 rounded-card overflow-hidden shrink-0 bg-line/20 flex items-center justify-center" style="aspect-ratio: 3/4;">
                             <?php if ($thumb_url): ?>
                                 <img src="<?php echo esc_url($thumb_url); ?>" alt="<?php echo esc_attr($item->post_title); ?>" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -185,7 +185,7 @@ $has_any = $has_berita || $has_galeri || $has_anggota || $has_dokumen;
                                 <?php endforeach; ?>
                             </div>
                         </div>
-                    </a>
+                    </div>
                     <?php endforeach; ?>
                 </div>
                 <div id="dprd-divider-anggota" class="dprd-results-divider border-t border-line my-12" style="display: none;"></div>
