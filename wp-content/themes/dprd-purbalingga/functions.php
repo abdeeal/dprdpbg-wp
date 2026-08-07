@@ -74,6 +74,7 @@ add_action('admin_enqueue_scripts', function($hook) {
 // --- Load CPT, Taxonomies, and Custom Systems ---
 require get_template_directory() . '/inc/post-types.php';
 require get_template_directory() . '/inc/taxonomies.php';
+require get_template_directory() . '/inc/category-manager.php';
 require get_template_directory() . '/inc/class-repeater-field.php';
 require get_template_directory() . '/inc/options-pages.php';
 require get_template_directory() . '/inc/sekretariat-dprd.php';
