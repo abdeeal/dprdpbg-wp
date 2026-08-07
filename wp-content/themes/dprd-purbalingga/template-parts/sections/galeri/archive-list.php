@@ -60,9 +60,9 @@ if (!empty($db_terms) && !is_wp_error($db_terms)) {
 ?>
 
 <div>
-    <!-- Search & Filter Bar (Sejajar Kanan-Kiri: Search ~75% Kiri, Filter Dropdown ~25% Kanan) -->
-    <div class="my-8 md:my-12 w-full flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-        <!-- Search Bar (Kiri - Jauh Lebih Panjang) -->
+    <!-- Search & Filter Bar (Sejajar Kanan-Kiri & Berjarak ke Gambar di Bawah) -->
+    <div class="mt-6 mb-10 md:mb-14 w-full flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <!-- Search Bar (Kiri - Panjang) -->
         <div class="relative w-full md:flex-[3] min-w-0">
             <input 
                 type="text" 
@@ -75,12 +75,18 @@ if (!empty($db_terms) && !is_wp_error($db_terms)) {
             </svg>
         </div>
 
-        <!-- Tombol Dropdown Filter Kategori (Kanan - Ringkas) -->
-        <div class="relative w-full md:w-56 lg:w-64 flex-shrink-0">
-            <div class="relative w-full">
+        <!-- Tombol Filter Kategori (Kotak Ringkas di Kanan dengan Icon Filter) -->
+        <div class="relative w-full md:w-56 lg:w-60 flex-shrink-0">
+            <div class="relative flex items-center bg-white border border-gray-300 focus-within:border-[#82111A] shadow-sm">
+                <!-- Icon Filter Funnel Kecil -->
+                <div class="pl-3.5 pr-1 text-[#82111A] pointer-events-none flex items-center flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                </div>
                 <select 
                     id="dprd-galeri-category-select"
-                    class="w-full border border-gray-300 focus:border-[#82111A] rounded-none px-5 py-3 text-sm md:text-base outline-none transition-colors text-body bg-white appearance-none cursor-pointer pr-10 shadow-sm font-medium"
+                    class="w-full border-none px-2 py-3 text-sm md:text-base outline-none bg-transparent text-body appearance-none cursor-pointer pr-9 font-medium truncate"
                 >
                     <option value="Semua Kategori">Semua Kategori</option>
                     <?php foreach ($categories as $cat) : ?>
@@ -88,8 +94,8 @@ if (!empty($db_terms) && !is_wp_error($db_terms)) {
                         <option value="<?php echo esc_attr($cat); ?>"><?php echo esc_html($cat); ?></option>
                     <?php endforeach; ?>
                 </select>
-                <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#82111A] flex items-center gap-1">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-body-secondary flex items-center">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </div>
