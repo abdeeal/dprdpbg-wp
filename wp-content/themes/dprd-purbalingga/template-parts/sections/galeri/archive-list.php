@@ -62,26 +62,26 @@ if (!empty($db_terms) && !is_wp_error($db_terms)) {
 <div>
     <!-- Search & Filter Bar (Kedudukan: Searching -> Button Filter Kecil di Kanan) -->
     <div class="mt-6 mb-10 md:mb-14 w-full flex items-center justify-between gap-3">
-        <!-- Search Bar (Kiri - Full Panjang) -->
+        <!-- Search Bar (Kiri - Full Panjang, Tinggi h-12) -->
         <div class="relative flex-1 min-w-0">
             <input 
                 type="text" 
                 id="dprd-galeri-search"
                 placeholder="Cari Galeri Kegiatan..." 
-                class="w-full border border-gray-300 focus:border-[#82111A] rounded-none px-5 py-3 text-sm md:text-base outline-none transition-colors text-body pr-12 bg-white shadow-sm h-[48px]" 
+                class="w-full border border-gray-300 focus:border-[#82111A] rounded-none px-5 py-3 text-sm md:text-base outline-none transition-colors text-body pr-12 bg-white shadow-sm h-12" 
             />
             <svg class="absolute right-4 top-1/2 -translate-y-1/2 text-body-secondary pointer-events-none w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
         </div>
 
-        <!-- Tombol Filter Kecil (Kanan - Kotak Kecil Hanya Icon Filter 3-Baris) -->
+        <!-- Tombol Filter Kecil (Kanan - Kotak Kecil Ukuran Presisi h-12 w-12) -->
         <div class="relative flex-shrink-0">
             <button 
                 type="button" 
                 id="dprd-galeri-filter-btn"
                 title="Filter Kategori Galeri"
-                class="w-12 h-[48px] bg-white border border-gray-300 hover:border-[#82111A] focus:border-[#82111A] flex items-center justify-center text-[#82111A] transition-all duration-200 shadow-sm cursor-pointer"
+                class="w-12 h-12 bg-white border border-gray-300 hover:border-[#82111A] focus:border-[#82111A] flex items-center justify-center text-[#82111A] transition-all duration-200 shadow-sm cursor-pointer"
             >
                 <!-- Icon filter-3 (3 garis horizontal berkurang) -->
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -89,22 +89,21 @@ if (!empty($db_terms) && !is_wp_error($db_terms)) {
                 </svg>
             </button>
 
-            <!-- Dropdown Popover Menu (Muncul saat tombol filter ditekan) -->
+            <!-- Dropdown Popover Menu (Lebar Menyesuaikan Kategori Paling Panjang, Tanpa Centang) -->
             <div 
                 id="dprd-galeri-filter-menu" 
-                class="hidden absolute right-0 top-full mt-2 w-64 bg-white border border-gray-200 shadow-xl z-50 py-1 max-h-80 overflow-y-auto"
+                class="hidden absolute right-0 top-full mt-2 w-max min-w-[220px] max-w-sm bg-white border border-gray-200 shadow-xl z-50 py-1 max-h-80 overflow-y-auto"
             >
-                <div class="px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-body-secondary border-b border-gray-100 bg-gray-50">
+                <div class="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-body-secondary border-b border-gray-100 bg-gray-50 whitespace-nowrap">
                     Pilih Kategori Galeri
                 </div>
                 <?php foreach ($categories as $cat) : ?>
                     <button 
                         type="button" 
                         data-category="<?php echo esc_attr($cat); ?>"
-                        class="dprd-galeri-cat-item w-full text-left px-4 py-2.5 text-sm hover:bg-[#82111A]/10 hover:text-[#82111A] transition-colors flex items-center justify-between group <?php echo $cat === 'Semua Kategori' ? 'font-semibold text-[#82111A] bg-[#82111A]/5' : 'text-body'; ?>"
+                        class="dprd-galeri-cat-item w-full text-left px-4 py-2.5 text-sm hover:bg-[#82111A]/10 hover:text-[#82111A] transition-colors whitespace-nowrap block <?php echo $cat === 'Semua Kategori' ? 'font-semibold text-[#82111A] bg-[#82111A]/5' : 'text-body'; ?>"
                     >
-                        <span><?php echo esc_html($cat); ?></span>
-                        <span class="dprd-cat-check text-[#82111A] <?php echo $cat === 'Semua Kategori' ? '' : 'hidden'; ?>">✓</span>
+                        <?php echo esc_html($cat); ?>
                     </button>
                 <?php endforeach; ?>
             </div>
@@ -286,13 +285,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 activeCategory = this.getAttribute('data-category');
                 
                 catItems.forEach(function(el) {
-                    var check = el.querySelector('.dprd-cat-check');
                     if (el.getAttribute('data-category') === activeCategory) {
                         el.classList.add('font-semibold', 'text-[#82111A]', 'bg-[#82111A]/5');
-                        if (check) check.classList.remove('hidden');
                     } else {
                         el.classList.remove('font-semibold', 'text-[#82111A]', 'bg-[#82111A]/5');
-                        if (check) check.classList.add('hidden');
                     }
                 });
 
