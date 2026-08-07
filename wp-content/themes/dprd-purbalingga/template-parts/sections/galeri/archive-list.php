@@ -5,6 +5,40 @@
  */
 if (!defined('ABSPATH')) exit;
 
+// Helper fungsi ekstrak tanggal dari judul galeri (YYYY.MM.DD, YYYY-MM-DD, DD-MM-YYYY, dll)
+if (!function_exists('dprd_extract_galeri_timestamp')) {
+    function dprd_extract_galeri_timestamp($title, $post_date = '') {
+        $timestamp = 0;
+        
+        // 1. Format YYYY.MM.DD / YYYY-MM-DD / YYYY_MM_DD / YYYY/MM/DD
+        if (preg_match('/\b(20\d{2})[\.\-\_\/](0[1-9]|1[0-2])[\.\-\_\/](0[1-9]|[12]\d|3[01])\b/', $title, $m)) {
+            $timestamp = strtotime("{$m[1]}-{$m[2]}-{$m[3]}");
+        }
+        // 2. Format DD.MM.YYYY / DD-MM-YYYY / DD_MM_YYYY / DD/MM/YYYY
+        elseif (preg_match('/\b(0[1-9]|[12]\d|3[01])[\.\-\_\/](0[1-9]|1[0-2])[\.\-\_\/](20\d{2})\b/', $title, $m)) {
+            $timestamp = strtotime("{$m[3]}-{$m[2]}-{$m[1]}");
+        }
+        // 3. Format DD [Nama Bulan ID/EN] YYYY
+        elseif (preg_match('/\b(0?[1-9]|[12]\d|3[01])[\s\-\_\/]+(januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember|jan|feb|mar|apr|mei|jun|jul|agu|sep|okt|nov|des)[\s\-\_\/]+(20\d{2})\b/i', $title, $m)) {
+            $months = [
+                'januari'=>1, 'jan'=>1, 'februari'=>2, 'feb'=>2, 'maret'=>3, 'mar'=>3,
+                'april'=>4, 'apr'=>4, 'mei'=>5, 'juni'=>6, 'jun'=>6, 'juli'=>7, 'jul'=>7,
+                'agustus'=>8, 'agu'=>8, 'september'=>9, 'sep'=>9, 'oktober'=>10, 'okt'=>10,
+                'november'=>11, 'nov'=>11, 'desember'=>12, 'des'=>12
+            ];
+            $month_num = $months[strtolower($m[2])] ?? 1;
+            $day = str_pad($m[1], 2, '0', STR_PAD_LEFT);
+            $timestamp = strtotime("{$m[3]}-{$month_num}-{$day}");
+        }
+
+        if (!$timestamp && !empty($post_date)) {
+            $timestamp = strtotime($post_date);
+        }
+
+        return $timestamp ?: time();
+    }
+}
+
 // Ambil semua data galeri dari database
 $galeri_posts = get_posts([
     'post_type'      => 'galeri',
@@ -33,14 +67,29 @@ foreach ($galeri_posts as $gp) {
     }
     $category = !empty($category_names) ? $category_names[0] : 'Lainnya';
 
+    // Bersihkan ekstensi file seperti .jpg, .Jpg, .png, .webp dari judul tampilan
+    $clean_title = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '', $gp->post_title);
+
+    // Hitung timestamp untuk pengurutan tanggal (terbaru ke terlama)
+    $timestamp = dprd_extract_galeri_timestamp($gp->post_title, $gp->post_date);
+
     $galeri_data[] = [
-        'id'         => $gp->ID,
-        'title'      => $gp->post_title,
-        'category'   => $category,
-        'categories' => $category_names,
-        'image'      => $image_url
+        'id'             => $gp->ID,
+        'title'          => $clean_title,
+        'category'       => $category,
+        'categories'     => $category_names,
+        'image'          => $image_url,
+        'sort_timestamp' => $timestamp,
     ];
 }
+
+// Urutkan galeri berdasarkan tanggal (terbaru paling atas, terlama paling bawah)
+usort($galeri_data, function($a, $b) {
+    if ($b['sort_timestamp'] === $a['sort_timestamp']) {
+        return $b['id'] <=> $a['id'];
+    }
+    return $b['sort_timestamp'] <=> $a['sort_timestamp'];
+});
 
 // Ambil daftar Kategori Galeri dari database secara dinamis
 $db_terms = get_terms([

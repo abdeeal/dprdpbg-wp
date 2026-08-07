@@ -131,12 +131,20 @@ add_action('save_post', function ($post_id) {
     // Cek Judul (post_title)
     $title = isset($_POST['post_title']) ? trim($_POST['post_title']) : '';
 
+    // Bersihkan ekstensi seperti .Jpg / .jpg / .png jika tersisa di judul
+    if (!empty($title) && preg_match('/\.(jpg|jpeg|png|webp)$/i', $title)) {
+        $title = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '', $title);
+        global $wpdb;
+        $wpdb->update($wpdb->posts, ['post_title' => $title], ['ID' => $post_id]);
+    }
+
     // Jika Judul Kosong, Otomatis Ambil dari Nama File Foto yang Diunggah
     if (empty($title) && $img_id > 0) {
         $att_post = get_post($img_id);
         if ($att_post && !empty($att_post->post_title)) {
             $raw = $att_post->post_title;
-            $clean = ucwords(trim(str_replace(['-', '_'], ' ', $raw)));
+            $clean = preg_replace('/\.(jpg|jpeg|png|webp)$/i', '', $raw);
+            $clean = ucwords(trim(str_replace(['-', '_'], ' ', $clean)));
             if (!empty($clean)) {
                 global $wpdb;
                 $wpdb->update($wpdb->posts, ['post_title' => $clean, 'post_status' => 'publish'], ['ID' => $post_id]);
