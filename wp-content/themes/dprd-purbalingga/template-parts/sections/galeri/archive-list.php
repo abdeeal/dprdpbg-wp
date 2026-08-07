@@ -42,43 +42,50 @@ foreach ($galeri_posts as $gp) {
     ];
 }
 
-// Kategori filter — uppercase sesuai referensi FilterTab.jsx
-$categories = [
-    'Semua',
-    'RAPAT PARIPURNA',
-    'RAPAT KOMISI',
-    'KUNJUNGAN KERJA',
-    'RESES',
-    'AUDIENSI & KUNJUNGAN TAMU'
-];
+// Ambil daftar Kategori Galeri dari database secara dinamis
+$db_terms = get_terms([
+    'taxonomy'   => 'kategori-galeri',
+    'hide_empty' => false,
+]);
+
+$categories = ['Semua'];
+if (!empty($db_terms) && !is_wp_error($db_terms)) {
+    foreach ($db_terms as $term) {
+        $cat_name = strtoupper(trim($term->name));
+        if (!in_array($cat_name, $categories)) {
+            $categories[] = $cat_name;
+        }
+    }
+}
 ?>
 
 <div>
-    <!-- Search Bar -->
-    <div class="flex justify-center my-10 md:my-14">
-        <div class="relative w-full max-w-2xl">
+    <!-- Container Sejajar Search & Filter dalam 1 Div -->
+    <div class="my-8 md:my-12 w-full space-y-6">
+        <!-- Search Bar -->
+        <div class="w-full relative">
             <input 
                 type="text" 
                 id="dprd-galeri-search"
-                placeholder="Cari Galeri" 
-                class="w-full border border-primary/30 rounded-none px-5 py-3.5 text-sm md:text-base outline-none focus:border-primary transition-colors text-body" 
+                placeholder="Cari Galeri Kegiatan..." 
+                class="w-full border border-primary/30 rounded-none px-5 py-3.5 text-sm md:text-base outline-none focus:border-primary transition-colors text-body pr-12 shadow-sm" 
             />
             <svg class="absolute right-4 top-1/2 -translate-y-1/2 text-body-secondary pointer-events-none w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
         </div>
-    </div>
 
-    <!-- Filter Tabs — layout justify-between, border pada tombol aktif -->
-    <div class="flex flex-wrap items-center justify-center md:justify-between gap-2 md:gap-4 mb-10 w-full overflow-x-auto no-scrollbar" id="dprd-galeri-filters">
-        <?php foreach ($categories as $cat) : ?>
-            <button 
-                data-category="<?php echo esc_attr($cat); ?>"
-                class="dprd-filter-btn px-6 py-2 text-xs md:text-[13px] tracking-wider uppercase whitespace-nowrap transition-colors border <?php echo $cat === 'Semua' ? 'bg-[#82111A] text-white border-[#82111A] hover:text-white' : 'text-body-secondary border-transparent hover:text-black bg-transparent'; ?>"
-            >
-                <?php echo esc_html($cat); ?>
-            </button>
-        <?php endforeach; ?>
+        <!-- Filter Buttons (Sejajar dalam 1 Container dengan Gap Sama) -->
+        <div class="flex flex-wrap items-center justify-start md:justify-between gap-2.5 w-full pb-2 overflow-x-auto no-scrollbar" id="dprd-galeri-filters">
+            <?php foreach ($categories as $cat) : ?>
+                <button 
+                    data-category="<?php echo esc_attr($cat); ?>"
+                    class="dprd-filter-btn px-5 py-2 text-xs md:text-[13px] font-medium tracking-wider uppercase whitespace-nowrap transition-all duration-200 border <?php echo $cat === 'Semua' ? 'bg-[#82111A] text-white border-[#82111A]' : 'text-body-secondary border-gray-200 hover:border-[#82111A] hover:text-black bg-white'; ?>"
+                >
+                    <?php echo esc_html($cat); ?>
+                </button>
+            <?php endforeach; ?>
+        </div>
     </div>
 
     <!-- Grid — 2 kolom ke kanan (2 cards per baris) -->
@@ -114,7 +121,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function render() {
         // Filter items
         var filtered = allItems.filter(function(item) {
-            var matchesCategory = activeCategory === 'Semua' || (Array.isArray(item.categories) && item.categories.indexOf(activeCategory) !== -1) || item.category === activeCategory;
+            var targetCat = activeCategory.toUpperCase();
+            var matchesCategory = targetCat === 'SEMUA' || 
+                (Array.isArray(item.categories) && item.categories.some(function(c){ return c.toUpperCase() === targetCat; })) || 
+                (item.category && item.category.toUpperCase() === targetCat);
             var matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
             return matchesCategory && matchesSearch;
         });
