@@ -300,8 +300,11 @@ $recent_news_posts = get_posts([
             </div>
 
             <!-- Button -->
-            <a href="<?php echo esc_url(home_url('/berita')); ?>" class="mt-4 w-full block text-center text-primary font-mono font-bold text-sm py-3 rounded-button border border-line hover:border-primary hover:bg-primary-light transition-colors">
-                Lihat Semua Berita
+            <a href="<?php echo esc_url(home_url('/berita')); ?>" class="mt-6 w-full flex items-center justify-center text-primary font-mono font-bold text-sm py-2 hover:underline transition-colors">
+                <span>Lihat Semua Berita</span>
+                <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
             </a>
             
         </div>
