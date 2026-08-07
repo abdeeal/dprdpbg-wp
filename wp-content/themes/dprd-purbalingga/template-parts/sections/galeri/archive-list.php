@@ -132,7 +132,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var activeCategory = 'Semua Kategori';
     var searchQuery = '';
     var currentPage = 1;
-    var itemsPerPage = 20; // 10 baris ke bawah x 2 kolom ke kanan = 20 card per halaman
+
+    function getItemsPerPage() {
+        return window.innerWidth < 640 ? 10 : 20; // Mobile: 10 card ke bawah; Desktop: 20 card (10 baris x 2 kolom)
+    }
 
     var grid = document.getElementById('dprd-galeri-grid');
     var searchInput = document.getElementById('dprd-galeri-search');
@@ -143,6 +146,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var noResults = document.getElementById('dprd-galeri-no-results');
 
     function render() {
+        var itemsPerPage = getItemsPerPage();
+
         // Filter items
         var filtered = allItems.filter(function(item) {
             var targetCat = activeCategory.toUpperCase();
@@ -307,6 +312,13 @@ document.addEventListener('DOMContentLoaded', function() {
             render();
         });
     }
+
+    // Window resize handler
+    var resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(render, 150);
+    });
 
     // Initial render
     render();
