@@ -200,26 +200,89 @@ $has_any = $has_berita || $has_galeri || $has_anggota || $has_dokumen;
                 </h3>
                 <div class="flex flex-col gap-4">
                     <?php foreach ($dokumen_items as $index => $item): 
-                        $permalink = get_permalink($item->ID);
-                        
                         $type_label = 'Dokumen';
                         if ($item->post_type === 'sakip') $type_label = 'SAKIP';
                         if ($item->post_type === 'ppid') $type_label = 'PPID';
                         if ($item->post_type === 'propemperda') $type_label = 'Propemperda';
+
+                        // Ambil daftar file dari documents_json atau file_url
+                        $docs_list = [];
+                        $single_file_url = get_post_meta($item->ID, 'file_url', true);
+                        if (!empty($single_file_url)) {
+                            $docs_list[] = [
+                                'title' => $item->post_title,
+                                'url'   => dprd_proxy_url($item->ID, $single_file_url, $item->post_title)
+                            ];
+                        }
+
+                        $json = get_post_meta($item->ID, 'documents_json', true);
+                        if ($json) {
+                            $decoded = json_decode($json, true);
+                            if (is_array($decoded) && !empty($decoded)) {
+                                foreach ($decoded as $d) {
+                                    if (!empty($d['url']) && $d['url'] !== '#') {
+                                        $docs_list[] = [
+                                            'title' => !empty($d['title']) ? $d['title'] : $item->post_title,
+                                            'url'   => dprd_proxy_url($item->ID, $d['url'], $d['title'] ?? $item->post_title)
+                                        ];
+                                    }
+                                }
+                            }
+                        }
+
+                        // Fallback link jika tidak ada file langsung
+                        $terms = wp_get_object_terms($item->ID, 'kategori-' . $item->post_type);
+                        $page_url = home_url('/' . $item->post_type . '/');
+                        if (!empty($terms) && !is_wp_error($terms)) {
+                            $page_url .= '?id=' . $terms[0]->slug;
+                        }
                     ?>
-                    <a href="<?php echo esc_url($permalink); ?>" class="flex items-start gap-4 p-5 bg-white border border-line rounded-card hover:border-primary/50 hover:shadow-sm transition-all group">
-                        <div class="w-10 h-10 rounded-full bg-main flex items-center justify-center text-body-secondary shrink-0 group-hover:text-primary transition-colors">
-                            <?php dprd_icon('file-text', 'w-5 h-5'); ?>
-                        </div>
-                        <div class="flex flex-col">
-                            <h4 class="font-sans font-medium text-body text-base group-hover:text-primary transition-colors">
-                                <?php echo esc_html($item->post_title); ?>
-                            </h4>
-                            <span class="font-mono text-xs text-body-secondary mt-1.5 flex items-center gap-2">
-                                <span class="bg-line/50 px-2 py-0.5 rounded text-[10px] uppercase"><?php echo esc_html($type_label); ?></span>
+                    <div class="flex flex-col p-5 bg-white border border-line rounded-card shadow-sm hover:border-primary/40 transition-all">
+                        <div class="flex items-center justify-between gap-4 mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-full bg-main flex items-center justify-center text-primary shrink-0">
+                                    <?php dprd_icon('file-text', 'w-5 h-5'); ?>
+                                </div>
+                                <div>
+                                    <h4 class="font-sans font-semibold text-body text-base md:text-lg">
+                                        <?php echo esc_html($item->post_title); ?>
+                                    </h4>
+                                </div>
+                            </div>
+                            <span class="bg-[#82111A]/10 text-[#82111A] font-mono font-medium px-2.5 py-1 rounded text-[11px] uppercase shrink-0">
+                                <?php echo esc_html($type_label); ?>
                             </span>
                         </div>
-                    </a>
+
+                        <?php if (!empty($docs_list)): ?>
+                            <div class="mt-2 pl-12 flex flex-col gap-2 border-t border-line/50 pt-3">
+                                <span class="text-xs font-mono text-body-secondary uppercase tracking-wider">Berkas / Unduhan Dokumen:</span>
+                                <?php foreach ($docs_list as $doc): ?>
+                                    <a 
+                                        href="<?php echo esc_url($doc['url']); ?>" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        class="inline-flex items-center gap-2 font-mono text-xs md:text-sm text-primary hover:text-primary/80 hover:underline decoration-primary/40 transition-all w-fit py-1"
+                                    >
+                                        <svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <span><?php echo esc_html($doc['title']); ?></span>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="mt-2 pl-12 pt-2">
+                                <a 
+                                    href="<?php echo esc_url($page_url); ?>" 
+                                    class="inline-flex items-center gap-1.5 font-mono text-xs text-primary hover:underline"
+                                >
+                                    <span>Lihat Dokumen di Halaman <?php echo esc_html($type_label); ?></span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                </a>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                     <?php endforeach; ?>
                 </div>
                 <div id="dprd-divider-dokumen" class="dprd-results-divider border-t border-line my-12" style="display: none;"></div>

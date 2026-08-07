@@ -607,4 +607,41 @@ add_action('template_redirect', function() {
 // =============================================================================
 require get_template_directory() . '/inc/security-reservasi.php';
 
+// Redirect URL singular CPT dokumen (sakip, ppid, propemperda) langsung ke file unduhan PDF atau ke halaman arsipnya dengan accordion terbuka
+add_action('template_redirect', function () {
+    if (is_singular(['sakip', 'ppid', 'propemperda'])) {
+        $post_id   = get_the_ID();
+        $post_type = get_post_type($post_id);
+        
+        $single_file_url = get_post_meta($post_id, 'file_url', true);
+        if (!empty($single_file_url)) {
+            wp_redirect(dprd_proxy_url($post_id, $single_file_url, get_the_title($post_id)));
+            exit;
+        }
+
+        $json = get_post_meta($post_id, 'documents_json', true);
+        if ($json) {
+            $docs = json_decode($json, true);
+            if (is_array($docs) && !empty($docs)) {
+                foreach ($docs as $d) {
+                    if (!empty($d['url']) && $d['url'] !== '#') {
+                        wp_redirect(dprd_proxy_url($post_id, $d['url'], $d['title'] ?? get_the_title($post_id)));
+                        exit;
+                    }
+                }
+            }
+        }
+
+        $terms = wp_get_object_terms($post_id, 'kategori-' . $post_type);
+        if (!empty($terms) && !is_wp_error($terms)) {
+            wp_redirect(home_url('/' . $post_type . '/?id=' . $terms[0]->slug));
+            exit;
+        }
+
+        wp_redirect(home_url('/' . $post_type . '/'));
+        exit;
+    }
+});
+
+
 
