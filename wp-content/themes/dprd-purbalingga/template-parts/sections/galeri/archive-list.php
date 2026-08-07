@@ -81,7 +81,7 @@ if (!empty($db_terms) && !is_wp_error($db_terms)) {
                 type="button" 
                 id="dprd-galeri-filter-btn"
                 title="Filter Kategori Galeri"
-                class="w-12 h-12 bg-white border border-gray-300 hover:border-[#82111A] focus:border-[#82111A] flex items-center justify-center text-[#82111A] transition-all duration-200 shadow-sm cursor-pointer"
+                class="w-12 h-12 bg-white border border-gray-300 hover:border-[#82111A] focus:border-[#82111A] flex items-center justify-center text-body-secondary hover:text-[#82111A] transition-all duration-200 shadow-sm cursor-pointer"
             >
                 <!-- Icon filter-3 (3 garis horizontal berkurang) -->
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
