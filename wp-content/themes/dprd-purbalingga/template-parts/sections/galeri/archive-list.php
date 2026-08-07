@@ -81,8 +81,8 @@ $categories = [
         <?php endforeach; ?>
     </div>
 
-    <!-- Grid — 2 kolom sesuai referensi GaleriGrid.jsx (grid-cols-1 md:grid-cols-2) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6" id="dprd-galeri-grid">
+    <!-- Grid — 2 kolom ke kanan (2 cards per baris) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6" id="dprd-galeri-grid">
         <!-- Diisi secara dinamis oleh JS -->
     </div>
     
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var activeCategory = 'Semua';
     var searchQuery = '';
     var currentPage = 1;
-    var itemsPerPage = 4; // Diturunkan sementara ke 4 agar pagination muncul
+    var itemsPerPage = 20; // 10 baris ke bawah x 2 kolom ke kanan = 20 card per halaman
 
     var grid = document.getElementById('dprd-galeri-grid');
     var searchInput = document.getElementById('dprd-galeri-search');
