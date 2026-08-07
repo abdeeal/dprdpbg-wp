@@ -1,40 +1,46 @@
 <?php
 /**
  * Unified Category Manager & Deleter for DPRD Purbalingga Theme
- * Menggabungkan pemilihan kategori, penambahan kategori baru, dan fitur Hapus Kategori menjadi 1 Meta Box tunggal yang bersih.
+ * HANYA aktif pada tipe konten yang membutuhkan kategori (Galeri, Berita, Alat Kelengkapan).
+ * Tipe konten SAKIP, PPID, dan Propemperda tidak menggunakan Meta Box Kategori.
  */
 
 if (!defined('ABSPATH')) exit;
 
 /**
- * Peta Tipe Konten ke Taksonomi terkait
+ * Peta Tipe Konten ke Taksonomi terkait yang aktif
  */
 function dprd_get_cpt_taxonomy_map() {
     return [
         'galeri'           => 'kategori-galeri',
-        'sakip'            => 'kategori-sakip',
-        'ppid'             => 'kategori-ppid',
-        'propemperda'      => 'kategori-propemperda',
         'berita'           => 'category',
         'alat-kelengkapan' => 'jenis',
     ];
 }
 
 /**
- * Hapus Meta Box Bawaan WordPress yang Duplikat dan Daftarkan 1 Meta Box Tunggal yang Bersih
+ * Hapus Meta Box Bawaan WP (termasuk SAKIP, PPID, Propemperda) dan Daftarkan 1 Meta Box Tunggal untuk CPT Aktif
  */
 add_action('add_meta_boxes', function () {
+    // 1. Selalu hapus meta box kategori bawaan untuk SAKIP, PPID, dan Propemperda
+    remove_meta_box('kategori-sakipdiv', 'sakip', 'side');
+    remove_meta_box('tagsdiv-kategori-sakip', 'sakip', 'side');
+    remove_meta_box('kategori-ppiddiv', 'ppid', 'side');
+    remove_meta_box('tagsdiv-kategori-ppid', 'ppid', 'side');
+    remove_meta_box('kategori-propemperdadiv', 'propemperda', 'side');
+    remove_meta_box('tagsdiv-kategori-propemperda', 'propemperda', 'side');
+
     $map = dprd_get_cpt_taxonomy_map();
 
     foreach ($map as $post_type => $taxonomy) {
         $tax_obj = get_taxonomy($taxonomy);
         if (!$tax_obj) continue;
 
-        // 1. Hapus Meta Box Bawaan WP agar tidak duplikat
+        // 2. Hapus Meta Box Bawaan WP untuk CPT Aktif agar tidak duplikat
         remove_meta_box($taxonomy . 'div', $post_type, 'side');
         remove_meta_box('tagsdiv-' . $taxonomy, $post_type, 'side');
 
-        // 2. Daftarkan 1 Meta Box Tunggal "Kategori [Nama Tipe Konten]"
+        // 3. Daftarkan 1 Meta Box Tunggal "Kategori [Nama Tipe Konten]"
         $box_title = $tax_obj->labels->name;
         add_meta_box(
             'dprd_unified_category_box',
