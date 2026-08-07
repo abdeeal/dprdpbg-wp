@@ -28,10 +28,10 @@ foreach ($galeri_posts as $gp) {
     $category_names = [];
     if (!empty($terms) && !is_wp_error($terms)) {
         foreach ($terms as $t) {
-            $category_names[] = strtoupper($t->name);
+            $category_names[] = wp_specialchars_decode($t->name);
         }
     }
-    $category = !empty($category_names) ? $category_names[0] : 'LAINNYA';
+    $category = !empty($category_names) ? $category_names[0] : 'Lainnya';
 
     $galeri_data[] = [
         'id'         => $gp->ID,
@@ -48,10 +48,10 @@ $db_terms = get_terms([
     'hide_empty' => false,
 ]);
 
-$categories = ['Semua'];
+$categories = ['Semua Kategori'];
 if (!empty($db_terms) && !is_wp_error($db_terms)) {
     foreach ($db_terms as $term) {
-        $cat_name = strtoupper(trim($term->name));
+        $cat_name = wp_specialchars_decode(trim($term->name));
         if (!in_array($cat_name, $categories)) {
             $categories[] = $cat_name;
         }
@@ -60,31 +60,40 @@ if (!empty($db_terms) && !is_wp_error($db_terms)) {
 ?>
 
 <div>
-    <!-- Container Sejajar Search & Filter dalam 1 Div -->
-    <div class="my-8 md:my-12 w-full space-y-6">
-        <!-- Search Bar -->
-        <div class="w-full relative">
+    <!-- Search & Filter Bar (Sejajar Kanan-Kiri dalam 1 Parent Div) -->
+    <div class="my-8 md:my-12 w-full flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <!-- Search Bar (Kiri) -->
+        <div class="relative flex-1 w-full">
             <input 
                 type="text" 
                 id="dprd-galeri-search"
                 placeholder="Cari Galeri Kegiatan..." 
-                class="w-full border border-primary/30 rounded-none px-5 py-3.5 text-sm md:text-base outline-none focus:border-primary transition-colors text-body pr-12 shadow-sm" 
+                class="w-full border border-gray-300 focus:border-[#82111A] rounded-none px-5 py-3 text-sm md:text-base outline-none transition-colors text-body pr-12 bg-white shadow-sm" 
             />
             <svg class="absolute right-4 top-1/2 -translate-y-1/2 text-body-secondary pointer-events-none w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
         </div>
 
-        <!-- Filter Buttons (Sejajar dalam 1 Container dengan Gap Sama) -->
-        <div class="flex flex-wrap items-center justify-start md:justify-between gap-2.5 w-full pb-2 overflow-x-auto no-scrollbar" id="dprd-galeri-filters">
-            <?php foreach ($categories as $cat) : ?>
-                <button 
-                    data-category="<?php echo esc_attr($cat); ?>"
-                    class="dprd-filter-btn px-5 py-2 text-xs md:text-[13px] font-medium tracking-wider uppercase whitespace-nowrap transition-all duration-200 border <?php echo $cat === 'Semua' ? 'bg-[#82111A] text-white border-[#82111A]' : 'text-body-secondary border-gray-200 hover:border-[#82111A] hover:text-black bg-white'; ?>"
+        <!-- Tombol Dropdown Filter Kategori (Kanan) -->
+        <div class="relative w-full md:w-72 flex-shrink-0">
+            <div class="relative">
+                <select 
+                    id="dprd-galeri-category-select"
+                    class="w-full border border-gray-300 focus:border-[#82111A] rounded-none px-5 py-3 text-sm md:text-base outline-none transition-colors text-body bg-white appearance-none cursor-pointer pr-10 shadow-sm font-medium"
                 >
-                    <?php echo esc_html($cat); ?>
-                </button>
-            <?php endforeach; ?>
+                    <option value="Semua Kategori">Semua Kategori</option>
+                    <?php foreach ($categories as $cat) : ?>
+                        <?php if ($cat === 'Semua Kategori' || $cat === 'Semua') continue; ?>
+                        <option value="<?php echo esc_attr($cat); ?>"><?php echo esc_html($cat); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#82111A] flex items-center gap-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -107,14 +116,14 @@ if (!empty($db_terms) && !is_wp_error($db_terms)) {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var allItems = <?php echo json_encode($galeri_data); ?>;
-    var activeCategory = 'Semua';
+    var activeCategory = 'Semua Kategori';
     var searchQuery = '';
     var currentPage = 1;
     var itemsPerPage = 20; // 10 baris ke bawah x 2 kolom ke kanan = 20 card per halaman
 
     var grid = document.getElementById('dprd-galeri-grid');
     var searchInput = document.getElementById('dprd-galeri-search');
-    var filterBtns = document.querySelectorAll('.dprd-filter-btn');
+    var categorySelect = document.getElementById('dprd-galeri-category-select');
     var pagination = document.getElementById('dprd-galeri-pagination');
     var noResults = document.getElementById('dprd-galeri-no-results');
 
@@ -122,7 +131,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Filter items
         var filtered = allItems.filter(function(item) {
             var targetCat = activeCategory.toUpperCase();
-            var matchesCategory = targetCat === 'SEMUA' || 
+            var isAll = (targetCat === 'SEMUA KATEGORI' || targetCat === 'SEMUA');
+            var matchesCategory = isAll || 
                 (Array.isArray(item.categories) && item.categories.some(function(c){ return c.toUpperCase() === targetCat; })) || 
                 (item.category && item.category.toUpperCase() === targetCat);
             var matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -236,34 +246,29 @@ document.addEventListener('DOMContentLoaded', function() {
     window.setGaleriPage = function(page) {
         currentPage = page;
         render();
-        var filterContainer = document.getElementById('dprd-galeri-filters');
-        if (filterContainer) {
-            filterContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        var searchEl = document.getElementById('dprd-galeri-search');
+        if (searchEl) {
+            searchEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     };
 
-    // Filter Buttons click handler
-    filterBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            filterBtns.forEach(function(b) {
-                b.classList.remove('bg-[#82111A]', 'text-white', 'border-[#82111A]', 'hover:text-white');
-                b.classList.add('text-body-secondary', 'border-transparent', 'bg-transparent', 'hover:text-black');
-            });
-            this.classList.add('bg-[#82111A]', 'text-white', 'border-[#82111A]', 'hover:text-white');
-            this.classList.remove('text-body-secondary', 'border-transparent', 'bg-transparent', 'hover:text-black');
-            
-            activeCategory = this.getAttribute('data-category');
+    // Filter Dropdown change handler
+    if (categorySelect) {
+        categorySelect.addEventListener('change', function() {
+            activeCategory = this.value;
             currentPage = 1;
             render();
         });
-    });
+    }
 
     // Search input handler
-    searchInput.addEventListener('input', function() {
-        searchQuery = this.value;
-        currentPage = 1;
-        render();
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            searchQuery = this.value;
+            currentPage = 1;
+            render();
+        });
+    }
 
     // Initial render
     render();
