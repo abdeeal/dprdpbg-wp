@@ -2,7 +2,15 @@
 **Proyek:** Website DPRD Kabupaten Purbalingga (Migrasi Next.js → WordPress Native)  
 **Modul Tipe:** Agenda, Berita, Galeri, Sekilas tentang Purbalingga, Pencarian Global, & Category Manager  
 **Pengembang:** Ghilbran  
-**Periode:** 20 Juli 2026 – 7 Agustus 2026  
+**Periode:** 6 Juli 2026 – 7 Agustus 2026  
+
+---
+
+## 📅 Periode 6 Juli – 19 Juli 2026 (Fase Persiapan & Perencanaan)
+* **Analisis & Perencanaan Migrasi (Fase 0):**
+  * Analisis struktur komponen React Next.js (`AgendaTransparansiSection.jsx`, `GaleriClient.jsx`, `SingleBerita.jsx`, dan data BPS `SekilasPurbalingga`).
+  * Perencanaan migrasi full native tanpa plugin berbayar (ACF Pro / Meta Box premium diganti dengan core API WordPress).
+  * Penyiapan lingkungan kerja lokal (XAMPP, Aiven Cloud MySQL Database, dan kerangka custom theme `dprd-purbalingga`).
 
 ---
 
@@ -75,7 +83,7 @@
   * **Item Anggota Hover-only:** Item hasil pencarian Anggota & Organisasi dapat di-hover secara interaktif namun tidak dapat di-klik menuju URL tunggal kosong.
   * **Tombol "Lihat Semua Berita" Borderless:** Menghapus kotak outline border dan background hover pada tombol *Lihat Semua Berita* di sidebar artikel serupa (`Lihat Semua Berita →`).
 * **Dokumentasi & Push GitHub:**
-  * Pembaruan berkas [progres-Ghilbran.md](file:///d:/XAMPP/htdocs/dprd-purbalingga/progres-Ghilbran.md) dan pembuatan [LOGBOOK-Ghilbran.md](file:///d:/XAMPP/htdocs/dprd-purbalingga/LOGBOOK-Ghilbran.md).
+  * Pembaruan berkas [progres-Ghilbran.md](file:///d:/XAMPP/htdocs/dprd-purbalingga/progres-Ghilbran.md) dan penyesuaian [LOGBOOK-Ghilbran.md](file:///d:/XAMPP/htdocs/dprd-purbalingga/LOGBOOK-Ghilbran.md).
   * Push seluruh hasil pengerjaan ke repositori GitHub.
 
 ---
