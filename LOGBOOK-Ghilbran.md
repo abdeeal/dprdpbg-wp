@@ -1,79 +1,69 @@
 # LOGBOOK HARIAN PEKERJAAN - GHILBRAN
 **Proyek:** Website DPRD Kabupaten Purbalingga (Migrasi Next.js Headless → Full WordPress Native 100% Gratis)  
-**Modul Pengerjaan:** Agenda, Berita, Galeri Kegiatan, Sekilas tentang Purbalingga, Optimasi Media WebP, Unified Category Manager, & Pencarian Global  
+**Modul Spesifik Ghilbran:** Agenda, Berita Terkini & Detail Berita, Galeri Kegiatan, Sekilas tentang Purbalingga, Unified Category Manager, Optimasi Media WebP, & Pencarian Global  
 **Pengembang:** Ghilbran  
 **Periode Pekerjaan:** 6 Juli 2026 – 7 Agustus 2026  
 
 ---
 
-## 📌 DAFTAR FASE MIGRASI YANG DIKERJAKAN GHILBRAN
+## 📌 PEMETAAN FASE MIGRASI SPESIFIK YANG DIKERJAKAN GHILBRAN
 
-| Fase | Nama Fase Migrasi | Modul / Komponen yang Dikerjakan Ghilbran |
+| Fase Alur Migrasi | Status | Rincian Modul & Fitur yang Dikerjakan Ghilbran |
 |---|---|---|
-| **Fase 0** | Setup Lingkungan Lokal & Database | XAMPP Apache, koneksi Aiven MySQL, custom theme skeleton `dprd-purbalingga`, `.gitignore`. |
-| **Fase 1** | Design System & Asset Dasar | Token warna Tailwind v4, 4 Google Fonts, penyiapan aset `assets/images/`, Vite build pipeline. |
-| **Fase 2** | Content Model (CPT & Custom Meta Box Native) | Registrasi CPT (`berita`, `galeri`, `agenda`), taksonomi (`kategori-galeri`), dan Custom Meta Box Admin. |
-| **Fase 3** | Pemetaan Halaman ke Template Hierarchy | Template `archive-berita.php`, `single-berita.php`, `archive-galeri.php`, `page-sekilas-tentang-purbalingga.php`. |
-| **Fase 4** | Convert Komponen React ke PHP Template Parts | Section Beranda (`agenda.php`, `berita.php`, `galeri.php`), Detail Berita (`single-content.php`), 8 sub-section Sekilas BPS. |
-| **Fase 5** | GSAP & Interaktivitas Client-Side Vanilla JS | Interaktivitas Galeri (filter tab, search instan), Scroll-Spy TOC Sekilas, paginasi responsif mobile (max 10 card/halaman). |
-| **Fase 6** | Fitur Pencarian Global (Custom, Native) | Pencarian Lintas CPT, unduhan PDF langsung pada kartu dokumen, single CPT redirect, tampilan kartu dokumen bersih (*clear*). |
-| **Fase 7** | Fitur Kustom & Optimasi Sistem | Unified Category Manager (`inc/category-manager.php`), Kompresi Adaptif WebP, Auto-Title Upload Foto, Parser & Sorting Tanggal Judul Galeri. |
-| **Fase 8** | Migrasi Data & QA Akhir | Entri data berita & galeri baru, QA visual responsivitas UI, dokumentasi `progres-Ghilbran.md`, dan push GitHub. |
+| **Fase 2 — Content Model CPT & Meta Box** | ✅ Dikerjakan | Pembuatan Custom Meta Box Native untuk CPT `berita` (ringkasan & metadata), CPT `galeri` (uploader foto & kategori), dan CPT `agenda` (tanggal & waktu). |
+| **Fase 3 — Pemetaan Halaman ke Template Hierarchy** | ✅ Dikerjakan | Pemetaan template `archive-berita.php`, `single-berita.php`, `archive-galeri.php`, dan `page-sekilas-tentang-purbalingga.php`. |
+| **Fase 4 — Convert Komponen React ke PHP Template Parts** | ✅ Dikerjakan | Konversi section Beranda (`agenda.php`, `berita.php`, `galeri.php`), Detail Berita (`single-content.php` dengan Dropcap & Foto Tambahan Paragraf), dan 8 sub-section Sekilas BPS. |
+| **Fase 5 — GSAP & Interaktivitas Client-Side Vanilla JS** | ✅ Dikerjakan | Interaktivitas Galeri (filter tab & search instan), Scroll-Spy TOC Sekilas Purbalingga, dan paginasi responsif mobile (maksimal 10 kartu/halaman). |
+| **Fase 6 — Fitur Pencarian Global (Custom, Native)** | ✅ Dikerjakan | Pencarian Lintas CPT, unduhan PDF langsung pada kartu dokumen (SAKIP/PPID/Propemperda), pengalihan URL tunggal CPT dokumen, dan kartu dokumen bersih (*clear*). |
+| **Fitur Kustom & Optimasi Performa** | ✅ Dikerjakan | Unified Category Manager (`inc/category-manager.php`), Kompresi Adaptif WebP (max 400 KB), Auto-Title Upload Foto Galeri, serta Parser & Sorting Tanggal Judul Galeri (Terbaru di Paling Atas). |
+| **Fase 8 — Migrasi Data & QA Akhir** | ✅ Dikerjakan | Entri data Berita & Galeri baru, QA visual responsivitas UI mobile & desktop, penyusunan dokumentasi `progres-Ghilbran.md`, dan push GitHub. |
 
 ---
 
-## 📅 LOGBOOK HARIAN PEKERJAAN HARI KERJA
+## 📅 LOGBOOK HARIAN PEKERJAAN GHILBRAN
 
 ---
 
-### 🔹 MINGGU 1: SETUP LINGKUNGAN, DESIGN SYSTEM, & ASSETS (6 – 10 JULI 2026)
+### 🔹 MINGGU 1: ANALISIS MODUL & PERANCANGAN SKEMA (6 – 10 JULI 2026)
 
-#### 📅 Senin, 6 Juli 2026 `[Fase 0 — Setup Lingkungan]`
-* **Analisis Kebutuhan Migrasi Modul:**
-  * Analisis struktur komponen React Next.js untuk modul **Agenda** (`AgendaTransparansiSection.jsx`), **Berita** (`BeritaSection.jsx`, `SingleBerita.jsx`), **Galeri** (`GaleriClient.jsx`), dan **Sekilas Purbalingga** (`sekilasPurbalingga.data.js`).
-  * Perencanaan migrasi full native tanpa plugin berbayar (ACF Pro / Meta Box premium diganti dengan Core API WordPress).
+#### 📅 Senin, 6 Juli 2026
+* **Analisis Kebutuhan Migrasi Modul Ghilbran:**
+  * Mempelajari struktur komponen React Next.js untuk modul **Agenda** (`AgendaTransparansiSection.jsx`), **Berita** (`BeritaSection.jsx`, `SingleBerita.jsx`), **Galeri** (`GaleriClient.jsx`), dan **Sekilas Purbalingga** (`sekilasPurbalingga.data.js`).
 
-#### 📅 Selasa, 7 Juli 2026 `[Fase 0 — Setup Lingkungan & Database]`
-* **Setup Lingkungan Kerja & Theme Skeleton:**
-  * Pengaturan server lokal XAMPP Apache dan koneksi database cloud Aiven MySQL (`wp-config.php`).
-  * Inisialisasi struktur kerangka custom theme `wp-content/themes/dprd-purbalingga/` (`style.css`, `index.php`, `functions.php`).
-  * Konfigurasi `.gitignore` untuk melindungi kredensial database `wp-config.php`, sertifikat `*.pem`, dan aset terkompilasi.
+#### 📅 Selasa, 7 Juli 2026
+* **Penentuan Alur Meta Box Native:**
+  * Merancang alur penginputan data pada WordPress Admin tanpa plugin berbayar (ACF Pro / Meta Box premium) khusus untuk CPT Berita, Galeri, dan Agenda.
 
-#### 📅 Rabu, 8 Juli 2026 `[Fase 1 — Setup Design System]`
-* **Setup Token Warna & Typography:**
-  * Menyalin token warna (Primary maroon `#82111A`, secondary, neutral) dari `tailwind.config.js` proyek Next.js.
-  * Menyiapkan typography Google Fonts: *Fraunces*, *Plus Jakarta Sans*, *JetBrains Mono*, dan *Montserrat*.
+#### 📅 Rabu, 8 Juli 2026
+* **Perancangan Skema Custom Fields Berita & Agenda:**
+  * Menentukan skema field ringkasan berita, tanggal rilis, waktu rilis, serta penyederhanaan input agenda agar sesuai dengan widget beranda.
 
-#### 📅 Kamis, 9 Juli 2026 `[Fase 1 — Penyiapan Aset Gambar]`
-* **Penyiapan Aset Media:**
-  * Memindahkan aset gambar dasar dari `public/images/` ke `wp-content/themes/dprd-purbalingga/assets/images/`.
-  * Menstrukturkan folder gambar pendukung untuk modul Berita, Galeri, dan Sekilas Purbalingga.
+#### 📅 Kamis, 9 Juli 2026
+* **Perancangan Skema Media & Kategori Galeri:**
+  * Menentukan skema uploader media foto bawaan WordPress dan daftar kategori galeri (Rapat Paripurna, Rapat Komisi, Kunjungan Kerja, Reses, Audiensi).
 
-#### 📅 Jumat, 10 Juli 2026 `[Fase 1 — Build Pipeline Asset]`
-* **Setup Build Pipeline Asset:**
-  * Inisialisasi build pipeline Vite + Tailwind CSS v4 (`vite.config.js`, `tailwind.config.js`, `src/css/main.css`, `src/js/main.js`).
-  * Menghubungkan fungsi enqueue script dan style pada `functions.php` untuk memuat `assets/dist/main.css` dan `assets/dist/main.js`.
+#### 📅 Jumat, 10 Juli 2026
+* **Penyiapan Struktur Aset Gambar Modul:**
+  * Menstrukturkan folder aset gambar pendukung untuk modul Berita, Galeri, dan Sekilas Purbalingga pada `assets/images/`.
 
 ---
 
-### 🔹 MINGGU 2: CONTENT MODEL CPT & CUSTOM META BOX NATIVE (13 – 17 JULI 2026)
+### 🔹 MINGGU 2: PEMBANGUNAN META BOX ADMIN NATIVE `[FASE 2]` (13 – 17 JULI 2026)
 
 #### 📅 Senin, 13 Juli 2026 `[Fase 2 — Content Model CPT]`
-* **Registrasi CPT & Taksonomi:**
-  * Membuat file `inc/post-types.php` untuk meredefinisi Custom Post Types modul yang dikerjakan: `berita`, `galeri`, dan `agenda`.
-  * Membuat file `inc/taxonomies.php` untuk meredefinisi taksonomi `kategori-galeri`.
+* **Registrasi CPT & Taksonomi Modul Ghilbran:**
+  * Membantu penyesuaian file `inc/post-types.php` untuk CPT `berita`, `galeri`, `agenda`, serta taksonomi `kategori-galeri` di `inc/taxonomies.php`.
 
 #### 📅 Selasa, 14 Juli 2026 `[Fase 2 — Custom Meta Box Berita]`
-* **Custom Meta Box Admin Berita:**
+* **Pembuatan Custom Meta Box Admin Berita:**
   * Membuat Meta Box Berita (`inc/meta-boxes/berita.php`) dengan penyederhanaan input ringkasan artikel, tanggal, dan waktu untuk pengguna non-teknis.
 
 #### 📅 Rabu, 15 Juli 2026 `[Fase 2 — Custom Meta Box Galeri]`
-* **Custom Meta Box Admin Galeri & Uploader Media:**
-  * Membuat Meta Box Galeri (`inc/meta-boxes/galeri.php`) dengan uploader media foto bawaan WordPress.
-  * Menyiapkan daftar kategori galeri (Rapat Paripurna, Rapat Komisi, Kunjungan Kerja, Reses, Audiensi).
+* **Pembuatan Custom Meta Box Admin Galeri:**
+  * Membuat Meta Box Galeri (`inc/meta-boxes/galeri.php`) dengan uploader media foto bawaan WordPress dan daftar kategori galeri kustom.
 
 #### 📅 Kamis, 16 Juli 2026 `[Fase 2 — Custom Meta Box Agenda]`
-* **Custom Meta Box Admin Agenda:**
+* **Pembuatan Custom Meta Box Admin Agenda:**
   * Membuat Meta Box Agenda (`inc/meta-boxes/agenda.php`) dengan mengeliminasi input lokasi & deskripsi yang tumpang tindih agar pas dengan widget beranda.
 
 #### 📅 Jumat, 17 Juli 2026 `[Fase 2 — Refactoring Meta Box Admin]`
@@ -83,17 +73,17 @@
 
 ---
 
-### 🔹 MINGGU 3: KONVERSI KOMPONEN REACT KE PHP TEMPLATE PARTS (20 – 24 JULI 2026)
+### 🔹 MINGGU 3: KONVERSI KOMPONEN REACT KE PHP `[FASE 3 & 4]` (20 – 24 JULI 2026)
 
 #### 📅 Senin, 20 Juli 2026 `[Fase 3 & 4 — Template Beranda]`
-* **Template Beranda (Agenda, Berita, & Galeri):**
+* **Konversi Template Beranda (Agenda, Berita, & Galeri):**
   * Konversi komponen React ke PHP Template Parts untuk Beranda:
     * `template-parts/sections/beranda/agenda.php` (query dinamis CPT agenda terdekat).
     * `template-parts/sections/beranda/berita.php` (grid 1 berita utama + 4 berita terbaru tanpa duplikasi).
     * `template-parts/sections/beranda/galeri.php` (grid 4 galeri foto terbaru).
 
 #### 📅 Selasa, 21 Juli 2026 `[Fase 3 & 4 — Detail Berita]`
-* **Detail Berita & Fitur Sisip Foto Paragraf:**
+* **Pembuatan Halaman Detail Berita:**
   * Pembuatan template detail berita `single-berita.php` & `template-parts/sections/berita/single-content.php`:
     * Efek **Dropcap otomatis** pada paragraf pertama artikel berita.
     * Breadcrumbs dinamis & penyesuaian ikon kalender/penulis.
@@ -101,24 +91,23 @@
     * Sidebar **Update Berita Serupa** (3 rekomendasi berita sejenis tanpa duplikasi).
 
 #### 📅 Rabu, 22 Juli 2026 `[Fase 3 & 4 — Sekilas Purbalingga]`
-* **Halaman Sekilas Purbalingga & Table of Contents:**
+* **Pembuatan Halaman Sekilas Purbalingga & TOC:**
   * Pembuatan halaman `page-sekilas-tentang-purbalingga.php` beserta 8 sub-section data statistik BPS (`letak-geografis.php`, `luas-wilayah.php`, `topografi-tanah.php`, `hidrologi.php`, `pemerintahan.php`, `kepegawaian.php`, `kependudukan.php`, `sosial-fasilitas.php`).
   * Integrasi **Sidebar Table of Contents** dengan fitur *scroll-spy* interaktif.
   * Pembuatan database fallback statistik `inc/sekilas-data.php`.
 
 #### 📅 Kamis, 23 Juli 2026 `[Fase 3 & 4 — Arsip Berita]`
-* **Halaman Arsip Berita & Paginasi:**
+* **Pembuatan Halaman Arsip Berita:**
   * Pembuatan template `archive-berita.php` dengan grid 3 kolom berita, form pencarian berita, dan paginasi halaman.
   * Penyesuaian native excerpt berita dan fitur kompresi gambar awal.
 
 #### 📅 Jumat, 24 Juli 2026 `[Fase 3 — Permalinks & Routing]`
-* **Routing Permalink & Configuration:**
+* **Routing Permalink Berita:**
   * Integrasi fungsi native `get_permalink()` di seluruh struktur berita kustom untuk mencegah error 404.
-  * Penyesuaian file konfigurasi `.htaccess` lokal untuk mendukung REST API.
 
 ---
 
-### 🔹 MINGGU 4: PENGUJIAN VISUAL & INTERAKTIVITAS UI (27 – 31 JULI 2026)
+### 🔹 MINGGU 4: PENGUJIAN VISUAL & INTERAKTIVITAS UI `[FASE 5]` (27 – 31 JULI 2026)
 
 #### 📅 Senin, 27 Juli 2026 `[Fase 4 — Grid Layout Review]`
 * **Review Tata Letak Grid Berita & Galeri:**
@@ -142,40 +131,40 @@
 
 ---
 
-### 🔹 MINGGU 5: OPTIMASI MEDIA, UNIFIED CATEGORY MANAGER, & PENCARIAN GLOBAL (3 – 7 AGUSTUS 2026)
+### 🔹 MINGGU 5: OPTIMASI MEDIA, UNIFIED CATEGORY MANAGER, PENCARIAN GLOBAL, & QA `[FASE 6, FITUR KUSTOM, & FASE 8]` (3 – 7 AGUSTUS 2026)
 
-#### 📅 Senin, 3 Agustus 2026 `[Fase 7 — Validasi Admin Berita & Agenda]`
+#### 📅 Senin, 3 Agustus 2026 `[Fitur Kustom — Validasi Admin]`
 * **Penyempurnaan Form Input Berita & Agenda Admin:**
   * Setting default tanggal agenda ke hari ini (`min=today`) serta validasi backend agar tidak memilih tanggal lampau.
   * Menambahkan fitur pemisahan otomatis tag berita saat di-paste (*Auto-split Tags*).
 
-#### 📅 Selasa, 4 Agustus 2026 `[Fase 7 — Auto-detection & Styling Admin]`
+#### 📅 Selasa, 4 Agustus 2026 `[Fitur Kustom — Auto-detection Berita]`
 * **Otomatisasi Deteksi Tanggal Berita & Presets:**
   * Mengembangkan fungsi auto-detection hari dan tanggal rilis dari isi artikel berita (misal: *"Kamis, 9 Juli 2026"*).
   * Format tampilan tanggal berita menjadi `Hari, DD NamaBulan YYYY`.
   * Setting default Penulis/Sumber ke *"Humpro DPRD Kabupaten Purbalingga"* dengan tombol preset `⚡ Humpro DPRD`.
   * Styling Meta Box admin berita (auto-expand textarea caption foto utama, warna tombol hapus merah).
 
-#### 📅 Rabu, 5 Agustus 2026 `[Fase 7 — Optimasi Gambar WebP]`
+#### 📅 Rabu, 5 Agustus 2026 `[Fitur Kustom — Optimasi Gambar WebP]`
 * **Optimasi Performa Media & Gambar WebP:**
   * Pembuatan kompresi otomatis gambar (JPG/PNG) ke format **WebP** dengan kompresi adaptif (target maks 400 KB, resolusi 1920px 90% kualitas).
   * Penghapusan file mentah JPG/PNG asli dari server secara otomatis.
   * Pembersihan file duplikat sub-ukuran bawaan WP (`-150x150`, `-300x200`) dan mematikan generator sub-sizes otomatis.
   * Alokasi memori PHP 256M saat proses kompresi foto besar.
 
-#### 📅 Kamis, 6 Agustus 2026 `[Fase 7 & 8 — Seeding Galeri & UI Finishing]`
+#### 📅 Kamis, 6 Agustus 2026 `[Fase 8 — Seeding Galeri & UI Finishing]`
 * **Penyempurnaan Tampilan Berita & Entri Galeri Baru:**
   * Entri foto kegiatan Galeri baru (kategori Rapat Paripurna & Rapat Komisi).
   * Penyempurnaan tombol **Lihat Semua Berita** di sidebar berita tunggal menjadi tautan teks *borderless* (`Lihat Semua Berita →`).
 
-#### 📅 Jumat, 7 Agustus 2026 `[Fase 5, 6, 7, & 8 — Final Features & QA]`
-* **Penyempurnaan Galeri Kegiatan & Paginasi Responsif Mobile `[Fase 5 & 7]`:**
+#### 📅 Jumat, 7 Agustus 2026 `[Fase 5, 6, Fitur Kustom, & 8 — Final Features & QA]`
+* **Penyempurnaan Galeri Kegiatan & Paginasi Responsif Mobile `[Fase 5 & Fitur Kustom]`:**
   * Layout grid Galeri desktop: 2 kolom ke kanan $\times$ 10 baris ke bawah (20 kartu per halaman).
   * **Paginasi Responsif Mobile:** Mengatur batas kartu galeri secara dinamis — **maksimal 10 kartu ke bawah** per halaman pada layar HP (`< 640px`) dan **20 kartu** per halaman pada desktop (`>= 640px`).
   * **Desain Filter Popover Minimalis:** Tombol filter kustom berbentuk kotak presisi (`w-12 h-12`) dengan ikon 3-garis horizontal (`filter-3`) dan menu popover melayang tanpa teks terlipat (`whitespace-nowrap`). Warna ikon filter disamakan dengan pencarian (`text-body-secondary`).
   * **Otomatisasi Judul dari Nama File Foto:** Nama file foto yang diunggah otomatis diproses, dibersihkan dari garis/strip dan ekstensi file, lalu diisikan langsung sebagai Judul Galeri secara instan.
   * **Ekstraksi Tanggal & Pengurutan Kronologis (Terbaru Paling Atas):** Parser tanggal kustom yang mendeteksi berbagai format tanggal di judul (`YYYY.MM.DD`, `YYYY-MM-DD`, `DD-MM-YYYY`, `DD.MM.YYYY`, `DD [Bulan] YYYY`) untuk mengurutkan seluruh galeri dari **tanggal terbaru di paling atas** hingga **terlama di paling bawah**. Pembersihan otomatis ekstensi `.jpg`/`.png` dari judul tampilan.
-* **Sistem Manajemen Kategori Admin (Unified Category Manager) `[Fase 7]`:**
+* **Sistem Manajemen Kategori Admin (Unified Category Manager) `[Fitur Kustom]`:**
   * **Single Meta Box Tunggal ("Kategori [Tipe Konten]"):** Menyatukan Meta Box kategori bawaan yang duplikat menjadi 1 box kustom tunggal yang bersih di sidebar kanan WP Admin (`inc/category-manager.php`).
   * **Fitur Hapus & Tambah Kategori Instan:** Menyediakan tombol merah **Hapus** pada setiap item kategori via AJAX (dilengkapi dialog konfirmasi) dan form **+ Tambah Kategori Baru**.
   * Diaktifkan khusus pada tipe konten `Galeri`, `Berita`, dan `Alat Kelengkapan`, serta di-nonaktifkan pada CPT dokumen (`SAKIP`, `PPID`, `Propemperda`).
@@ -189,4 +178,4 @@
   * Push seluruh hasil pengerjaan ke repositori GitHub.
 
 ---
-**Status Akhir Pekerjaan Ghilbran:** Seluruh modul yang Anda kerjakan (Agenda, Berita, Galeri Kegiatan, Sekilas tentang Purbalingga, Optimasi Media WebP, Unified Category Manager, & Pencarian Global) pada Fase 0, 1, 2, 3, 4, 5, 6, 7, dan 8 telah 100% selesai dikembangkan dan teruji.
+**Status Akhir Pekerjaan Ghilbran:** Seluruh modul spesifik yang Anda kerjakan (Agenda, Berita, Galeri Kegiatan, Sekilas tentang Purbalingga, Optimasi Media WebP, Unified Category Manager, & Pencarian Global) pada Fase 2, 3, 4, 5, 6, Fitur Kustom, dan 8 telah 100% selesai dikembangkan dan teruji.
