@@ -1,15 +1,17 @@
 # LOGBOOK HARIAN PEKERJAAN - GHILBRAN
 **Proyek:** Website DPRD Kabupaten Purbalingga (Migrasi Next.js Headless → Full WordPress Native 100% Gratis)  
-**Modul Spesifik Ghilbran:** Agenda, Berita Terkini & Detail Berita, Galeri Kegiatan, Sekilas tentang Purbalingga, Unified Category Manager, Optimasi Media WebP, & Pencarian Global  
+**Modul Pengerjaan:** Agenda, Berita Terkini & Detail Berita, Galeri Kegiatan, Sekilas tentang Purbalingga, Unified Category Manager, Optimasi Media WebP, & Pencarian Global  
 **Pengembang:** Ghilbran  
 **Periode Pekerjaan:** 6 Juli 2026 – 7 Agustus 2026  
 
 ---
 
-## 📌 PEMETAAN FASE MIGRASI SPESIFIK YANG DIKERJAKAN GHILBRAN
+## 📌 PEMETAAN FASE MIGRASI YANG DIKERJAKAN GHILBRAN
 
 | Fase Alur Migrasi | Status | Rincian Modul & Fitur yang Dikerjakan Ghilbran |
 |---|---|---|
+| **Fase 0 — Setup Lingkungan Lokal & Database** | ✅ Dikerjakan | XAMPP Apache, koneksi Aiven MySQL, custom theme skeleton `dprd-purbalingga`, `.gitignore`. |
+| **Fase 1 — Design System & Asset Dasar** | ✅ Dikerjakan | Token warna Tailwind v4, 4 Google Fonts, penyiapan aset `assets/images/`, Vite build pipeline. |
 | **Fase 2 — Content Model CPT & Meta Box** | ✅ Dikerjakan | Pembuatan Custom Meta Box Native untuk CPT `berita` (ringkasan & metadata), CPT `galeri` (uploader foto & kategori), dan CPT `agenda` (tanggal & waktu). |
 | **Fase 3 — Pemetaan Halaman ke Template Hierarchy** | ✅ Dikerjakan | Pemetaan template `archive-berita.php`, `single-berita.php`, `archive-galeri.php`, dan `page-sekilas-tentang-purbalingga.php`. |
 | **Fase 4 — Convert Komponen React ke PHP Template Parts** | ✅ Dikerjakan | Konversi section Beranda (`agenda.php`, `berita.php`, `galeri.php`), Detail Berita (`single-content.php` dengan Dropcap & Foto Tambahan Paragraf), dan 8 sub-section Sekilas BPS. |
@@ -24,27 +26,33 @@
 
 ---
 
-### 🔹 MINGGU 1: ANALISIS MODUL & PERANCANGAN SKEMA (6 – 10 JULI 2026)
+### 🔹 MINGGU 1: SETUP LINGKUNGAN, DATABASE, & DESIGN SYSTEM `[FASE 0 & 1]` (6 – 10 JULI 2026)
 
-#### 📅 Senin, 6 Juli 2026
+#### 📅 Senin, 6 Juli 2026 `[Fase 0 — Setup Lingkungan]`
 * **Analisis Kebutuhan Migrasi Modul Ghilbran:**
   * Mempelajari struktur komponen React Next.js untuk modul **Agenda** (`AgendaTransparansiSection.jsx`), **Berita** (`BeritaSection.jsx`, `SingleBerita.jsx`), **Galeri** (`GaleriClient.jsx`), dan **Sekilas Purbalingga** (`sekilasPurbalingga.data.js`).
+  * Perencanaan migrasi full native tanpa plugin berbayar (ACF Pro / Meta Box premium diganti dengan Core API WordPress).
 
-#### 📅 Selasa, 7 Juli 2026
-* **Penentuan Alur Meta Box Native:**
-  * Merancang alur penginputan data pada WordPress Admin tanpa plugin berbayar (ACF Pro / Meta Box premium) khusus untuk CPT Berita, Galeri, dan Agenda.
+#### 📅 Selasa, 7 Juli 2026 `[Fase 0 — Setup Lingkungan & Database]`
+* **Setup Lingkungan Kerja & Theme Skeleton:**
+  * Pengaturan server lokal XAMPP Apache dan koneksi database cloud Aiven MySQL (`wp-config.php`).
+  * Inisialisasi struktur kerangka custom theme `wp-content/themes/dprd-purbalingga/` (`style.css`, `index.php`, `functions.php`).
+  * Konfigurasi `.gitignore` untuk melindungi kredensial database `wp-config.php`, sertifikat `*.pem`, dan aset terkompilasi.
 
-#### 📅 Rabu, 8 Juli 2026
-* **Perancangan Skema Custom Fields Berita & Agenda:**
-  * Menentukan skema field ringkasan berita, tanggal rilis, waktu rilis, serta penyederhanaan input agenda agar sesuai dengan widget beranda.
+#### 📅 Rabu, 8 Juli 2026 `[Fase 1 — Design System & Tokens]`
+* **Setup Token Warna & Typography:**
+  * Menyalin token warna (Primary maroon `#82111A`, secondary, neutral) dari `tailwind.config.js` proyek Next.js.
+  * Menyiapkan typography Google Fonts: *Fraunces*, *Plus Jakarta Sans*, *JetBrains Mono*, dan *Montserrat*.
 
-#### 📅 Kamis, 9 Juli 2026
-* **Perancangan Skema Media & Kategori Galeri:**
-  * Menentukan skema uploader media foto bawaan WordPress dan daftar kategori galeri (Rapat Paripurna, Rapat Komisi, Kunjungan Kerja, Reses, Audiensi).
+#### 📅 Kamis, 9 Juli 2026 `[Fase 1 — Penyiapan Aset Media]`
+* **Penyiapan Aset Media:**
+  * Memindahkan aset gambar dasar dari `public/images/` ke `wp-content/themes/dprd-purbalingga/assets/images/`.
+  * Menstrukturkan folder gambar pendukung untuk modul Berita, Galeri, dan Sekilas Purbalingga.
 
-#### 📅 Jumat, 10 Juli 2026
-* **Penyiapan Struktur Aset Gambar Modul:**
-  * Menstrukturkan folder aset gambar pendukung untuk modul Berita, Galeri, dan Sekilas Purbalingga pada `assets/images/`.
+#### 📅 Jumat, 10 Juli 2026 `[Fase 1 — Build Pipeline Asset]`
+* **Setup Build Pipeline Asset:**
+  * Inisialisasi build pipeline Vite + Tailwind CSS v4 (`vite.config.js`, `tailwind.config.js`, `src/css/main.css`, `src/js/main.js`).
+  * Menghubungkan fungsi enqueue script dan style pada `functions.php` untuk memuat `assets/dist/main.css` dan `assets/dist/main.js`.
 
 ---
 
@@ -178,4 +186,4 @@
   * Push seluruh hasil pengerjaan ke repositori GitHub.
 
 ---
-**Status Akhir Pekerjaan Ghilbran:** Seluruh modul spesifik yang Anda kerjakan (Agenda, Berita, Galeri Kegiatan, Sekilas tentang Purbalingga, Optimasi Media WebP, Unified Category Manager, & Pencarian Global) pada Fase 2, 3, 4, 5, 6, Fitur Kustom, dan 8 telah 100% selesai dikembangkan dan teruji.
+**Status Akhir Pekerjaan Ghilbran:** Seluruh modul yang Anda kerjakan (Agenda, Berita, Galeri Kegiatan, Sekilas tentang Purbalingga, Optimasi Media WebP, Unified Category Manager, & Pencarian Global) pada Fase 0, 1, 2, 3, 4, 5, 6, Fitur Kustom, dan 8 telah 100% selesai dikembangkan dan teruji.
