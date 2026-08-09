@@ -124,7 +124,7 @@ function dprd_custom_rewrite_rules() {
         'top'
     );
     add_rewrite_rule(
-        '^profil-dprd/komisi/([1-4])/?$',
+        '^profil-dprd/komisi/([0-9]+)/?$',
         'index.php?alat-kelengkapan=komisi&komisi_num=$matches[1]',
         'top'
     );

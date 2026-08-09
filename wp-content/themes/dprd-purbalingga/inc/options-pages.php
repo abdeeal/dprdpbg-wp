@@ -3,10 +3,10 @@
  * Options Page: Pengaturan Situs DPRD Purbalingga
  * Pengganti ACF Options Page — 100% native, gratis.
  *
- * Menyimpan 3 kelompok data ke wp_options:
- * - dprd_navigation_json  → repeater bercabang (nested), lewat DPRD_Repeater_Field
+ * Menyimpan data ke wp_options:
  * - dprd_banner_json      → repeater biasa (gambar, judul, link)
  * - dprd_hero_stats_*     → field sederhana (anggota, fraksi, komisi, periode)
+ * - dprd_pengumuman_strip → teks pengumuman running (marquee)
  *
  * @package DPRD_Purbalingga
  */
@@ -27,13 +27,6 @@ add_action('admin_menu', function () {
     );
 });
 
-/**
- * Definisikan instance repeater di sini (bukan lewat add_meta_boxes,
- * karena ini bukan post type — kita panggil render_field_only() &
- * sanitize_from_post() secara manual).
- */
-
-
 function dprd_get_banner_repeater() {
     static $instance = null;
     if ($instance === null) {
@@ -50,8 +43,6 @@ function dprd_get_banner_repeater() {
     return $instance;
 }
 
-// Ensure the repeater singletons are instantiated early enough so their
-// enqueue_scripts hooks are registered before admin_enqueue_scripts fires.
 add_action('admin_init', function() {
     dprd_get_banner_repeater();
 });
@@ -94,7 +85,10 @@ function dprd_render_site_settings_page() {
     $stats_komisi  = get_option('dprd_hero_stats_komisi', '');
     $stats_periode_mulai = get_option('dprd_hero_stats_periode_mulai', '');
     $stats_periode_akhir = get_option('dprd_hero_stats_periode_akhir', '');
-    $pengumuman_strip    = get_option('dprd_pengumuman_strip', '');
+    $pengumuman_strip    = get_option('dprd_pengumuman_strip');
+    if ($pengumuman_strip === false) {
+        $pengumuman_strip = 'Sidang Paripurna DPRD Kabupaten Purbalingga berlangsung transparan, akuntabel, dan profesional.';
+    }
     ?>
     <div class="wrap">
         <h1>Pengaturan Situs DPRD Purbalingga</h1>

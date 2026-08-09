@@ -341,18 +341,23 @@ if ($slug === 'pimpinan-dprd') {
 
 } elseif ($slug === 'komisi') {
     // --- GROUP MEMBER "KOMISI" ---
-    $komisi_num = get_query_var('komisi_num');
+    $komisi_num  = get_query_var('komisi_num');
+    $ak_children = isset($ak_data['children']) && is_array($ak_data['children']) ? $ak_data['children'] : [];
     
     if (empty($komisi_num)) {
         // Render Komisi Index (Directory)
         $breadcrumbs[] = ['label' => 'Komisi'];
         $title = 'Komisi';
-        $children_links = [
-            ['title' => 'Komisi I', 'href' => home_url('/profil-dprd/komisi/1/')],
-            ['title' => 'Komisi II', 'href' => home_url('/profil-dprd/komisi/2/')],
-            ['title' => 'Komisi III', 'href' => home_url('/profil-dprd/komisi/3/')],
-            ['title' => 'Komisi IV', 'href' => home_url('/profil-dprd/komisi/4/')],
-        ];
+        $children_links = [];
+        foreach ($ak_children as $c) {
+            $c_nama = trim($c['nama'] ?? '');
+            if (empty($c_nama)) continue;
+            $num = dprd_get_komisi_num_from_name($c_nama);
+            $children_links[] = [
+                'title' => $c_nama,
+                'href'  => home_url('/profil-dprd/komisi/' . $num . '/')
+            ];
+        }
         
         ob_start();
         ?>
@@ -376,28 +381,23 @@ if ($slug === 'pimpinan-dprd') {
         <?php
         $custom_html = ob_get_clean();
     } else {
-        $slug_num_map = [
-            '1' => 'Komisi I',
-            '2' => 'Komisi II',
-            '3' => 'Komisi III',
-            '4' => 'Komisi IV'
-        ];
-        $c_title = isset($slug_num_map[$komisi_num]) ? $slug_num_map[$komisi_num] : 'Komisi I';
+        // Find target child matching $komisi_num
+        $target_child = null;
+        foreach ($ak_children as $c) {
+            $c_nama = trim($c['nama'] ?? '');
+            $num = dprd_get_komisi_num_from_name($c_nama);
+            if ((string)$num === (string)$komisi_num) {
+                $target_child = $c;
+                break;
+            }
+        }
+        
+        $c_title = $target_child ? $target_child['nama'] : 'Komisi ' . $komisi_num;
         
         $breadcrumbs[] = ['label' => 'Komisi', 'href' => home_url('/profil-dprd/komisi/')];
         $breadcrumbs[] = ['label' => $c_title];
         
         $title = $c_title;
-        
-        // Find target child
-        $target_child = null;
-        $children = isset($ak_data['children']) ? $ak_data['children'] : [];
-        foreach ($children as $c) {
-            if ($c['nama'] === $c_title) {
-                $target_child = $c;
-                break;
-            }
-        }
         
         if ($target_child) {
             $members_list = dprd_get_flat_members_from_hierarki(isset($target_child['hierarki']) ? $target_child['hierarki'] : []);
@@ -457,19 +457,23 @@ if ($slug === 'pimpinan-dprd') {
 } elseif ($slug === 'fraksi') {
     // --- GROUP MEMBER "FRAKSI" ---
     $fraksi_slug = get_query_var('fraksi_slug');
+    $children = isset($ak_data['children']) && is_array($ak_data['children']) ? $ak_data['children'] : [];
     
     if (empty($fraksi_slug)) {
-        // Render Fraksi Index (Directory)
+        // Render Fraksi Index (Directory) secara dinamis
         $breadcrumbs[] = ['label' => 'Fraksi'];
         $title = 'Fraksi';
-        $children_links = [
-            ['title' => 'Fraksi PDI Perjuangan', 'href' => home_url('/profil-dprd/fraksi/pdi-perjuangan/')],
-            ['title' => 'Fraksi Partai Golongan Karya', 'href' => home_url('/profil-dprd/fraksi/golkar/')],
-            ['title' => 'Fraksi Partai Gerindra', 'href' => home_url('/profil-dprd/fraksi/gerindra/')],
-            ['title' => 'Fraksi PKB', 'href' => home_url('/profil-dprd/fraksi/pkb/')],
-            ['title' => 'Fraksi PKS', 'href' => home_url('/profil-dprd/fraksi/pks/')],
-            ['title' => 'Fraksi Amanat Demokrat (PAN)', 'href' => home_url('/profil-dprd/fraksi/pan/')],
-        ];
+        $children_links = [];
+
+        foreach ($children as $c) {
+            if (!empty($c['nama'])) {
+                $f_slug = dprd_get_fraksi_slug_from_name($c['nama']);
+                $children_links[] = [
+                    'title' => $c['nama'],
+                    'href'  => home_url('/profil-dprd/fraksi/' . $f_slug . '/'),
+                ];
+            }
+        }
         
         ob_start();
         ?>
@@ -493,30 +497,23 @@ if ($slug === 'pimpinan-dprd') {
         <?php
         $custom_html = ob_get_clean();
     } else {
-        $slug_name_map = [
-            'pdi-perjuangan' => 'Fraksi PDI Perjuangan',
-            'golkar'         => 'Fraksi Partai Golkar',
-            'gerindra'       => 'Fraksi Partai Gerindra',
-            'pkb'            => 'Fraksi PKB',
-            'pks'            => 'Fraksi PKS',
-            'pan'            => 'Fraksi PAN'
-        ];
-        $c_title = isset($slug_name_map[$fraksi_slug]) ? $slug_name_map[$fraksi_slug] : 'Fraksi PDI Perjuangan';
+        // Cari target child yang sesuai dengan fraksi_slug
+        $target_child = null;
+        foreach ($children as $c) {
+            if (empty($c['nama'])) continue;
+            $c_slug = dprd_get_fraksi_slug_from_name($c['nama']);
+            if ($c_slug === $fraksi_slug || strtolower(sanitize_title($c['nama'])) === $fraksi_slug) {
+                $target_child = $c;
+                break;
+            }
+        }
+
+        $c_title = $target_child ? $target_child['nama'] : 'Fraksi';
         
         $breadcrumbs[] = ['label' => 'Fraksi', 'href' => home_url('/profil-dprd/fraksi/')];
         $breadcrumbs[] = ['label' => $c_title];
         
         $title = $c_title;
-        
-        // Find target child
-        $target_child = null;
-        $children = isset($ak_data['children']) ? $ak_data['children'] : [];
-        foreach ($children as $c) {
-            if ($c['nama'] === $c_title) {
-                $target_child = $c;
-                break;
-            }
-        }
         
         if ($target_child) {
             $members_list = dprd_get_flat_members_from_hierarki(isset($target_child['hierarki']) ? $target_child['hierarki'] : []);

@@ -171,6 +171,19 @@ function dprd_render_ak_struktur_meta($post) {
             render();
         };
 
+        window.moveChildNode = function(pathStr, dir) {
+            let path = JSON.parse(pathStr);
+            let index = path.pop();
+            let parent = getNode(path);
+            let targetIndex = dir === 'up' ? index - 1 : index + 1;
+            if (targetIndex >= 0 && targetIndex < parent.children.length) {
+                let temp = parent.children[index];
+                parent.children[index] = parent.children[targetIndex];
+                parent.children[targetIndex] = temp;
+                render();
+            }
+        };
+
         window.removeChildNode = function(pathStr) {
             let path = JSON.parse(pathStr);
             if(confirm('Yakin ingin menghapus sub-alat kelengkapan ini?')) {
@@ -252,13 +265,15 @@ function dprd_render_ak_struktur_meta($post) {
             let html = `<div style="border:1px solid #ccd0d4; padding:15px; margin-bottom:10px; background:#fff; border-radius:4px;">`;
             
             if (path.length > 0) {
-                html += `<div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
-                    <input type="text" class="widefat" value="${node.nama || ''}" onchange="updateNodeNama('${pathStr}', this.value)" placeholder="Nama Sub-Alat Kelengkapan (mis. Komisi I)" style="flex:1;">
+                html += `<div style="display:flex; gap:6px; align-items:center; margin-bottom:15px;">
+                    <input type="text" class="widefat" value="${escapeHtml(node.nama || '')}" onchange="updateNodeNama('${pathStr}', this.value)" oninput="updateNodeNama('${pathStr}', this.value)" placeholder="Nama Sub-Alat Kelengkapan (mis. Fraksi PKB)" style="flex:1;">
                     <select onchange="updateNodeTipe('${pathStr}', this.value)">
                         <option value="badan" ${node.tipe==='badan'?'selected':''}>Tipe: Badan</option>
                         <option value="grup" ${node.tipe==='grup'?'selected':''}>Tipe: Grup</option>
                     </select>
-                    <button type="button" class="button" onclick="removeChildNode('${pathStr}')">Hapus Blok</button>
+                    <button type="button" class="button button-small" onclick="moveChildNode('${pathStr}', 'up')" title="Pindah ke Atas">▲ Ke Atas</button>
+                    <button type="button" class="button button-small" onclick="moveChildNode('${pathStr}', 'down')" title="Pindah ke Bawah">▼ Ke Bawah</button>
+                    <button type="button" class="button button-small" onclick="removeChildNode('${pathStr}')" style="color:#a00;">Hapus</button>
                 </div>`;
             } else {
                 html += `<div style="margin-bottom:15px;">
@@ -340,11 +355,359 @@ function dprd_render_ak_struktur_meta($post) {
     <?php
 }
 
-add_action('save_post', function ($post_id) {
-    if (isset($_POST['dprd_ak_struktur_nonce']) && wp_verify_nonce($_POST['dprd_ak_struktur_nonce'], 'dprd_save_ak_struktur')) {
-        if (isset($_POST['dprd_ak_struktur_json'])) {
-            $json = wp_unslash($_POST['dprd_ak_struktur_json']);
-            update_post_meta($post_id, 'dprd_ak_struktur_json', $json);
+add_action('save_post_alat-kelengkapan', function ($post_id, $post, $update) {
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (wp_is_post_revision($post_id)) return;
+
+    if (isset($_POST['dprd_ak_struktur_json'])) {
+        $json = wp_unslash($_POST['dprd_ak_struktur_json']);
+        update_post_meta($post_id, 'dprd_ak_struktur_json', $json);
+    }
+
+    $json = get_post_meta($post_id, 'dprd_ak_struktur_json', true);
+    if (!empty($json)) {
+        $post_slug  = strtolower(get_post_field('post_name', $post_id));
+        $post_title = strtolower(get_post_field('post_title', $post_id));
+        $data       = is_array($json) ? $json : json_decode($json, true);
+        $name       = strtolower(trim($data['nama'] ?? ''));
+
+        if ($name === 'fraksi' || $post_slug === 'fraksi' || $post_title === 'fraksi') {
+            dprd_sync_fraksi_nav_menu($json);
+        } elseif ($name === 'komisi' || $post_slug === 'komisi' || $post_title === 'komisi') {
+            dprd_sync_komisi_nav_menu($json);
         }
     }
-});
+}, 10, 3);
+
+/**
+ * Helper untuk membuat slug Fraksi yang konsisten dari nama Fraksi
+ */
+function dprd_get_fraksi_slug_from_name($nama) {
+    $clean = trim(preg_replace('/^fraksi\s+/i', '', $nama));
+    $slug = sanitize_title($clean);
+
+    $aliases = [
+        'partai-golongan-karya' => 'golkar',
+        'partai-golkar'         => 'golkar',
+        'partai-gerindra'       => 'gerindra',
+        'gerindra'              => 'gerindra',
+        'amanat-demokrat-pan'   => 'pan',
+        'amanat-nasional'       => 'pan',
+    ];
+
+    if (isset($aliases[$slug])) {
+        return $aliases[$slug];
+    }
+    return $slug ? $slug : sanitize_title($nama);
+}
+
+/**
+ * Sinkronisasi otomatis submenu Fraksi di Appearance > Menus (Tampilan > Menu)
+ * ketika data Fraksi di Alat Kelengkapan diperbarui.
+ */
+function dprd_sync_fraksi_nav_menu($json_string) {
+    if (empty($json_string)) return;
+
+    $data = is_array($json_string) ? $json_string : json_decode($json_string, true);
+    if (!is_array($data)) return;
+
+    // Cek apakah data ini adalah struktur Fraksi
+    $name = strtolower(trim($data['nama'] ?? ''));
+    if ($name !== 'fraksi' && empty($data['children'])) {
+        return;
+    }
+
+    $raw_children = $data['children'] ?? [];
+    if (!is_array($raw_children)) return;
+
+    // Filter & hapus duplikat fraksi berdasarkan slug
+    $children = [];
+    $seen_slugs = [];
+    foreach ($raw_children as $c) {
+        $t = trim($c['nama'] ?? '');
+        if (empty($t)) continue;
+        $s = dprd_get_fraksi_slug_from_name($t);
+        if (!isset($seen_slugs[$s])) {
+            $seen_slugs[$s] = true;
+            $children[] = $c;
+        }
+    }
+
+    // Update statistik hero jika berubah
+    update_option('dprd_hero_stats_fraksi', count($children));
+
+    // Cari lokasi menu primary atau seluruh menu yang terdaftar
+    $menus_to_sync = [];
+    $locations = get_nav_menu_locations();
+    if (!empty($locations['primary'])) {
+        $menus_to_sync[] = $locations['primary'];
+    }
+
+    if (empty($menus_to_sync)) {
+        $all_menus = wp_get_nav_menus();
+        foreach ($all_menus as $m) {
+            $menus_to_sync[] = $m->term_id;
+        }
+    }
+
+    foreach ($menus_to_sync as $menu_id) {
+        $menu_items = wp_get_nav_menu_items($menu_id);
+        if (!$menu_items || is_wp_error($menu_items)) continue;
+
+        // Cari parent menu item untuk "Fraksi"
+        $parent_menu_item_id = 0;
+        foreach ($menu_items as $mi) {
+            $title = strtolower(trim($mi->title));
+            $path  = rtrim(parse_url($mi->url, PHP_URL_PATH) ?: '', '/');
+
+            if ($title === 'fraksi' || substr($path, -19) === '/profil-dprd/fraksi') {
+                $parent_menu_item_id = (int) $mi->ID;
+                break;
+            }
+        }
+
+        if (!$parent_menu_item_id) continue;
+
+        // Dapatkan child menu items saat ini di bawah item "Fraksi"
+        $existing_children = [];
+        $existing_by_slug  = [];
+
+        foreach ($menu_items as $mi) {
+            if ((int)$mi->menu_item_parent === $parent_menu_item_id) {
+                $existing_children[] = $mi;
+
+                $mi_slug = dprd_get_fraksi_slug_from_name($mi->title);
+                $existing_by_slug[$mi_slug] = $mi;
+
+                // Cek slug dari URL menu item juga
+                $path = rtrim(parse_url($mi->url, PHP_URL_PATH) ?: '', '/');
+                $parts = explode('/', $path);
+                $url_slug = end($parts);
+                if ($url_slug && $url_slug !== $mi_slug) {
+                    $existing_by_slug[$url_slug] = $mi;
+                }
+            }
+        }
+
+        $used_existing_ids = [];
+
+        // Update atau buat item menu untuk tiap fraksi sesuai urutan baru
+        foreach ($children as $i => $child_data) {
+            $title = trim($child_data['nama'] ?? '');
+            if (empty($title)) continue;
+
+            $slug = dprd_get_fraksi_slug_from_name($title);
+            $url  = home_url('/profil-dprd/fraksi/' . $slug . '/');
+            $position = $i + 1;
+
+            $db_id = 0;
+            if (isset($existing_by_slug[$slug])) {
+                $matched_item = $existing_by_slug[$slug];
+                $db_id = (int) $matched_item->ID;
+                $used_existing_ids[$db_id] = true;
+            }
+
+            $updated_id = wp_update_nav_menu_item($menu_id, $db_id, [
+                'menu-item-title'     => $title,
+                'menu-item-url'       => $url,
+                'menu-item-type'      => 'custom',
+                'menu-item-object'    => 'custom',
+                'menu-item-status'    => 'publish',
+                'menu-item-parent-id' => $parent_menu_item_id,
+                'menu-item-position'  => $position,
+            ]);
+
+            // Set menu_order secara eksplisit pada wp_posts
+            if ($updated_id && !is_wp_error($updated_id)) {
+                wp_update_post([
+                    'ID'         => $updated_id,
+                    'menu_order' => $position,
+                ]);
+                $used_existing_ids[(int)$updated_id] = true;
+            }
+        }
+
+        // Hapus item menu yang tidak lagi terpakai di data Fraksi
+        foreach ($existing_children as $ex_item) {
+            if (!isset($used_existing_ids[(int)$ex_item->ID])) {
+                wp_delete_post($ex_item->ID, true);
+            }
+        }
+    }
+}
+
+/**
+ * Helper untuk membuat penomoran Komisi yang konsisten dari nama Komisi
+ */
+function dprd_get_komisi_num_from_name($nama) {
+    $roman_map = [
+        'I'    => '1',
+        'II'   => '2',
+        'III'  => '3',
+        'IV'   => '4',
+        'V'    => '5',
+        'VI'   => '6',
+        'VII'  => '7',
+        'VIII' => '8',
+    ];
+
+    $clean = trim(preg_replace('/^komisi\s+/i', '', $nama));
+    $upper = strtoupper($clean);
+
+    if (isset($roman_map[$upper])) {
+        return $roman_map[$upper];
+    }
+    if (is_numeric($clean)) {
+        return $clean;
+    }
+    if (preg_match('/(\d+)/', $nama, $matches)) {
+        return $matches[1];
+    }
+    return sanitize_title($nama);
+}
+
+/**
+ * Sinkronisasi otomatis submenu Komisi di Appearance > Menus (Tampilan > Menu)
+ * dan total Komisi di hero stats dashboard ketika data Komisi diperbarui.
+ */
+function dprd_sync_komisi_nav_menu($json_string) {
+    if (empty($json_string)) return;
+
+    $data = is_array($json_string) ? $json_string : json_decode($json_string, true);
+    if (!is_array($data)) return;
+
+    $name = strtolower(trim($data['nama'] ?? ''));
+    if ($name !== 'komisi' && empty($data['children'])) {
+        return;
+    }
+
+    $raw_children = $data['children'] ?? [];
+    if (!is_array($raw_children)) return;
+
+    $children = [];
+    $seen_nums = [];
+    foreach ($raw_children as $c) {
+        $t = trim($c['nama'] ?? '');
+        if (empty($t)) continue;
+        $num = dprd_get_komisi_num_from_name($t);
+        if (!isset($seen_nums[$num])) {
+            $seen_nums[$num] = true;
+            $children[] = $c;
+        }
+    }
+
+    // Update statistik hero komisi di dashboard
+    update_option('dprd_hero_stats_komisi', count($children));
+
+    // Cari lokasi menu primary atau seluruh menu yang terdaftar
+    $menus_to_sync = [];
+    $locations = get_nav_menu_locations();
+    if (!empty($locations['primary'])) {
+        $menus_to_sync[] = $locations['primary'];
+    }
+
+    if (empty($menus_to_sync)) {
+        $all_menus = wp_get_nav_menus();
+        foreach ($all_menus as $m) {
+            $menus_to_sync[] = $m->term_id;
+        }
+    }
+
+    foreach ($menus_to_sync as $menu_id) {
+        $menu_items = wp_get_nav_menu_items($menu_id);
+        if (!$menu_items || is_wp_error($menu_items)) continue;
+
+        // Cari parent menu item untuk "Komisi"
+        $parent_menu_item_id = 0;
+        foreach ($menu_items as $mi) {
+            $title = strtolower(trim($mi->title));
+            $path  = rtrim(parse_url($mi->url, PHP_URL_PATH) ?: '', '/');
+
+            if ($title === 'komisi' || substr($path, -19) === '/profil-dprd/komisi') {
+                $parent_menu_item_id = (int) $mi->ID;
+                break;
+            }
+        }
+
+        if (!$parent_menu_item_id) continue;
+
+        $existing_children = [];
+        $existing_by_num  = [];
+
+        foreach ($menu_items as $mi) {
+            if ((int)$mi->menu_item_parent === $parent_menu_item_id) {
+                $existing_children[] = $mi;
+
+                $mi_num = dprd_get_komisi_num_from_name($mi->title);
+                $existing_by_num[$mi_num] = $mi;
+
+                $path = rtrim(parse_url($mi->url, PHP_URL_PATH) ?: '', '/');
+                $parts = explode('/', $path);
+                $url_slug = end($parts);
+                if ($url_slug && $url_slug !== $mi_num) {
+                    $existing_by_num[$url_slug] = $mi;
+                }
+            }
+        }
+
+        $used_existing_ids = [];
+
+        foreach ($children as $i => $child_data) {
+            $title = trim($child_data['nama'] ?? '');
+            if (empty($title)) continue;
+
+            $num = dprd_get_komisi_num_from_name($title);
+            $url  = home_url('/profil-dprd/komisi/' . $num . '/');
+            $position = $i + 1;
+
+            $db_id = 0;
+            if (isset($existing_by_num[$num])) {
+                $matched_item = $existing_by_num[$num];
+                $db_id = (int) $matched_item->ID;
+                $used_existing_ids[$db_id] = true;
+            }
+
+            $updated_id = wp_update_nav_menu_item($menu_id, $db_id, [
+                'menu-item-title'     => $title,
+                'menu-item-url'       => $url,
+                'menu-item-type'      => 'custom',
+                'menu-item-object'    => 'custom',
+                'menu-item-status'    => 'publish',
+                'menu-item-parent-id' => $parent_menu_item_id,
+                'menu-item-position'  => $position,
+            ]);
+
+            if ($updated_id && !is_wp_error($updated_id)) {
+                wp_update_post([
+                    'ID'         => $updated_id,
+                    'menu_order' => $position,
+                ]);
+                $used_existing_ids[(int)$updated_id] = true;
+            }
+        }
+
+        foreach ($existing_children as $ex_item) {
+            if (!isset($used_existing_ids[(int)$ex_item->ID])) {
+                wp_delete_post($ex_item->ID, true);
+            }
+        }
+    }
+}
+
+// Hook ke meta updates untuk mengantisipasi update programmatic
+add_action('updated_post_meta', function($meta_id, $object_id, $meta_key, $_meta_value) {
+    if ($meta_key === 'dprd_ak_struktur_json') {
+        $post_slug  = strtolower(get_post_field('post_name', $object_id));
+        $post_title = strtolower(get_post_field('post_title', $object_id));
+        $data       = is_array($_meta_value) ? $_meta_value : json_decode($_meta_value, true);
+        if (is_array($data)) {
+            $name = strtolower(trim($data['nama'] ?? ''));
+            if ($name === 'fraksi' || $post_slug === 'fraksi' || $post_title === 'fraksi') {
+                dprd_sync_fraksi_nav_menu($_meta_value);
+            } elseif ($name === 'komisi' || $post_slug === 'komisi' || $post_title === 'komisi') {
+                dprd_sync_komisi_nav_menu($_meta_value);
+            }
+        }
+    }
+}, 10, 4);
+

@@ -31,6 +31,13 @@ if ($menu_items) {
             $menu_tree[] = &$item_map[$item->ID];
         }
     }
+    foreach ($item_map as $item) {
+        if (!empty($item->children)) {
+            usort($item->children, function($a, $b) {
+                return (int)($a->menu_order ?? 0) <=> (int)($b->menu_order ?? 0);
+            });
+        }
+    }
 }
 
 // Logo

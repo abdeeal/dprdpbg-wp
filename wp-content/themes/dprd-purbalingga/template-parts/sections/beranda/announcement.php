@@ -5,11 +5,13 @@
 if (!defined('ABSPATH')) exit;
 
 $pengumuman_text = get_option('dprd_pengumuman_strip');
-if (empty($pengumuman_text)) {
+if ($pengumuman_text === false) {
     $pengumuman_text = "Sidang Paripurna DPRD Kabupaten Purbalingga berlangsung transparan, akuntabel, dan profesional.";
 }
+$show_marquee = (trim($pengumuman_text) !== '');
 ?>
 
+<?php if ($show_marquee) : ?>
 <div class="sticky top-[64px] z-20">
     <div class="w-full bg-[#11230e] text-white py-3 overflow-hidden whitespace-nowrap flex items-center border-t border-b border-primary/20">
         <div class="flex items-center dprd-marquee-container animate-marquee">
@@ -26,6 +28,10 @@ if (empty($pengumuman_text)) {
         </div>
     </div>
 </div>
+<?php else : ?>
+    <!-- Gap spacing dengan warna background halaman saat pengumuman kosong -->
+    <div class="w-full h-6 sm:h-8 bg-main"></div>
+<?php endif; ?>
 
 <?php
 $raw_banners = get_option('dprd_banner_json', '[]');
