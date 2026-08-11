@@ -246,10 +246,10 @@ function dprd_handle_reservasi_submit() {
     update_post_meta($post_id, 'res_file_url', $file_url);
     update_post_meta($post_id, 'res_status', 'Pending');
 
-    // 8. Kirim Real-time ke Google Sheets Webhook
     // 8. Kirim Real-time ke Google Sheets Webhook dan Upload ke Google Drive
-    // Fallback menggunakan webhook baru pengguna
-    $webhook_url = get_option('dprd_google_sheets_webhook_url', 'https://script.google.com/macros/s/AKfycbyP3sA4xbSGiY3dxyGsM1XTKo-aFA-o2vkBOQaYzlFt8gOWnynACCtMrn6i319wvtAicA/exec');
+    $default_webhook = 'https://script.google.com/macros/s/AKfycbyP3sA4xbSGiY3dxyGsM1XTKo-aFA-o2vkBOQaYzlFt8gOWnynACCtMrn6i319wvtAicA/exec';
+    $saved_url = get_option('dprd_google_sheets_webhook_url');
+    $webhook_url = !empty($saved_url) ? trim($saved_url) : $default_webhook;
     
     if (!empty($webhook_url)) {
         $sheet_data = [
@@ -270,18 +270,40 @@ function dprd_handle_reservasi_submit() {
             'status'           => 'Pending'
         ];
 
-        // Karena mengunggah file 5MB butuh waktu, timeout dinaikkan jadi 60s dan dibuat blocking
+        // Pengiriman dengan sslverify false untuk mencegah kegagalan SSL CA Bundle di live hosting cPanel
         $response = wp_remote_post($webhook_url, [
             'method'      => 'POST',
             'timeout'     => 60,
             'redirection' => 5,
             'httpversion' => '1.1',
-            'blocking'    => true, // Harus blocking untuk dapat response URL Drive
+            'blocking'    => true,
+            'sslverify'   => false,
             'headers'     => ['Content-Type' => 'application/json; charset=utf-8'],
             'body'        => wp_json_encode($sheet_data),
         ]);
 
-        if (!is_wp_error($response)) {
+        // Jika terjadi error cURL/SSL/Timeout atau Payload > 5MB, coba kirim ulang tanpa file Base64 agar data teks tetap masuk ke Google Sheets
+        if (is_wp_error($response) || wp_remote_retrieve_response_code($response) >= 400) {
+            unset($sheet_data['file_base64']);
+            $retry_response = wp_remote_post($webhook_url, [
+                'method'      => 'POST',
+                'timeout'     => 30,
+                'redirection' => 5,
+                'httpversion' => '1.1',
+                'blocking'    => true,
+                'sslverify'   => false,
+                'headers'     => ['Content-Type' => 'application/json; charset=utf-8'],
+                'body'        => wp_json_encode($sheet_data),
+            ]);
+
+            if (!is_wp_error($retry_response)) {
+                $body = wp_remote_retrieve_body($retry_response);
+                $json_resp = json_decode($body, true);
+                if (!empty($json_resp['drive_url'])) {
+                    update_post_meta($post_id, 'res_file_url', $json_resp['drive_url']);
+                }
+            }
+        } else {
             $body = wp_remote_retrieve_body($response);
             $json_resp = json_decode($body, true);
 
