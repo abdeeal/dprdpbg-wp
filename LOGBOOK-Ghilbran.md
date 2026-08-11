@@ -2,7 +2,7 @@
 **Proyek:** Website DPRD Kabupaten Purbalingga (Migrasi Next.js Headless → Full WordPress Native 100% Gratis)  
 **Modul Pengerjaan:** Agenda, Berita Terkini & Detail Berita, Galeri Kegiatan, Sekilas tentang Purbalingga, Unified Category Manager, Optimasi Media WebP, & Pencarian Global  
 **Pengembang:** Ghilbran  
-**Periode Pekerjaan:** 6 Juli 2026 – 7 Agustus 2026  
+**Periode Pekerjaan:** 6 Juli 2026 – 11 Agustus 2026  
 
 ---
 
@@ -184,6 +184,20 @@
 * **Dokumentasi & Push GitHub `[Fase 8]`:**
   * Pembaruan berkas [progres-Ghilbran.md](file:///d:/XAMPP/htdocs/dprd-purbalingga/progres-Ghilbran.md) dan penyesuaian [LOGBOOK-Ghilbran.md](file:///d:/XAMPP/htdocs/dprd-purbalingga/LOGBOOK-Ghilbran.md).
   * Push seluruh hasil pengerjaan ke repositori GitHub.
+
+---
+
+### 🔹 MINGGU 6: PENYUSUNAN BUKU PANDUAN TUTORIAL, DOKUMENTASI, & FINISHING `[FASE 8]` (10 – 11 AGUSTUS 2026)
+
+#### 📅 Senin, 10 Agustus 2026 `[Fase 8 — Penyusunan Buku Panduan Tutorial Admin]`
+* **Penyusunan Buku Panduan Pengguna (User Manual) Bagian I:**
+  * Pembuatan berkas dokumentasi [Panduan-Pengelolaan-Berita-Galeri-Agenda.md](file:///d:/XAMPP/htdocs/dprd-purbalingga/Panduan-Pengelolaan-Berita-Galeri-Agenda.md) sebagai buku panduan tutorial lengkap pengelolaan konten untuk admin Humpro.
+  * Menyusun Bab 1 s.d. Bab 3: Pengenalan alur kerja editor admin WP, tata cara penulisan Berita (auto-detect tanggal, preset penulis `⚡ Humpro DPRD`, sisip foto paragraf dengan live preview, auto-split tags), dan pengelolaan Galeri Kegiatan (auto-title dari nama file, parser pengurutan tanggal, & paginasi mobile).
+
+#### 📅 Selasa, 11 Agustus 2026 `[Fase 8 — Penyempurnaan Tutorial & Finishing Logbook]`
+* **Penyempurnaan Buku Panduan Pengguna (User Manual) Bagian II & Logbook:**
+  * Menyelesaikan Bab 4 s.d. Bab 6 pada [Panduan-Pengelolaan-Berita-Galeri-Agenda.md](file:///d:/XAMPP/htdocs/dprd-purbalingga/Panduan-Pengelolaan-Berita-Galeri-Agenda.md): Pengelolaan Agenda Transparansi (validasi H+0), Fitur Otomatisasi Performa (Auto-compress WebP adaptif & Dropcap), serta panduan Troubleshooting & FAQ.
+  * Refactoring dan penyelarasan akhir berkas jurnal [LOGBOOK-Ghilbran.md](file:///d:/XAMPP/htdocs/dprd-purbalingga/LOGBOOK-Ghilbran.md) hingga siap untuk serah terima proyek dan push repositori GitHub.
 
 ---
 **Status Akhir Pekerjaan Ghilbran:** Seluruh modul yang Anda kerjakan (Agenda, Berita, Galeri Kegiatan, Sekilas tentang Purbalingga, Optimasi Media WebP, Unified Category Manager, & Pencarian Global) pada Fase 0, 1, 2, 3, 4, 5, 6, Fitur Kustom, dan 8 telah 100% selesai dikembangkan dan teruji.

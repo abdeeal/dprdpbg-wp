@@ -83,6 +83,7 @@ require get_template_directory() . '/inc/lucide-icons.php';
 require get_template_directory() . '/inc/insert-default-data.php';
 require get_template_directory() . '/inc/search.php';
 require get_template_directory() . '/inc/backend-reservasi.php';
+require get_template_directory() . '/inc/open-graph.php';
 
 // Autoload all Meta Box controllers
 foreach (glob(get_template_directory() . '/inc/meta-boxes/*.php') as $file) {
