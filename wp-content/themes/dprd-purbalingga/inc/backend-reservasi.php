@@ -252,8 +252,12 @@ function dprd_handle_reservasi_submit() {
     $webhook_url = !empty($saved_url) ? trim($saved_url) : $default_webhook;
     
     if (!empty($webhook_url)) {
+        $tz_jakarta = new DateTimeZone('Asia/Jakarta');
+        $dt_wib = new DateTime('now', $tz_jakarta);
+        $timestamp_wib = $dt_wib->format('Y-m-d H:i:s');
+
         $sheet_data = [
-            'timestamp'        => date('Y-m-d H:i:s'),
+            'timestamp'        => $timestamp_wib,
             'nama_instansi'    => $nama_instansi,
             'email'            => $email,
             'alamat_instansi'  => $alamat_instansi,
