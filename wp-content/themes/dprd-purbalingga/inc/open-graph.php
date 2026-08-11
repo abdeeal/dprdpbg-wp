@@ -90,10 +90,19 @@ function dprd_add_open_graph_meta_tags() {
         $modified_time  = get_the_modified_date('c', $post->ID);
     }
 
-    $clean_title       = esc_attr(trim(wp_strip_all_tags($title)));
-    $clean_description = esc_attr(trim(wp_strip_all_tags($description)));
+    // Clean html entities for title and description
+    $clean_title       = esc_attr(trim(html_entity_decode(wp_strip_all_tags($title), ENT_QUOTES, 'UTF-8')));
+    $clean_description = esc_attr(trim(html_entity_decode(wp_strip_all_tags($description), ENT_QUOTES, 'UTF-8')));
     $clean_url         = esc_url($url);
     $clean_image       = esc_url($image_url);
+
+    // Mime type detection for og:image:type
+    $image_mime = 'image/jpeg';
+    if (preg_match('/\.webp$/i', $clean_image)) {
+        $image_mime = 'image/webp';
+    } elseif (preg_match('/\.png$/i', $clean_image)) {
+        $image_mime = 'image/png';
+    }
     ?>
 
     <!-- Standard SEO Meta Tags -->
@@ -109,10 +118,19 @@ function dprd_add_open_graph_meta_tags() {
     <meta property="og:url" content="<?php echo $clean_url; ?>">
     <meta property="og:image" content="<?php echo $clean_image; ?>">
     <meta property="og:image:secure_url" content="<?php echo $clean_image; ?>">
+    <meta property="og:image:type" content="<?php echo esc_attr($image_mime); ?>">
     <?php if ($image_width && $image_height) : ?>
     <meta property="og:image:width" content="<?php echo esc_attr($image_width); ?>">
     <meta property="og:image:height" content="<?php echo esc_attr($image_height); ?>">
     <?php endif; ?>
+
+    <?php if ($image_mime === 'image/webp') : ?>
+    <!-- PNG Fallback Image for WhatsApp clients that don't support WebP previews -->
+    <meta property="og:image" content="<?php echo esc_url($default_logo); ?>">
+    <meta property="og:image:secure_url" content="<?php echo esc_url($default_logo); ?>">
+    <meta property="og:image:type" content="image/png">
+    <?php endif; ?>
+
     <meta property="og:image:alt" content="<?php echo $clean_title; ?>">
     <meta property="og:locale" content="id_ID">
 
