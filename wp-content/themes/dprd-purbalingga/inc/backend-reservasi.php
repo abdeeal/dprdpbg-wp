@@ -37,9 +37,9 @@ function dprd_render_reservasi_meta_box($post) {
             <th><label>Status Permohonan</label></th>
             <td>
                 <select name="res_status" class="regular-text">
-                    <option value="Pending" <?php selected($status, 'Pending'); ?>>⏳ Menunggu Persetujuan (Pending)</option>
-                    <option value="Disetujui" <?php selected($status, 'Disetujui'); ?>>✅ Disetujui (Approved)</option>
-                    <option value="Ditolak" <?php selected($status, 'Ditolak'); ?>>❌ Ditolak (Rejected)</option>
+                    <option value="Pending" <?php selected($status, 'Pending'); ?>>Menunggu Persetujuan (Pending)</option>
+                    <option value="Disetujui" <?php selected($status, 'Disetujui'); ?>>Disetujui (Approved)</option>
+                    <option value="Ditolak" <?php selected($status, 'Ditolak'); ?>>Ditolak (Rejected)</option>
                 </select>
             </td>
         </tr>
@@ -77,7 +77,7 @@ function dprd_render_reservasi_meta_box($post) {
             <th><label>Narahubung (WhatsApp)</label></th>
             <td>
                 <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $wa); ?>" target="_blank" class="button button-secondary">
-                    💬 Chat WA: <?php echo esc_html($wa); ?>
+                    Chat WA: <?php echo esc_html($wa); ?>
                 </a>
             </td>
         </tr>
@@ -86,7 +86,7 @@ function dprd_render_reservasi_meta_box($post) {
             <td>
                 <?php if ($file_url) : ?>
                     <a href="<?php echo esc_url($file_url); ?>" target="_blank" class="button button-primary">
-                        📄 Lihat / Download Berkas Surat PDF
+                        Lihat / Download Berkas Surat PDF
                     </a>
                 <?php else : ?>
                     <em>Tidak ada lampiran berkas</em>
