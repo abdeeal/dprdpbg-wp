@@ -270,7 +270,7 @@ function dprd_handle_reservasi_submit() {
             'status'           => 'Pending'
         ];
 
-        // Pengiriman dengan sslverify false untuk mencegah kegagalan SSL CA Bundle di live hosting cPanel
+        // Pengiriman tunggal dengan sslverify false untuk mencegah duplikasi & kegagalan SSL CA Bundle di live hosting cPanel
         $response = wp_remote_post($webhook_url, [
             'method'      => 'POST',
             'timeout'     => 60,
@@ -282,32 +282,11 @@ function dprd_handle_reservasi_submit() {
             'body'        => wp_json_encode($sheet_data),
         ]);
 
-        // Jika terjadi error cURL/SSL/Timeout atau Payload > 5MB, coba kirim ulang tanpa file Base64 agar data teks tetap masuk ke Google Sheets
-        if (is_wp_error($response) || wp_remote_retrieve_response_code($response) >= 400) {
-            unset($sheet_data['file_base64']);
-            $retry_response = wp_remote_post($webhook_url, [
-                'method'      => 'POST',
-                'timeout'     => 30,
-                'redirection' => 5,
-                'httpversion' => '1.1',
-                'blocking'    => true,
-                'sslverify'   => false,
-                'headers'     => ['Content-Type' => 'application/json; charset=utf-8'],
-                'body'        => wp_json_encode($sheet_data),
-            ]);
-
-            if (!is_wp_error($retry_response)) {
-                $body = wp_remote_retrieve_body($retry_response);
-                $json_resp = json_decode($body, true);
-                if (!empty($json_resp['drive_url'])) {
-                    update_post_meta($post_id, 'res_file_url', $json_resp['drive_url']);
-                }
-            }
-        } else {
+        if (!is_wp_error($response)) {
             $body = wp_remote_retrieve_body($response);
             $json_resp = json_decode($body, true);
 
-            // Jika Google Drive mengembalikan URL, update meta di WordPress
+            // Jika Google Drive mengembalikan URL berkas, update meta di WordPress
             if (!empty($json_resp['drive_url'])) {
                 update_post_meta($post_id, 'res_file_url', $json_resp['drive_url']);
             }
