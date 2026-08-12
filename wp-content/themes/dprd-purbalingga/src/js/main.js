@@ -271,23 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
     }
 
-    // ── Interaksi Halaman Reservasi ────────────────────────────────────────
-    const btnMinus = document.getElementById('dprd-jumlah-minus');
-    const btnPlus  = document.getElementById('dprd-jumlah-plus');
-    const inputJumlah = document.getElementById('res_jumlah_peserta');
 
-    if (btnMinus && btnPlus && inputJumlah) {
-        btnMinus.addEventListener('click', () => {
-            let val = parseInt(inputJumlah.value) || 1;
-            if (val > 1) {
-                inputJumlah.value = val - 1;
-            }
-        });
-        btnPlus.addEventListener('click', () => {
-            let val = parseInt(inputJumlah.value) || 1;
-            inputJumlah.value = val + 1;
-        });
-    }
 
     const uploadBox = document.getElementById('dprd-upload-box');
     const fileInput = document.getElementById('res_file_surat');
