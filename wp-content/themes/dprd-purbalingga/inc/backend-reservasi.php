@@ -108,34 +108,36 @@ add_action('save_post_reservasi', function($post_id, $post, $update) {
         
         update_post_meta($post_id, 'res_status', $new_status);
 
-        // Jika status berubah, kirim sinkronisasi update status ke Google Sheets
-        $default_webhook = 'https://script.google.com/macros/s/AKfycbyP3sA4xbSGiY3dxyGsM1XTKo-aFA-o2vkBOQaYzlFt8gOWnynACCtMrn6i319wvtAicA/exec';
-        $saved_url = get_option('dprd_google_sheets_webhook_url');
-        $webhook_url = !empty($saved_url) ? trim($saved_url) : $default_webhook;
+        // Kirim sinkronisasi HANYA JIKA status benar-benar berubah
+        if ($old_status !== $new_status) {
+            $default_webhook = 'https://script.google.com/macros/s/AKfycbyP3sA4xbSGiY3dxyGsM1XTKo-aFA-o2vkBOQaYzlFt8gOWnynACCtMrn6i319wvtAicA/exec';
+            $saved_url = get_option('dprd_google_sheets_webhook_url');
+            $webhook_url = !empty($saved_url) ? trim($saved_url) : $default_webhook;
 
-        if (!empty($webhook_url)) {
-            $nama_instansi = get_post_meta($post_id, 'res_nama_instansi', true);
-            $email         = get_post_meta($post_id, 'res_email', true);
-            $tanggal       = get_post_meta($post_id, 'res_tanggal', true);
+            if (!empty($webhook_url)) {
+                $nama_instansi = get_post_meta($post_id, 'res_nama_instansi', true);
+                $email         = get_post_meta($post_id, 'res_email', true);
+                $tanggal       = get_post_meta($post_id, 'res_tanggal', true);
 
-            $sync_payload = [
-                'action'        => 'update_status',
-                'nama_instansi' => $nama_instansi,
-                'email'         => $email,
-                'tanggal'       => $tanggal,
-                'status'        => $new_status,
-            ];
+                $sync_payload = [
+                    'action'        => 'update_status',
+                    'nama_instansi' => $nama_instansi,
+                    'email'         => $email,
+                    'tanggal'       => $tanggal,
+                    'status'        => $new_status,
+                ];
 
-            wp_remote_post($webhook_url, [
-                'method'      => 'POST',
-                'timeout'     => 15,
-                'redirection' => 5,
-                'httpversion' => '1.1',
-                'blocking'    => false, // Async fast response
-                'sslverify'   => false,
-                'headers'     => ['Content-Type' => 'application/json; charset=utf-8'],
-                'body'        => wp_json_encode($sync_payload),
-            ]);
+                wp_remote_post($webhook_url, [
+                    'method'      => 'POST',
+                    'timeout'     => 15,
+                    'redirection' => 5,
+                    'httpversion' => '1.1',
+                    'blocking'    => false, // Async fast response
+                    'sslverify'   => false,
+                    'headers'     => ['Content-Type' => 'application/json; charset=utf-8'],
+                    'body'        => wp_json_encode($sync_payload),
+                ]);
+            }
         }
     }
 }, 10, 3);
