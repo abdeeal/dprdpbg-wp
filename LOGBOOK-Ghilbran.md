@@ -10,8 +10,12 @@
 
 | Fase Pekerjaan | Status | Rincian Pekerjaan & Modul yang Dikerjakan Ghilbran |
 |---|---|---|
-| **Tahap Awal — Pengembangan Web Next.js (6–10 Juli)** | ✅ Dikerjakan | Setup project Next.js (Headless), token warna Tailwind v4, 4 Google Fonts, penyiapan komponen React (`AgendaSection`, `BeritaSection`, `GaleriClient`), & struktur mock data. |
-| **Fase 0 — Setup Lingkungan WordPress & Database** | ✅ Dikerjakan | XAMPP Apache, koneksi Aiven MySQL, custom theme skeleton `dprd-purbalingga`, `.gitignore`. |
+| **Senin, 6 Juli 2026** | ✅ Dikerjakan | Setup & inisialisasi project Next.js (Headless), penyusunan arsitektur folder modul Agenda, Berita, Galeri, dan Sekilas Purbalingga. |
+| **Selasa, 7 Juli 2026** | ✅ Dikerjakan | Setup design system token warna Tailwind v4 (`#82111A`) & integrasi 4 Google Fonts (*Fraunces*, *Plus Jakarta Sans*, *JetBrains Mono*, *Montserrat*). |
+| **Rabu, 8 Juli 2026** | ✅ Dikerjakan | Pembuatan komponen React widget Agenda (`AgendaTransparansiSection`), grid Berita Utama & Terbaru (`BeritaSection`), serta baca artikel (`SingleBerita`). |
+| **Kamis, 9 Juli 2026** | ✅ Dikerjakan | Pembuatan komponen React Galeri Kegiatan (`GaleriClient`) dengan filter tab & penyiapan data statistik BPS 2024 (`sekilasPurbalingga.data.js`). |
+| **Jumat, 10 Juli 2026** | ✅ Dikerjakan | Penyiapan aset gambar `public/images/`, finalisasi UI mockup Next.js, & evaluasi pengalihan arsitektur ke Full WordPress Native. |
+| **Fase 0 — Setup Lingkungan WP (13–14 Juli)** | ✅ Dikerjakan | XAMPP Apache, koneksi Aiven MySQL, custom theme skeleton `dprd-purbalingga`, `.gitignore`. |
 | **Fase 1 — Design System & Asset Dasar WP** | ✅ Dikerjakan | Porting token warna Tailwind & font ke WordPress theme, penyiapan aset `assets/images/`, Vite build pipeline. |
 | **Fase 2 — Content Model CPT & Meta Box** | ✅ Dikerjakan | Pembuatan Custom Meta Box Native untuk CPT `berita` (ringkasan & metadata), CPT `galeri` (uploader foto & kategori), dan CPT `agenda` (tanggal & waktu). |
 | **Fase 3 — Pemetaan Halaman ke Template Hierarchy** | ✅ Dikerjakan | Pemetaan template `archive-berita.php`, `single-berita.php`, `archive-galeri.php`, dan `page-sekilas-tentang-purbalingga.php`. |

@@ -7,8 +7,12 @@ Dokumen ini mencatat seluruh modul, fitur kustom, dan optimasi yang telah disele
 ---
 
 ## 📌 Timeline Ringkasan Alur Pengerjaan
-* **6 – 10 Juli 2026 (Tahap Awal — Next.js Framework)**: Pengembangan awal aplikasi web menggunakan framework **Next.js (Headless)**, mencakup penyiapan basis kode React, token warna Tailwind v4, integrasi 4 Google Fonts (*Fraunces*, *Plus Jakarta Sans*, *JetBrains Mono*, *Montserrat*), serta penyiapan komponen UI React dan mock data JSON untuk modul Agenda, Berita, Galeri, dan Sekilas Purbalingga.
-* **13 Juli 2026 – Sekarang (Tahap Persiapan & Implementasi Full WordPress Native)**: Persiapan dan migrasi menyeluruh ke **WordPress Native (100% Gratis & Tanpa Plugin Berbayar)**. Mencakup penyiapan XAMPP Apache, database cloud Aiven MySQL, kerangka custom theme `wp-content/themes/dprd-purbalingga/`, pendaftaran CPT & Custom Meta Box Native, konversi komponen React ke PHP Template Parts, Vanilla JS interaktivitas, Unified Category Manager, Open Graph Meta Tags sosial media, dan QA akhir.
+* **Senin, 6 Juli 2026**: Inisialisasi basis kode framework **Next.js (Headless)** dan penyusunan arsitektur folder utama untuk modul Agenda, Berita, Galeri, dan Sekilas Purbalingga.
+* **Selasa, 7 Juli 2026**: Setup design system token warna Tailwind v4 (`#82111A`) dan integrasi 4 Google Fonts (*Fraunces*, *Plus Jakarta Sans*, *JetBrains Mono*, *Montserrat*).
+* **Rabu, 8 Juli 2026**: Pembuatan komponen React untuk widget Agenda (`AgendaTransparansiSection.jsx`), grid Berita Utama & Terbaru (`BeritaSection.jsx`), serta halaman artikel (`SingleBerita.jsx`).
+* **Kamis, 9 Juli 2026**: Pembuatan komponen interaktif Galeri Kegiatan (`GaleriClient.jsx`) dengan tab filter & modal preview, serta penyiapan data statistik BPS 2024 (`sekilasPurbalingga.data.js`).
+* **Jumat, 10 Juli 2026**: Penyiapan aset media pendukung di `public/images/`, finalisasi UI mockup Next.js, dan evaluasi transisi strategi pengalihan arsitektur ke Full WordPress Native.
+* **Mulai Senin, 13 Juli 2026 – Sekarang (Tahap Persiapan & Implementasi Full WordPress Native)**: Pelaksanaan migrasi dan implementasi **Full WordPress Native (100% Gratis & Tanpa Plugin Berbayar)**. Mencakup penyiapan XAMPP Apache, database cloud Aiven MySQL, kerangka custom theme `wp-content/themes/dprd-purbalingga/`, pendaftaran CPT & Custom Meta Box Native, konversi komponen React ke PHP Template Parts, Vanilla JS interaktivitas, Unified Category Manager, Open Graph Meta Tags sosial media, dan QA akhir.
 
 ---
 
