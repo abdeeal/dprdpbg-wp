@@ -6,6 +6,12 @@ Dokumen ini mencatat seluruh modul, fitur kustom, dan optimasi yang telah disele
 
 ---
 
+## 📌 Timeline Ringkasan Alur Pengerjaan
+* **6 – 10 Juli 2026 (Tahap Awal — Next.js Framework)**: Pengembangan awal aplikasi web menggunakan framework **Next.js (Headless)**, mencakup penyiapan basis kode React, token warna Tailwind v4, integrasi 4 Google Fonts (*Fraunces*, *Plus Jakarta Sans*, *JetBrains Mono*, *Montserrat*), serta penyiapan komponen UI React dan mock data JSON untuk modul Agenda, Berita, Galeri, dan Sekilas Purbalingga.
+* **13 Juli 2026 – Sekarang (Tahap Persiapan & Implementasi Full WordPress Native)**: Persiapan dan migrasi menyeluruh ke **WordPress Native (100% Gratis & Tanpa Plugin Berbayar)**. Mencakup penyiapan XAMPP Apache, database cloud Aiven MySQL, kerangka custom theme `wp-content/themes/dprd-purbalingga/`, pendaftaran CPT & Custom Meta Box Native, konversi komponen React ke PHP Template Parts, Vanilla JS interaktivitas, Unified Category Manager, Open Graph Meta Tags sosial media, dan QA akhir.
+
+---
+
 ## 📅 1. Agenda & Transparansi Kinerja (Beranda)
 * **File Template:** `template-parts/sections/beranda/agenda.php`
 * **Pekerjaan yang Diselesaikan:**

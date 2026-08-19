@@ -6,12 +6,13 @@
 
 ---
 
-## 📌 PEMETAAN FASE MIGRASI YANG DIKERJAKAN GHILBRAN
+## 📌 PEMETAAN FASE PEKERJAAN & MIGRASI GHILBRAN
 
-| Fase Alur Migrasi | Status | Rincian Modul & Fitur yang Dikerjakan Ghilbran |
+| Fase Pekerjaan | Status | Rincian Pekerjaan & Modul yang Dikerjakan Ghilbran |
 |---|---|---|
-| **Fase 0 — Setup Lingkungan Lokal & Database** | ✅ Dikerjakan | XAMPP Apache, koneksi Aiven MySQL, custom theme skeleton `dprd-purbalingga`, `.gitignore`. |
-| **Fase 1 — Design System & Asset Dasar** | ✅ Dikerjakan | Token warna Tailwind v4, 4 Google Fonts, penyiapan aset `assets/images/`, Vite build pipeline. |
+| **Tahap Awal — Pengembangan Web Next.js (6–10 Juli)** | ✅ Dikerjakan | Setup project Next.js (Headless), token warna Tailwind v4, 4 Google Fonts, penyiapan komponen React (`AgendaSection`, `BeritaSection`, `GaleriClient`), & struktur mock data. |
+| **Fase 0 — Setup Lingkungan WordPress & Database** | ✅ Dikerjakan | XAMPP Apache, koneksi Aiven MySQL, custom theme skeleton `dprd-purbalingga`, `.gitignore`. |
+| **Fase 1 — Design System & Asset Dasar WP** | ✅ Dikerjakan | Porting token warna Tailwind & font ke WordPress theme, penyiapan aset `assets/images/`, Vite build pipeline. |
 | **Fase 2 — Content Model CPT & Meta Box** | ✅ Dikerjakan | Pembuatan Custom Meta Box Native untuk CPT `berita` (ringkasan & metadata), CPT `galeri` (uploader foto & kategori), dan CPT `agenda` (tanggal & waktu). |
 | **Fase 3 — Pemetaan Halaman ke Template Hierarchy** | ✅ Dikerjakan | Pemetaan template `archive-berita.php`, `single-berita.php`, `archive-galeri.php`, dan `page-sekilas-tentang-purbalingga.php`. |
 | **Fase 4 — Convert Komponen React ke PHP Template Parts** | ✅ Dikerjakan | Konversi section Beranda (`agenda.php`, `berita.php`, `galeri.php`), Detail Berita (`single-content.php` dengan Dropcap & Foto Tambahan Paragraf), dan 8 sub-section Sekilas BPS. |
@@ -26,58 +27,64 @@
 
 ---
 
-### 🔹 MINGGU 1: SETUP LINGKUNGAN, DATABASE, & DESIGN SYSTEM `[FASE 0 & 1]` (6 – 10 JULI 2026)
+### 🔹 MINGGU 1: PENGEMBANGAN AWAL WEBSITE MENGGUNAKAN NEXT.JS `[6 – 10 JULI 2026]`
 
-#### 📅 Senin, 6 Juli 2026 `[Fase 0 — Setup Lingkungan]`
-* **Analisis Kebutuhan Migrasi Modul Ghilbran:**
-  * Mempelajari struktur komponen React Next.js untuk modul **Agenda** (`AgendaTransparansiSection.jsx`), **Berita** (`BeritaSection.jsx`, `SingleBerita.jsx`), **Galeri** (`GaleriClient.jsx`), dan **Sekilas Purbalingga** (`sekilasPurbalingga.data.js`).
-  * Perencanaan migrasi full native tanpa plugin berbayar (ACF Pro / Meta Box premium diganti dengan Core API WordPress).
+#### 📅 Senin, 6 Juli 2026 `[Pengembangan Web Next.js — Setup & Arsitektur]`
+* **Inisialisasi Proyek & Arsitektur Aplikasi Next.js:**
+  * Inisialisasi basis kode proyek web menggunakan framework **Next.js (Headless)**.
+  * Penyusunan arsitektur folder utama, routing halaman, dan penyiapan komponen dasar untuk modul **Agenda**, **Berita**, **Galeri**, dan **Sekilas Purbalingga**.
 
-#### 📅 Selasa, 7 Juli 2026 `[Fase 0 — Setup Lingkungan & Database]`
-* **Setup Lingkungan Kerja & Theme Skeleton:**
+#### 📅 Selasa, 7 Juli 2026 `[Pengembangan Web Next.js — Design System & Typography]`
+* **Setup Design System & Typography:**
+  * Penyiapan token warna Tailwind (Primary maroon `#82111A`, secondary, neutral) di `tailwind.config.js`.
+  * Integrasi 4 typography Google Fonts: *Fraunces*, *Plus Jakarta Sans*, *JetBrains Mono*, dan *Montserrat*.
+
+#### 📅 Rabu, 8 Juli 2026 `[Pengembangan Web Next.js — Komponen Agenda & Berita]`
+* **Pembuatan Komponen React (Agenda & Berita):**
+  * Membangun komponen React untuk widget Agenda (`AgendaTransparansiSection.jsx`).
+  * Membangun layout Berita Utama & Grid Berita Terbaru (`BeritaSection.jsx`) serta halaman baca artikel (`SingleBerita.jsx`).
+
+#### 📅 Kamis, 9 Juli 2026 `[Pengembangan Web Next.js — Komponen Galeri & Sekilas Purbalingga]`
+* **Pembuatan Komponen React (Galeri & Sekilas Purbalingga):**
+  * Membangun komponen interaktif Galeri Kegiatan (`GaleriClient.jsx`) dengan sistem tab filter & modal preview.
+  * Menyusun struktur data statistik BPS 2024 dan komponen halaman Sekilas Purbalingga (`sekilasPurbalingga.data.js`).
+
+#### 📅 Jumat, 10 Juli 2026 `[Pengembangan Web Next.js — Finalisasi UI Mockup Next.js]`
+* **Finalisasi UI Mockup & Evaluasi Arsitektur:**
+  * Memindahkan dan merapikan seluruh aset gambar dasar pendukung di `public/images/`.
+  * Evaluasi tampilan UI versi Next.js dan persiapan transisi strategi pengalihan arsitektur menuju **Full WordPress Native (100% Gratis)**.
+
+---
+
+### 🔹 MINGGU 2: PERSIAPAN & MIGRASI FULL WORDPRESS NATIVE `[FASE 0 & 1]` (13 – 17 JULI 2026)
+
+#### 📅 Senin, 13 Juli 2026 `[Fase 0 — Setup Lingkungan WordPress & Database]`
+* **Setup Lingkungan Kerja WordPress & Cloud Database:**
   * Pengaturan server lokal XAMPP Apache dan koneksi database cloud Aiven MySQL (`wp-config.php`).
   * Inisialisasi struktur kerangka custom theme `wp-content/themes/dprd-purbalingga/` (`style.css`, `index.php`, `functions.php`).
   * Konfigurasi `.gitignore` untuk melindungi kredensial database `wp-config.php`, sertifikat `*.pem`, dan aset terkompilasi.
 
-#### 📅 Rabu, 8 Juli 2026 `[Fase 1 — Design System & Tokens]`
-* **Setup Token Warna & Typography:**
-  * Menyalin token warna (Primary maroon `#82111A`, secondary, neutral) dari `tailwind.config.js` proyek Next.js.
-  * Menyiapkan typography Google Fonts: *Fraunces*, *Plus Jakarta Sans*, *JetBrains Mono*, dan *Montserrat*.
+#### 📅 Selasa, 14 Juli 2026 `[Fase 1 — Porting Design System ke Theme WP]`
+* **Porting Token Warna & Style Utilities ke Theme WordPress:**
+  * Memindahkan token warna dan override `@layer utilities` dari Next.js ke `src/css/main.css`.
+  * Menyiapkan pemanggilan Google Fonts pada `header.php` theme.
 
-#### 📅 Kamis, 9 Juli 2026 `[Fase 1 — Penyiapan Aset Media]`
-* **Penyiapan Aset Media:**
-  * Memindahkan aset gambar dasar dari `public/images/` ke `wp-content/themes/dprd-purbalingga/assets/images/`.
-  * Menstrukturkan folder gambar pendukung untuk modul Berita, Galeri, dan Sekilas Purbalingga.
-
-#### 📅 Jumat, 10 Juli 2026 `[Fase 1 — Build Pipeline Asset]`
-* **Setup Build Pipeline Asset:**
-  * Inisialisasi build pipeline Vite + Tailwind CSS v4 (`vite.config.js`, `tailwind.config.js`, `src/css/main.css`, `src/js/main.js`).
+#### 📅 Rabu, 15 Juli 2026 `[Fase 1 — Penyiapan Aset Theme WP & Vite Build]`
+* **Penyiapan Aset Theme & Build Pipeline:**
+  * Memindahkan aset gambar dari `public/images/` ke `wp-content/themes/dprd-purbalingga/assets/images/`.
+  * Konfigurasi Vite + Tailwind v4 build pipeline (`vite.config.js`, `tailwind.config.js`, `src/css/main.css`, `src/js/main.js`).
   * Menghubungkan fungsi enqueue script dan style pada `functions.php` untuk memuat `assets/dist/main.css` dan `assets/dist/main.js`.
 
----
-
-### 🔹 MINGGU 2: PEMBANGUNAN META BOX ADMIN NATIVE `[FASE 2]` (13 – 17 JULI 2026)
-
-#### 📅 Senin, 13 Juli 2026 `[Fase 2 — Content Model CPT]`
-* **Registrasi CPT & Taksonomi Modul Ghilbran:**
+#### 📅 Kamis, 16 Juli 2026 `[Fase 2 — Content Model CPT & Meta Box Berita]`
+* **Registrasi CPT & Custom Meta Box Admin Berita:**
   * Membantu penyesuaian file `inc/post-types.php` untuk CPT `berita`, `galeri`, `agenda`, serta taksonomi `kategori-galeri` di `inc/taxonomies.php`.
-
-#### 📅 Selasa, 14 Juli 2026 `[Fase 2 — Custom Meta Box Berita]`
-* **Pembuatan Custom Meta Box Admin Berita:**
   * Membuat Meta Box Berita (`inc/meta-boxes/berita.php`) dengan penyederhanaan input ringkasan artikel, tanggal, dan waktu untuk pengguna non-teknis.
 
-#### 📅 Rabu, 15 Juli 2026 `[Fase 2 — Custom Meta Box Galeri]`
-* **Pembuatan Custom Meta Box Admin Galeri:**
+#### 📅 Jumat, 17 Juli 2026 `[Fase 2 — Custom Meta Box Galeri & Agenda]`
+* **Pembuatan Custom Meta Box Admin Galeri & Agenda:**
   * Membuat Meta Box Galeri (`inc/meta-boxes/galeri.php`) dengan uploader media foto bawaan WordPress dan daftar kategori galeri kustom.
-
-#### 📅 Kamis, 16 Juli 2026 `[Fase 2 — Custom Meta Box Agenda]`
-* **Pembuatan Custom Meta Box Admin Agenda:**
   * Membuat Meta Box Agenda (`inc/meta-boxes/agenda.php`) dengan mengeliminasi input lokasi & deskripsi yang tumpang tindih agar pas dengan widget beranda.
-
-#### 📅 Jumat, 17 Juli 2026 `[Fase 2 — Refactoring Meta Box Admin]`
-* **Pengujian Simpan Data Meta Box:**
   * Pengujian fungsi `save_post` dan verifikasi simpan data pada seluruh Meta Box Berita, Galeri, dan Agenda.
-  * Penyederhanaan label dan deskripsi petunjuk di admin WordPress agar ramah bagi pengguna non-teknis (admin Humpro).
 
 ---
 
