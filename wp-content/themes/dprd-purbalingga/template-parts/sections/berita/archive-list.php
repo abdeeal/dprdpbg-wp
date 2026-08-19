@@ -85,7 +85,7 @@ $query = new WP_Query($args);
         </div>
 
         <!-- Pagination -->
-        <div class="flex items-center gap-2 text-sm font-sans text-body-secondary mt-8">
+        <div class="flex items-center gap-2 text-sm font-sans text-body-secondary mt-8 justify-center">
             <?php
             $big = 999999999;
             $pages = paginate_links([
@@ -102,19 +102,11 @@ $query = new WP_Query($args);
             if (is_array($pages)) {
                 foreach ($pages as $page) {
                     if (strpos($page, 'current') !== false) {
-                        echo str_replace(
-                            "class='page-numbers current'",
-                            "class='w-8 h-8 flex items-center justify-center rounded bg-primary text-white font-medium'",
-                            $page
-                        );
+                        echo preg_replace('/class=["\'][^"\']*page-numbers\s+current[^"\']*["\']/', 'class="w-9 h-9 flex items-center justify-center rounded-md bg-primary text-white font-medium shadow-sm"', $page);
                     } else if (strpos($page, 'dots') !== false) {
-                        echo '<span class="px-1 tracking-widest">...</span>';
+                        echo '<span class="w-9 h-9 flex items-center justify-center text-body-secondary font-medium">...</span>';
                     } else {
-                        echo str_replace(
-                            "class='page-numbers'",
-                            "class='w-8 h-8 flex items-center justify-center rounded hover:bg-surface transition-colors font-medium hover:text-primary'",
-                            $page
-                        );
+                        echo preg_replace('/class=["\'][^"\']*page-numbers[^"\']*["\']/', 'class="w-9 h-9 flex items-center justify-center rounded-md text-body hover:bg-primary/10 hover:text-primary transition-colors font-medium"', $page);
                     }
                 }
             }
