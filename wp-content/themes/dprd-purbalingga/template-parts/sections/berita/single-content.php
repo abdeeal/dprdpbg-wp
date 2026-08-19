@@ -25,7 +25,10 @@ if (empty($img_url)) {
 // Konten Berita dengan Dropcap otomatis pada huruf pertama (Fase 4 - Kustom)
 $content = get_the_content();
 $content = apply_filters('the_content', $content);
-$content = preg_replace('/\.artikel-content\s*\{.*$/s', '', $content);
+if (($pos = strpos($content, '.artikel-content')) !== false) {
+    $content = substr($content, 0, $pos);
+}
+$content = preg_replace('/<\/div>\s*$/i', '', trim($content));
 $content = trim($content);
 $content = preg_replace('/(<p[^>]*>\s*(?:<[a-zA-Z0-9]+[^>]*>\s*|[“"\'‘\(\[])*)([A-Za-z\p{L}])/u', '$1<span class="dropcap">$2</span>', $content, 1);
 
