@@ -124,13 +124,6 @@ function dprd_add_open_graph_meta_tags() {
     <meta property="og:image:height" content="<?php echo esc_attr($image_height); ?>">
     <?php endif; ?>
 
-    <?php if ($image_mime === 'image/webp') : ?>
-    <!-- PNG Fallback Image for WhatsApp clients that don't support WebP previews -->
-    <meta property="og:image" content="<?php echo esc_url($default_logo); ?>">
-    <meta property="og:image:secure_url" content="<?php echo esc_url($default_logo); ?>">
-    <meta property="og:image:type" content="image/png">
-    <?php endif; ?>
-
     <meta property="og:image:alt" content="<?php echo $clean_title; ?>">
     <meta property="og:locale" content="id_ID">
 
